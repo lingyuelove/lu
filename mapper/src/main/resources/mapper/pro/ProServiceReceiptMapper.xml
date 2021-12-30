@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProServiceReceiptMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProServiceReceipt">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="pro_name" jdbcType="VARCHAR" property="proName" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="price_type" jdbcType="CHAR" property="priceType" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="service_price" jdbcType="DECIMAL" property="servicePrice" />
+    <result column="small_img" jdbcType="VARCHAR" property="smallImg" />
+    <result column="product_img" jdbcType="VARCHAR" property="productImg" />
+    <result column="customer_name" jdbcType="VARCHAR" property="customerName" />
+    <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone" />
+    <result column="customer_address" jdbcType="VARCHAR" property="customerAddress" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+    <result column="save_end_time" jdbcType="TIMESTAMP" property="saveEndTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_pro_product_id, fk_shp_shop_id, number, type, pro_name, state, price_type, 
+    price, service_price, small_img, product_img, customer_name, customer_phone, customer_address, 
+    insert_time, update_time, finish_time, save_end_time, insert_admin, update_admin, 
+    versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from pro_service_receipt
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_service_receipt
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProServiceReceipt">
+    insert into pro_service_receipt
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkProProductId != null">
+        fk_pro_product_id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="number != null">
+        number,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="proName != null">
+        pro_name,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="priceType != null">
+        price_type,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="servicePrice != null">
+        service_price,
+      </if>
+      <if test="smallImg != null">
+        small_img,
+      </if>
+      <if test="productImg != null">
+        product_img,
+      </if>
+      <if test="customerName != null">
+        customer_name,
+      </if>
+      <if test="customerPhone != null">
+        customer_phone,
+      </if>
+      <if test="customerAddress != null">
+        customer_address,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="finishTime != null">
+        finish_time,
+      </if>
+      <if test="saveEndTime != null">
+        save_end_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkProProductId != null">
+        #{fkProProductId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="number != null">
+        #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="priceType != null">
+        #{priceType,jdbcType=CHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="servicePrice != null">
+        #{servicePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="smallImg != null">
+        #{smallImg,jdbcType=VARCHAR},
+      </if>
+      <if test="productImg != null">
+        #{productImg,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null">
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerPhone != null">
+        #{customerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerAddress != null">
+        #{customerAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saveEndTime != null">
+        #{saveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProServiceReceipt">
+    update pro_service_receipt
+    <set>
+      <if test="fkProProductId != null">
+        fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="number != null">
+        number = #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        pro_name = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="priceType != null">
+        price_type = #{priceType,jdbcType=CHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="servicePrice != null">
+        service_price = #{servicePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="smallImg != null">
+        small_img = #{smallImg,jdbcType=VARCHAR},
+      </if>
+      <if test="productImg != null">
+        product_img = #{productImg,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null">
+        customer_name = #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerPhone != null">
+        customer_phone = #{customerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerAddress != null">
+        customer_address = #{customerAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saveEndTime != null">
+        save_end_time = #{saveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

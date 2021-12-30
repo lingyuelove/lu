@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProDynamicProductMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProDynamicProduct">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_pro_dynamic_id" jdbcType="INTEGER" property="fkProDynamicId"/>
+
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="VARCHAR" property="del"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_pro_dynamic_id,
+		fk_pro_product_id,
+		state,
+		fk_shp_shop_id,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+	</sql>
+
+    <!--批量插入-->
+    <insert id="saveBatch" parameterType="java.util.List">
+        insert into pro_dynamic_product (
+        fk_pro_dynamic_id,
+        fk_pro_product_id,
+        state,
+        fk_shp_shop_id,
+        insert_time,
+        update_time,
+        insert_admin,
+        update_admin)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.fkProDynamicId,jdbcType=INTEGER},
+            #{item.fkProProductId,jdbcType=INTEGER},
+            #{item.state,jdbcType=INTEGER},
+            #{item.fkShpShopId,jdbcType=INTEGER},
+            #{item.insertTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.insertAdmin,jdbcType=INTEGER},
+            #{item.updateAdmin,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProDynamicProduct" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into pro_dynamic_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkProDynamicId!=null ">
+                fk_pro_dynamic_id,
+            </if>
+            <if test="fkProProductId!=null ">
+                fk_pro_product_id,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="fkShpShopId!=null ">
+                fk_shp_shop_id,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkProDynamicId!=null">
+                #{fkProDynamicId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId!=null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  pro_dynamic_product 
+
+		where id = #{id} 
+ 
+
+	</delete>
+    <delete id="deleteDynamicProductByProIds">
+        update pro_dynamic_product set del = 1
+        where fk_pro_product_id  in
+        <foreach collection="proIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and fk_shp_shop_id = #{shopId}
+    </delete>
+    <update id="deleteDynamicProductByProId">
+        update pro_dynamic_product set del = 1
+        where fk_pro_product_id  = #{proId}
+        and fk_shp_shop_id = #{shopId}
+    </update>
+    <update id="deleteDynamicProductByDynamicIds" parameterType="java.util.List">
+        update pro_dynamic_product set del = 1
+        where fk_pro_dynamic_id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="deleteDynamicProduct" parameterType="java.util.List">
+        update pro_dynamic_product set del = 1 where id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProDynamicProduct">
+        update pro_dynamic_product
+        <set>
+            <if test="fkProDynamicId!=null">
+                fk_pro_dynamic_id = #{fkProDynamicId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId!=null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null and del!=''">
+                del = #{del,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+    <update id="updateByIds">
+        update pro_dynamic_product set fk_pro_dynamic_id = #{dynamicId} where id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateStateByProId">
+        update pro_dynamic_product set state = #{state}
+        where fk_pro_product_id = #{proId}
+        and fk_shp_shop_id = #{shopId}
+        and del = 0
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_pro_dynamic_id,
+		fk_pro_product_id,
+		state,
+		fk_shp_shop_id,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+		from pro_dynamic_product
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="listCountByDynamicIds" resultType="com.luxuryadmin.vo.pro.VoCountDynamic"
+            parameterType="java.util.List">
+        SELECT
+        pdp.id,
+        pdp.fk_pro_dynamic_id AS fkProDynamicId,
+        sum( pp.total_num ) AS totalNum
+        FROM
+        pro_dynamic_product pdp
+        LEFT JOIN pro_product pp ON pdp.fk_pro_product_id = pp.id
+        WHERE
+        pdp.del = 0
+        AND pdp.fk_pro_dynamic_id in
+        <foreach collection="dynamicIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and pp.id is not null
+        GROUP BY
+        pdp.fk_pro_dynamic_id
+    </select>
+    <select id="listDynamicProduct" resultType="com.luxuryadmin.vo.pro.VoDynamicProductList"
+            parameterType="com.luxuryadmin.param.pro.ParamDynamicProductQuery">
+		SELECT
+			pdp.id AS dynamicProductId,
+			pro.id AS proId,
+			pro.remark as remark,
+			pdp.state AS state,
+			pdp.update_time as updateTime,
+			( SELECT uShopR.`name` FROM shp_user_shop_ref uShopR WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id AND uShopR.fk_shp_user_id = pdp.insert_admin ) AS 'userName',
+			pro.`total_num` as totalNum,
+			pdp.insert_time AS showTime,
+			pd.unique_code uniqueCode,
+			pro.`name` 'name',
+			pro.`small_img` 'smallImg',
+			pro.`init_price` * pro.`total_num` 'initPrice',
+			pro.target_user AS targetUser,
+			pro.fk_pro_attribute_code AS attributeUs,
+			pro.fk_pro_classify_code 'classifyUs',
+			pro.insert_time 'uploadStoreTime',
+			pro.biz_id AS bizId,
+			pro.fk_shp_shop_id AS shopId
+		FROM
+			pro_dynamic_product pdp
+			LEFT JOIN pro_product pro ON pdp.fk_pro_product_id = pro.id
+			LEFT JOIN shp_user su ON pdp.insert_admin = su.id
+			LEFT JOIN pro_detail pd ON pdp.fk_pro_product_id = pd.fk_pro_product_id
+		where
+			pdp.del = 0
+			and pdp.fk_pro_dynamic_id =#{dynamicId}  and pro.id is not null
+	</select>
+    <select id="getDynamicProductInfoByProductId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_dynamic_product
+        where fk_pro_product_id in
+        <foreach collection="proIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and fk_shp_shop_id = #{shopId}
+        and del = 0
+    </select>
+
+
+</mapper>

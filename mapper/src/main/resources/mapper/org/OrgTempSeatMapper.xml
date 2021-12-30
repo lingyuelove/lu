@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.org.OrgTempSeatMapper">
+
+    <select id="getShopTempSeat" parameterType="java.lang.Integer" resultType="com.luxuryadmin.vo.org.VoTempSeatList">
+        select
+        id as id
+        ,fk_shp_shop_id as shopId
+        ,name as name
+        from org_temp_seat
+        where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getObjectById" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.org.OrgTempSeat">
+        select
+         id
+        ,fk_shp_shop_id  as fkShpShopId
+        ,name as name
+        ,insert_time as insertTime
+        ,insert_admin as insertAdmin
+        from org_temp_seat
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getTempSeatByName" parameterType="java.lang.String" resultType="com.luxuryadmin.entity.org.OrgTempSeat">
+        select
+        *
+        from org_temp_seat
+        where name = #{name,jdbcType=VARCHAR}  and fk_shp_shop_id = #{shopId,jdbcType=INTEGER} limit 1
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from org_temp_seat
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByShopId" parameterType="java.lang.Integer">
+        delete from org_temp_seat
+        where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.org.OrgTempSeat" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into org_temp_seat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+
+        </trim>
+    </insert>
+
+</mapper>

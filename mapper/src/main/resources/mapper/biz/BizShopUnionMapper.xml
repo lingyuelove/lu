@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizShopUnionMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizShopUnion">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="CHAR" property="del"/>
+
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+    </resultMap>
+
+    <select id="getUnionForAdminList" parameterType="com.luxuryadmin.param.biz.ParamShopUnionForAdminBySearch"
+            resultType="com.luxuryadmin.vo.biz.VoShopUnionForAdminList">
+        select
+        su.id,
+        su.fk_shp_shop_id as shopId,
+        su.insert_time as insertTime,
+        ss.number as number,
+        ss.name as name,
+        det.upload_state 'uploadState',
+        CONCAT(
+        det.`province`,
+        det.`city`,
+        ss.address
+        ) 'address',
+        (SELECT IFNULL(SUM(pro.total_num), 0) FROM
+        pro_product pro WHERE pro.fk_pro_state_code BETWEEN 20 AND 39 and pro.`fk_shp_shop_id` =
+        su.`fk_shp_shop_id`)'totalNum',
+        (SELECT IFNULL(SUM(pro.total_num), 0) FROM
+        pro_product pro WHERE pro.fk_pro_state_code BETWEEN 20 AND 39 and pro.`fk_shp_shop_id` =
+        su.`fk_shp_shop_id` and  #{tradePrice} &lt; pro.`trade_price`)'totalTradePriceNum',
+        ss.contact as contact,
+        ss.member_state as memberState,
+        <if test="type != null and type == '10'">
+            ss.contact as phoneNumber,
+        </if>
+        ss.pay_start_time as payStartTime,
+        su.insert_time as shopInsertTime
+        from biz_shop_union su left join shp_shop ss on su.fk_shp_shop_id = ss.id
+        LEFT JOIN shp_detail det
+        ON su.`fk_shp_shop_id` = det.`fk_shp_shop_id`
+        <!-- <if test="type != null and type == '10'">
+             left join  shp_user sus ON su.`fk_shp_shop_id` = sus.`fk_shp_shop_id`
+         </if>-->
+        where su.state >0
+        <if test="phone != null and type == '20'">
+            and ss.contact like CONCAT('%',#{phone},'%')
+        </if>
+        <if test="phone != null and type == '10'">
+            and ss.contact like CONCAT('%',#{phone},'%')
+        </if>
+        <if test="type != null ">
+            and su.type = #{type}
+        </if>
+
+        <if test="memberState == '1' or memberState == 1  ">
+            and (ss.member_state = '2' or ss.member_state = '3')
+        </if>
+        <if test="memberState == '0' or memberState == 0 ">
+            and (ss.member_state = '0' or ss.member_state = '1')
+        </if>
+        <if test="insertTimeStart != null">
+            and su.insert_time <![CDATA[>=]]> #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and su.insert_time <![CDATA[<=]]> #{insertTimeEnd}
+        </if>
+        <if test="shopName != null and shopName != ''">
+            and ss.name like CONCAT('%',#{shopName},'%')
+        </if>
+        <if test="shopNumber != null and shopNumber != ''">
+            and ss.number like CONCAT('%',#{shopNumber},'%')
+        </if>
+        <if test="shopId != null ">
+            and ss.id like CONCAT('%',#{shopId},'%')
+        </if>
+        <if test="uploadState != null ">
+            and det.upload_state = #{uploadState}
+        </if>
+        order by su.insert_time desc
+    </select>
+    <!-- 根据店铺id获取是否已添加至联盟 只获取最近新增的一条记录-->
+    <select id="getByShopId" resultMap="BaseResultMap">
+        select
+        id,
+        fk_shp_shop_id,
+        state,
+        type,
+        insert_time,
+        update_time,
+        insert_admin,
+        update_admin,
+        del,
+        remark
+        from biz_shop_union
+        where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        order by id desc limit 1
+    </select>
+
+    <!--app端详情 -->
+    <select id="getShopUnionForAppByShopId" parameterType="Integer"
+            resultType="com.luxuryadmin.vo.biz.VoShopUnionByAppShow">
+        select
+        ss.id as shopId,
+        ss.number as shopNumber,
+        ss.name as shopName,
+        ss.cover_img_url as coverImgUrl,
+        ss.head_img_url as headImgUrl
+        from shp_shop ss
+        where ss.id = #{shopId,jdbcType=INTEGER}
+    </select>
+
+
+    <sql id="Base_Column_List">
+        id,
+        fk_shp_shop_id,
+        state,
+        type,
+        insert_time,
+        update_time,
+        insert_admin,
+        update_admin,
+        del,
+        remark
+    </sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizShopUnion" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into biz_shop_union
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkShpShopId!=null ">
+                fk_shp_shop_id,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="type!=null ">
+                type,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+            <if test="remark!=null ">
+                remark,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="type!=null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark!=null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+        delete from biz_shop_union
+
+        where id = #{id}
+
+
+    </delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizShopUnion">
+        update biz_shop_union
+        <set>
+            <if test="fkShpShopId!=null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="type!=null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+        select
+        id,
+        fk_shp_shop_id,
+        state,
+        type,
+        insert_time,
+        update_time,
+        insert_admin,
+        update_admin,
+        del,
+        remark
+        from biz_shop_union
+        where id = #{id,jdbcType=INTEGER}
+
+    </select>
+
+
+    <select resultMap="BaseResultMap" id="bizShopUniontest">
+        select * from biz_shop_union
+    </select>
+
+    <select id="listBizShopUnionByState" resultMap="BaseResultMap">
+        select * from biz_shop_union where state = #{state}
+    </select>
+
+    <!--获取商家联盟小程序分享用户组-->
+    <select id="listUnionMpShareUser" resultType="com.luxuryadmin.vo.shp.VoShpUser">
+        SELECT
+          id,
+          nickname
+        FROM
+          shp_user
+        WHERE id IN
+          (SELECT
+            fk_shp_user_id
+          FROM
+            pro_share_see_user
+          WHERE TYPE = 1
+          GROUP BY fk_shp_user_id)
+    </select>
+</mapper>

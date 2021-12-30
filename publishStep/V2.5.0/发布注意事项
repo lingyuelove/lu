@@ -1,0 +1,27 @@
+
+
+二、后台添加APP首页菜单
+  测试和线上OSS图片都已上传，线上后台管理系统需要配置。
+  1.线上云仓
+  (1)线上云仓:onlineOrgTemp
+      /default/functionIcon/onlineOrgTemp.png
+      查看
+      onlineOrgTemp:list
+      /getOrganizationPageByApp 机构版临时仓app端集合显示 接口已添加权限
+      /getOrganizationTempPageByApp 机构临时仓详情app端集合显示 接口已添加权限
+      /getTempProductOrgByApp 所有商品页面--机构临时仓 接口已添加权限
+      /getTempProductOrgForShopByApp 机构临时仓--机构临时仓 接口已添加权限
+      添加
+     onlineOrgTemp:add
+      /addOrganization 机构版临时仓创建 接口已添加权限
+      /getVoTempForOrg 机构版临时仓提取--临时仓信息接口已添加权限
+      /addOrganizationTemp 提取【机构临时仓】接口已添加权限
+      修改
+      onlineOrgTemp:update
+      /updateOrganization 机构版临时仓修改 接口已添加权限
+      /updateOrganizationTemp 修改【机构临时仓详情】接口已添加权限
+      删除
+      onlineOrgTemp:delete
+      /deleteOrganization 机构版临时仓删除 接口已添加权限
+      /delete 删除【机构临时仓详情】 接口已添加权限
+

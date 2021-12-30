@@ -1,0 +1,21 @@
+
+
+二、后台添加APP首页菜单
+  测试和线上OSS图片都已上传，线上后台管理系统需要配置。
+  1.仓库模块
+  (1)商品盘点:checkProduct
+      /default/functionIcon/checkProduct.png
+      查看
+      checkProduct:list
+      /getCheckListForApi 接口已添加权限
+      添加
+     checkProduct:addCheck
+      /addCheck 接口已添加权限
+      修改
+      checkProduct:updateCheckState
+      /updateCheckState 接口已添加权限
+      /updateCheckProduct 接口已添加权限
+      删除
+      checkProduct:deleteCheck
+      /deleteCheck 接口已添加权限
+

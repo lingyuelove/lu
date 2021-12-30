@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.stat.StatShopMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.stat.StatShop">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="prod_num_upload" jdbcType="INTEGER" property="prodNumUpload" />
+    <result column="prod_num_onsale" jdbcType="INTEGER" property="prodNumOnsale" />
+    <result column="total_sale_num" jdbcType="INTEGER" property="totalSaleNum" />
+    <result column="total_sale_amount" jdbcType="DECIMAL" property="totalSaleAmount" />
+    <result column="shop_staff_num" jdbcType="INTEGER" property="shopStaffNum" />
+    <result column="shop_leaguer_num" jdbcType="INTEGER" property="shopLeaguerNum" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id, prod_num_upload, prod_num_onsale, total_sale_num, total_sale_amount, 
+    shop_staff_num, shop_leaguer_num, insert_time, update_time
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from stat_shop
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+    <select id="selectStatShopByShopId" resultMap="BaseResultMap">
+      select
+        <include refid="Base_Column_List" />
+      from
+        stat_shop
+      where
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 根据排序字段查询店铺排名 -->
+    <select id="selectStatDataShopRank" resultType="com.luxuryadmin.vo.stat.VoStateShopRank">
+        SELECT
+            t2.`name` as 'shopName',
+            showData AS 'showData'
+        FROM
+            (
+                SELECT
+                    fk_shp_shop_id,
+                    SUM(${rankField}) 'showData'
+                FROM
+                    stat_shop
+                GROUP BY
+                    fk_shp_shop_id
+                ORDER BY
+                    ${rankField} DESC
+                LIMIT 10
+            ) t1
+        LEFT JOIN (
+            SELECT
+                id,
+                `name`
+            FROM
+                shp_shop
+        ) t2 ON t1.fk_shp_shop_id = t2.id
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from stat_shop
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.stat.StatShop">
+    insert into stat_shop
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="prodNumUpload != null">
+        prod_num_upload,
+      </if>
+      <if test="prodNumOnsale != null">
+        prod_num_onsale,
+      </if>
+      <if test="totalSaleNum != null">
+        total_sale_num,
+      </if>
+      <if test="totalSaleAmount != null">
+        total_sale_amount,
+      </if>
+      <if test="shopStaffNum != null">
+        shop_staff_num,
+      </if>
+      <if test="shopLeaguerNum != null">
+        shop_leaguer_num,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="prodNumUpload != null">
+        #{prodNumUpload,jdbcType=INTEGER},
+      </if>
+      <if test="prodNumOnsale != null">
+        #{prodNumOnsale,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleNum != null">
+        #{totalSaleNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleAmount != null">
+        #{totalSaleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="shopStaffNum != null">
+        #{shopStaffNum,jdbcType=INTEGER},
+      </if>
+      <if test="shopLeaguerNum != null">
+        #{shopLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.stat.StatShop">
+    update stat_shop
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="prodNumUpload != null">
+        prod_num_upload = #{prodNumUpload,jdbcType=INTEGER},
+      </if>
+      <if test="prodNumOnsale != null">
+        prod_num_onsale = #{prodNumOnsale,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleNum != null">
+        total_sale_num = #{totalSaleNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleAmount != null">
+        total_sale_amount = #{totalSaleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="shopStaffNum != null">
+        shop_staff_num = #{shopStaffNum,jdbcType=INTEGER},
+      </if>
+      <if test="shopLeaguerNum != null">
+        shop_leaguer_num = #{shopLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.stat.StatShop">
+    update stat_shop
+    set fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      prod_num_upload = #{prodNumUpload,jdbcType=INTEGER},
+      prod_num_onsale = #{prodNumOnsale,jdbcType=INTEGER},
+      total_sale_num = #{totalSaleNum,jdbcType=INTEGER},
+      total_sale_amount = #{totalSaleAmount,jdbcType=DECIMAL},
+      shop_staff_num = #{shopStaffNum,jdbcType=INTEGER},
+      shop_leaguer_num = #{shopLeaguerNum,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pay.PayOrderMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pay.PayOrder">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="transaction_id" jdbcType="VARCHAR" property="transactionId"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="total_money" jdbcType="DECIMAL" property="totalMoney"/>
+        <result column="discount_money" jdbcType="DECIMAL" property="discountMoney"/>
+        <result column="real_money" jdbcType="DECIMAL" property="realMoney"/>
+        <result column="order_type" jdbcType="VARCHAR" property="orderType"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="pay_channel" jdbcType="VARCHAR" property="payChannel"/>
+        <result column="pay_platform" jdbcType="VARCHAR" property="payPlatform"/>
+        <result column="trade_type" jdbcType="VARCHAR" property="tradeType"/>
+        <result column="create_type" jdbcType="VARCHAR" property="createType"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , fk_shp_shop_id, fk_shp_user_id, goods_name, transaction_id, order_no, total_money,
+    discount_money, real_money, order_type, state, pay_channel, pay_platform, trade_type, 
+    create_type, insert_time, update_time, pay_time, finish_time, insert_admin, update_admin, 
+    remark,open_id
+    </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pay_order
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--根据平台订单号获取支付记录-->
+    <select id="getPayOrderByOrderNo" resultMap="BaseResultMap">
+        SELECT *
+        FROM pay_order
+        WHERE order_no = #{orderNo}
+          and fk_shp_user_id = #{userId}
+    </select>
+
+    <!--根据支付平台订单号获取支付记录;如: 微信支付返回的订单号, 支付宝返回的订单号-->
+    <select id="getPayOrderByTransactionId" resultMap="BaseResultMap">
+        SELECT *
+        FROM pay_order
+        WHERE transaction_id = #{transactionId}
+          and fk_shp_user_id = #{userId}
+    </select>
+
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete
+        from pay_order
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pay.PayOrder">
+        insert into pay_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="goodsName != null">
+                goods_name,
+            </if>
+            <if test="transactionId != null">
+                transaction_id,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="totalMoney != null">
+                total_money,
+            </if>
+            <if test="discountMoney != null">
+                discount_money,
+            </if>
+            <if test="realMoney != null">
+                real_money,
+            </if>
+            <if test="orderType != null">
+                order_type,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="openId != null">
+                open_id,
+            </if>
+            <if test="payChannel != null">
+                pay_channel,
+            </if>
+            <if test="payPlatform != null">
+                pay_platform,
+            </if>
+            <if test="tradeType != null">
+                trade_type,
+            </if>
+            <if test="createType != null">
+                create_type,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="payTime != null">
+                pay_time,
+            </if>
+            <if test="finishTime != null">
+                finish_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                #{goodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionId != null">
+                #{transactionId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalMoney != null">
+                #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="discountMoney != null">
+                #{discountMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="realMoney != null">
+                #{realMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="payChannel != null">
+                #{payChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="payPlatform != null">
+                #{payPlatform,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType != null">
+                #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="createType != null">
+                #{createType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime != null">
+                #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime != null">
+                #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pay.PayOrder">
+        update pay_order
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                goods_name = #{goodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionId != null">
+                transaction_id = #{transactionId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalMoney != null">
+                total_money = #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="discountMoney != null">
+                discount_money = #{discountMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="realMoney != null">
+                real_money = #{realMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="orderType != null">
+                order_type = #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="payChannel != null">
+                pay_channel = #{payChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="payPlatform != null">
+                pay_platform = #{payPlatform,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType != null">
+                trade_type = #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="createType != null">
+                create_type = #{createType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime != null">
+                pay_time = #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="pageVoMemShopOrder" parameterType="com.luxuryadmin.param.mem.ParamMemShopOrder"
+            resultType="com.luxuryadmin.vo.mem.VoMemShopOrder">
+        SELECT
+        po.transaction_id AS transactionId
+        ,ss.number AS shopNumber
+        ,ss.name AS shopName
+        ,ss.contact AS phone
+        ,"年费会员" AS memberType
+        ,po.pay_channel AS payChannel
+        ,po.real_money AS realMoney
+        ,po.insert_time AS insertTime
+        ,po.state AS state
+        FROM
+        pay_order po
+        LEFT JOIN shp_shop ss
+        ON po.fk_shp_shop_id = ss.id
+
+        WHERE 1=1
+        <if test="transactionId != null and transactionId != ''">
+            and po.transaction_id like CONCAT('%',#{transactionId},'%')
+        </if>
+        <if test="phone != null">
+            and ss.contact like CONCAT('%',#{phone},'%')
+        </if>
+        <if test="shopNumber != null">
+            and ss.number like CONCAT('%',#{shopNumber},'%')
+        </if>
+        <if test="state != null and state == 10">
+            and po.state = #{state}
+        </if>
+        <if test="state != null and state == 11">
+            and (po.state <![CDATA[>=]]>11 or po.state <![CDATA[<=]]>12)
+        </if>
+        <if test="state != null and state == 20">
+            and po.state = #{state}
+        </if>
+        <if test="state != null and state == 30">
+            and (po.state <![CDATA[>=]]>30 and po.state <![CDATA[<=]]>32)
+        </if>
+        <if test="state != null and state == 40">
+            and (po.state <![CDATA[>=]]>33 and po.state <![CDATA[<=]]>40)
+        </if>
+        <if test="payChannel != null ">
+            and po.pay_channel = #{payChannel}
+        </if>
+        <if test="insertTimeStart != null">
+            and po.insert_time <![CDATA[>=]]> #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} <![CDATA[>=]]> po.insert_time
+        </if>
+
+        order by po.insert_time desc
+    </select>
+    <select id="getVoPayOrderShopForAdmin"
+            resultType="com.luxuryadmin.vo.pay.VoPayOrderShopForAdmin">
+        SELECT
+        po.goods_name AS goodsName
+        ,po.create_type AS createType
+        ,po.remark AS remark
+        ,po.finish_time AS finishTime
+        FROM
+        pay_order po
+
+        WHERE state = 40 and
+            po.fk_shp_shop_id = #{fkShpShopId}
+
+        order by po.insert_time desc
+    </select>
+</mapper>

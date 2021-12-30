@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProConveyMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProConvey">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_send_shop_id" jdbcType="INTEGER" property="fkSendShopId" />
+
+		<result column="fk_receive_shop_id" jdbcType="INTEGER" property="fkReceiveShopId" />
+
+		<result column="number" jdbcType="VARCHAR" property="number" />
+
+		<result column="name" jdbcType="VARCHAR" property="name" />
+
+		<result column="send_state" jdbcType="VARCHAR" property="sendState" />
+
+		<result column="receive_state" jdbcType="VARCHAR" property="receiveState" />
+
+		<result column="send_del" jdbcType="VARCHAR" property="sendDel" />
+
+		<result column="receive_del" jdbcType="VARCHAR" property="receiveDel" />
+
+		<result column="receive_user_id" jdbcType="INTEGER" property="receiveUserId" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_send_shop_id,
+		fk_receive_shop_id,
+		number,
+		name,
+		send_state,
+		receive_state,
+		send_del,
+		receive_del,
+		receive_user_id,
+		insert_admin,
+		update_admin,
+		receive_time,
+		insert_time,
+		update_time,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProConvey" keyProperty="id"
+			useGeneratedKeys="true">
+		insert into pro_convey
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id,
+			</if>
+			<if test="fkSendShopId!=null ">
+				fk_send_shop_id,
+			</if>
+			<if test="fkReceiveShopId!=null ">
+				fk_receive_shop_id,
+			</if>
+			<if test="number!=null ">
+				number,
+			</if>
+			<if test="name!=null ">
+				name,
+			</if>
+			<if test="sendState!=null ">
+				send_state,
+			</if>
+			<if test="receiveState!=null ">
+				receive_state,
+			</if>
+			<if test="sendDel!=null ">
+				send_del,
+			</if>
+			<if test="receiveDel!=null ">
+				receive_del,
+			</if>
+			<if test="receiveUserId!=null ">
+				receive_user_id,
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin,
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin,
+			</if>
+			<if test="receiveTime!=null ">
+				receive_time,
+			</if>
+			<if test="insertTime!=null ">
+				insert_time,
+			</if>
+			<if test="updateTime!=null ">
+				update_time,
+			</if>
+			<if test="remark!=null ">
+				remark,
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkSendShopId!=null">
+				#{fkSendShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkReceiveShopId!=null">
+				#{fkReceiveShopId,jdbcType=INTEGER},
+			</if>
+			<if test="number!=null">
+				#{number,jdbcType=VARCHAR},
+			</if>
+			<if test="name!=null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="sendState!=null">
+				#{sendState,jdbcType=VARCHAR},
+			</if>
+			<if test="receiveState!=null">
+				#{receiveState,jdbcType=VARCHAR},
+			</if>
+			<if test="sendDel!=null">
+				#{sendDel,jdbcType=VARCHAR},
+			</if>
+			<if test="receiveDel!=null">
+				#{receiveDel,jdbcType=VARCHAR},
+			</if>
+			<if test="receiveUserId!=null">
+				#{receiveUserId,jdbcType=INTEGER},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="receiveTime!=null">
+				#{receiveTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_convey 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProConvey" >
+		update pro_convey
+		<set>
+			<if test="fkSendShopId!=null">
+				fk_send_shop_id = #{fkSendShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkReceiveShopId!=null">
+				fk_receive_shop_id = #{fkReceiveShopId,jdbcType=INTEGER},
+			</if>
+			<if test="number!=null and number!=''">
+				number = #{number,jdbcType=VARCHAR},
+			 </if>
+			<if test="name!=null and name!=''">
+				name = #{name,jdbcType=VARCHAR},
+			 </if>
+			<if test="sendState!=null and sendState!=''">
+				send_state = #{sendState,jdbcType=VARCHAR},
+			 </if>
+			<if test="receiveState!=null and receiveState!=''">
+				receive_state = #{receiveState,jdbcType=VARCHAR},
+			 </if>
+			<if test="sendDel!=null and sendDel!=''">
+				send_del = #{sendDel,jdbcType=VARCHAR},
+			 </if>
+			<if test="receiveDel!=null and receiveDel!=''">
+				receive_del = #{receiveDel,jdbcType=VARCHAR},
+			 </if>
+			<if test="receiveUserId!=null">
+				receive_user_id = #{receiveUserId,jdbcType=INTEGER},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="receiveTime!=null">
+				receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_send_shop_id,
+		fk_receive_shop_id,
+		number,
+		name,
+		send_state,
+		receive_state,
+		send_del,
+		receive_del,
+		receive_user_id,
+		insert_admin,
+		update_admin,
+		insert_time,
+		update_time,
+		remark
+		from pro_convey
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="listConvey" resultType="com.luxuryadmin.vo.pro.VoConvey"
+            parameterType="com.luxuryadmin.param.pro.ParamConveyQuery">
+		select
+		id,
+		number,
+		name,
+		send_state sendState,
+		receive_state receiveState,
+		<if test="type != null and type=='send'">
+			(SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+			WHERE uShopR.fk_shp_shop_id = pc.fk_send_shop_id
+			AND uShopR.fk_shp_user_id = pc.insert_admin
+			) 'showUserName',
+			insert_time 'showTime',
+		</if>
+		<if test="type != null and type=='receive' ">
+			(SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+			WHERE uShopR.fk_shp_shop_id = pc.fk_receive_shop_id
+			AND uShopR.fk_shp_user_id = pc.receive_user_id
+			) 'showUserName',
+			receive_time 'showTime',
+		</if>
+		(SELECT ss.`name` FROM shp_shop ss
+		WHERE ss.id = pc.fk_send_shop_id
+		) 'shopName',
+		receive_time 'showTime',
+		receive_user_id,
+		insert_admin
+		from pro_convey pc
+		<where>
+
+			<if test="type=='send' and type != null">
+				fk_send_shop_id = #{shopId}
+				and	send_del = '0'
+			</if>
+			<if test="type=='receive' and type != null">
+				fk_receive_shop_id = #{shopId}
+				and receive_del = '0'
+			</if>
+
+		</where>
+		<if test="type=='send' and type != null">
+			order by id desc
+		</if>
+		<if test="type=='receive' and type != null">
+			order by receive_time desc
+		</if>
+
+
+	</select>
+	<!-- 根据编号提取传送详情 -->
+    <select id="getByNumber" resultMap="BaseResultMap"
+            parameterType="java.lang.String">
+		select
+		id,
+		fk_send_shop_id,
+		fk_receive_shop_id,
+		number,
+		name,
+		send_state,
+		receive_state,
+		send_del,
+		receive_del,
+		receive_user_id,
+		insert_admin,
+		update_admin,
+		insert_time,
+		update_time,
+		remark
+		from pro_convey
+		where number = #{number} and send_del = '0'
+	</select>
+
+
+</mapper>

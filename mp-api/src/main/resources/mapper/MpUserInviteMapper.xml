@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpUserInviteMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpUserInvite">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_invite_mp_user_id" jdbcType="INTEGER" property="fkInviteMpUserId"/>
+
+        <result column="fk_be_invite_mp_user_id" jdbcType="INTEGER" property="fkBeInviteMpUserId"/>
+
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+
+        <result column="reward_state" jdbcType="VARCHAR" property="rewardState"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="CHAR" property="del"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_invite_mp_user_id,
+		fk_be_invite_mp_user_id,
+		state,
+		reward_state,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.MpUserInvite" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into mp_user_invite
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkInviteMpUserId!=null ">
+                fk_invite_mp_user_id,
+            </if>
+            <if test="fkBeInviteMpUserId!=null ">
+                fk_be_invite_mp_user_id,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="rewardState!=null ">
+                reward_state,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkInviteMpUserId!=null">
+                #{fkInviteMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviteMpUserId!=null">
+                #{fkBeInviteMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="rewardState!=null">
+                #{rewardState,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=CHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  mp_user_invite 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.MpUserInvite">
+        update mp_user_invite
+        <set>
+            <if test="fkInviteMpUserId!=null">
+                fk_invite_mp_user_id = #{fkInviteMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviteMpUserId!=null">
+                fk_be_invite_mp_user_id = #{fkBeInviteMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="rewardState!=null and rewardState!=''">
+                reward_state = #{rewardState,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_invite_mp_user_id,
+		fk_be_invite_mp_user_id,
+		state,
+		reward_state,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+		from mp_user_invite
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="listUserInvite" resultType="com.luxuryadmin.vo.invite.VOUserInviteList"
+            parameterType="com.luxuryadmin.param.invite.ParamUserInviteList">
+        SELECT
+        mp_user_invite.id AS id,
+        mp_user.id AS userId,
+        mp_user.wx_nickname AS wxNickname,
+        mp_user.head_img_url AS headImgUrl,
+        mp_user.member_state AS memberState
+        FROM
+        mp_user_invite
+        LEFT JOIN mp_user ON mp_user_invite.fk_be_invite_mp_user_id = mp_user.id
+        WHERE
+        mp_user_invite.del = 0
+        and
+        mp_user_invite.fk_invite_mp_user_id = #{userId}
+        <if test="inviteType == 20">
+            and mp_user.member_state in (2,3)
+            and mp_user.is_member = 'yes'
+        </if>
+        <if test="inviteType == 30">
+            and mp_user.member_state = 1
+            and mp_user.is_member = 'no'
+        </if>
+        <if test="inviteType == 40">
+            and mp_user.member_state = 0
+            and mp_user.is_member = 'no'
+        </if>
+    </select>
+    <select id="getUserInviteByBeUserId" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_user_invite
+        where fk_be_invite_mp_user_id = #{userId}
+        and del = 0
+    </select>
+
+</mapper>

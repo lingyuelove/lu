@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.sys.SysRoleMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.sys.SysRole">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <resultMap id="VoSysRole" type="com.luxuryadmin.vo.sys.VoSysRole">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_name, insert_time, update_time, insert_admin, update_admin, versions, del, 
+    remark, type
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="listSysRole" parameterType="com.luxuryadmin.param.sys.ParamSysRole" resultMap="VoSysRole">
+        select <include refid="Base_Column_List" />
+        from  sys_role
+        where (1=1)
+        <if test="id != null">
+          and id = #{id}
+        </if>
+        <if test="roleName != null">
+          and role_name = #{roleName}
+        </if>
+        <if test="del != null">
+          and del = #{del}
+        </if>
+        <if test="insertTimeStart != null">
+          and insert_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+          and #{insertTimeEnd} >= insert_time
+        </if>
+        and del = '0'
+        order by insert_time desc
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from sys_role
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.sys.SysRole" useGeneratedKeys="true" keyProperty="id">
+    insert into sys_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="roleName != null">
+        role_name,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="roleName != null">
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.sys.SysRole">
+    update sys_role
+    <set>
+      <if test="roleName != null">
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.sys.SysRole">
+    update sys_role
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      versions = #{versions,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

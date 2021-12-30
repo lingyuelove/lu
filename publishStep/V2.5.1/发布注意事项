@@ -1,0 +1,26 @@
+
+
+二、后台添加APP首页菜单
+  测试和线上OSS图片都已上传，线上后台管理系统需要配置。
+  1.对账单
+  (1)对账单:statement
+      /default/functionIcon/statement.png
+      查看
+      statement:list
+      /getBillDetailByApp 对账单详情 接口已添加权限
+      /getBillPageByApp 对账单首页 接口已添加权限
+
+      添加
+     statement:add
+      /addBill 创建对账单--接口已添加权限
+      /getBillProductMoneyByApp 选择对账类型--创建对账单--临时仓信息接口已添加权限
+
+      修改
+      statement:update
+      /updateBill 修改对账单 接口已添加权限
+
+      删除
+      statement:delete
+      /deleteBill 删除对账单 接口已添加权限
+
+

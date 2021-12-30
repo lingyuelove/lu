@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>一键导入图片</title>
+</head>
+<script src="https://file.luxuryadmin.com/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+    //var domain = "http://192.168.0.250:8080";
+    var domain = "https://m.luxuryadmin.com";
+    $(document).ready(function () {
+        $("#getShopNumber").click(function () {
+            var tableObj = $("#shopNumberTable");
+            var shopNumberObj = $("#shopNumber");
+            tableObj.hide();
+            shopNumberObj.val("");
+            var phone = $("#phone").val();
+            if (phone === "") {
+                alert("请填写手机号!")
+                return false;
+            }
+            var ajaxRul = $.ajax({url: domain + "/tool/getShopNumber?phone=" + phone, async: false});
+            var ajaxJson = JSON.parse(ajaxRul.responseText);
+            if (ajaxJson.code !== 'ok') {
+                alert(ajaxJson.msg);
+                return false;
+            }
+            var data = ajaxJson.data;
+            if (data.length === 1) {
+                shopNumberObj.val(data[0].number);
+            } else {
+                var td = "<tr><td>店铺名称</td><td width='200px'>店铺编号</td></tr>";
+                for (var i = 0; i < data.length; i++) {
+                    var name = data[i].name;
+                    var number = data[i].number;
+                    td += "<tr><td>" + name + "</td><td>" + number + "</td></tr>"
+                }
+                tableObj.empty();
+                tableObj.append(td);
+                tableObj.show();
+            }
+            //console.log();
+            //console.log(ajaxJson.data.length);
+            //console.log(ajaxJson.data[0].name);
+
+        });
+        $("#confirm").click(function () {
+            importImg();
+        });
+
+    });
+    var timestamp1 = (new Date()).valueOf();
+
+    function importImg() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        var phone = document.getElementById("phone").value;
+        var shopNumber = document.getElementById("shopNumber").value;
+        var wxTag = document.getElementById("wxTag").value;
+        var filterName = document.getElementById("filterName").value;
+        if (username === "" || password === "" || phone === "" || shopNumber === "") {
+            alert("所有值为必填")
+            return false;
+        }
+        if (confirm("are you sure continue?")) {
+            var param = "username=" + username + "&password="
+                + password + "&phone=" + phone + "&shopNumber="
+                + shopNumber + "&timestamp=" + timestamp1 + "&tag=" + wxTag + "&filterName=" + filterName;
+            //window.location.href = "https://m.luxuryadmin.com/tool/putIntoImg?" + param
+            var url = domain + "/tool/putIntoImg?" + param;
+            $("#showDiv").attr("style", "display: block;");
+            $.ajax({
+                type: "get",
+                async: true,
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                cache: false,
+                success: function (response) {
+                    $("#showDiv").attr("style", "display: none;");
+                    //返回的数据用data.d获取内容
+                    //移除原有的行;
+                    if (response.code === 'ok') {
+                        alert(response.data);
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (err) {
+                    $("#showDiv").attr("style", "display: none;");
+                    alert("请求服务器失败!");
+                }
+            });
+        }
+    }
+
+
+</script>
+<style type="text/css">
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    div {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: white;
+        text-align: center;
+    }
+
+    input {
+        width: 440px;
+        height: 80px;
+        font-size: 50px;
+        text-align: center;
+        align-content: center;
+        margin-top: 20px;
+        border: 1px;
+        border-style: solid;
+    }
+
+
+</style>
+<body>
+<div id="showDiv" style="display: none;">
+    <img
+            src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4105776946,2723577313&fm=26&gp=0.jpg"><br/>
+    <p style="font-size: 50px;">数据正在后台导入,请耐心等候...</p>
+    <p style="font-size: 40px;">tips:如不想等待结果,该页面可关闭!</p>
+</div>
+
+<form style="text-align: left;margin-top: 150px;margin-left: 220px;">
+    帐号: <input type="text" id="username" name="username"/><br/>
+    密码: <input type="text" id="password" name="password"/><br/>
+    微商相册标签(选填): <input type="text" id="wxTag" name="wxTag" placeholder="仅包含@xxx | 不包含@xxx"
+                       style="font-size: 30px;"/><br/>
+    筛选商品名称(选填): <input type="text" id="filterName" name="filterName" placeholder="包含该关键字的名称才被导入"
+                       style="font-size: 30px;"/><br/>
+    sdj帐号:<input type="text" id="phone" name="phone"/>
+    <input type="button" id="getShopNumber" value="GetNumber" style="width:230px;font-size: 40px;margin-top: 50px"/>
+    <br/>
+    <table border="1" style="display: none; text-align:center;width:700px;font-size: 40px;margin-top: 50px"
+           id="shopNumberTable">
+    </table>
+    sdj店铺编号:<input type="text" id="shopNumber" name="shopNumber"/><br/>
+    <input type="button" id="confirm" value="confirm" style="font-size: 40px;margin-top: 50px"/>
+</form>
+</body>
+</html>

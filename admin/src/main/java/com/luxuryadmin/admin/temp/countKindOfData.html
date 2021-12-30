@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据汇总</title>
+</head>
+<script src="https://file.luxuryadmin.com/js/jquery-3.1.1.min.js"></script>
+<style type="text/css">
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    div {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: white;
+        text-align: center;
+    }
+
+    input {
+        width: 80px;
+        height: 65px;
+        font-size: 40px;
+        text-align: center;
+        align-content: center;
+        border: 1px;
+        border-style: solid;
+    }
+
+
+</style>
+<body>
+
+<form style="text-align: left;margin-top: 50px;margin-left: 50px;margin-right: 20px;">
+
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="registerUserAndShop">
+    </table>
+
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="registerList">
+    </table>
+    <br/>
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="initPriceNotNull">
+    </table>
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="classifyOnSalePrice">
+    </table>
+    <br/>
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="onSale">
+    </table>
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="classifyOnSaleAll">
+    </table>
+    <br/>
+    <span style="font-size: 40px;">在售商品数量范围:</span><br/>
+    <input type="text" id="startNum" name="startNum" value="50"/>至
+    <input type="text" id="endNum" name="endNum" value=""/><br/><br/>
+    <span style="font-size: 40px;">统计开始时间: </span> <br/>
+    <input type="text" id="st" name="st" value="2021-01-01" style="width: 230px"/><br/>
+    <input type="button" id="confirm" value="查询" style="width:230px;"/>
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="activityUser">
+    </table>
+</form>
+</body>
+<script type="text/javascript">
+    //var domain = "http://127.0.0.1:8088";
+    var domain = "https://sdjadmin-api.luxuryadmin.com";
+    $(document).ready(function () {
+        queryData();
+        //console.log();
+
+
+        $("#confirm").click(function () {
+            queryData();
+        });
+
+
+        function queryData() {
+            var registerUserAndShop = $("#registerUserAndShop");
+            var registerList = $("#registerList");
+            var initPriceNotNull = $("#initPriceNotNull");
+            var classifyOnSalePrice = $("#classifyOnSalePrice");
+            var onSale = $("#onSale");
+            var classifyOnSaleAll = $("#classifyOnSaleAll");
+            var activityUser = $("#activityUser");
+            registerUserAndShop.hide();
+            registerList.hide();
+            initPriceNotNull.hide();
+            classifyOnSalePrice.hide();
+            onSale.hide();
+            classifyOnSaleAll.hide();
+            activityUser.hide();
+
+
+            var startNum = $("#startNum").val();
+            var endNum = $("#endNum").val();
+            var st = $("#st").val();
+            var urlParam = "?appVersion=2.3&startNum=" + startNum + "&endNum=" + endNum + "&st=" + st;
+            var ajaxRul = $.ajax({url: domain + "/temp/getKindOfCountData" + urlParam, async: false});
+            var ajaxJson = JSON.parse(ajaxRul.responseText);
+            if (ajaxJson.code !== 'ok') {
+                alert(ajaxJson.msg);
+                return false;
+            }
+
+            //注册用户和店铺总数量
+            var dataRegisterUserAndShop = ajaxJson.data.registerUserAndShop;
+            console.log(dataRegisterUserAndShop);
+            if (dataRegisterUserAndShop != null) {
+                var td = "<tr><td>截至当前时间</td><td >注册总用户数</td><td>注册总店铺数</td><td>开店转化率</td><td>付费用户</td><td>店铺付费转化率</td></tr>";
+                var currentTime = dataRegisterUserAndShop.currentTime;
+                var registerUser = dataRegisterUserAndShop.registerUser;
+                var registerShop = dataRegisterUserAndShop.registerShop;
+                var rate = dataRegisterUserAndShop.rate;
+                var payingUser = dataRegisterUserAndShop.payingUser;
+                var payingUserRate = dataRegisterUserAndShop.payingUserRate;
+
+                console.log(currentTime);
+                console.log(onSaleNumInitPriceNotNull);
+                console.log(totalMoney);
+                td += "<tr><td>" + currentTime + "</td><td>" + registerUser + "</td><td>" + registerShop + "</td><td>" + rate + "%</td><td>" + payingUser + "</td><td>" + payingUserRate + "%</td></tr>"
+                registerUserAndShop.empty();
+                registerUserAndShop.append(td);
+                registerUserAndShop.show();
+            }
+
+            //注册数量
+            var data = ajaxJson.data.registerList;
+            //console.log(data);
+            if (data.length > 0) {
+                var td = "<tr><td>日期</td><td >注册用户数</td><td>注册店铺数</td><td>开店转化率%</td></tr>";
+                for (var i = 0; i < data.length; i++) {
+                    var date = data[i].bizDate.substring(0, 10);
+                    var userNum = data[i].userNum;
+                    var shopNum = data[i].shopNum;
+                    var rate = data[i].rate;
+                    td += "<tr><td>" + date + "</td><td>" + userNum + "</td><td>" + shopNum + "</td><td>" + rate + "%</td></tr>"
+                }
+                registerList.empty();
+                registerList.append(td);
+                registerList.show();
+            }
+
+
+            //在售商品(成本>0)
+            var data2 = ajaxJson.data.initPriceNotNull;
+            console.log(data2);
+            if (data2 != null) {
+                var td = "<tr><td>截止当前时间</td><td >在售商品数量</td><td>在售商品总成本(成本>0元)</td><td>均价(元)</td></tr>";
+                var currentTime = data2.currentTime;
+                var onSaleNumInitPriceNotNull = data2.onSaleNumInitPriceNotNull;
+                var totalMoney = data2.totalMoney;
+                var avgPrice = data2.avgPrice;
+
+                console.log(currentTime);
+                console.log(onSaleNumInitPriceNotNull);
+                console.log(totalMoney);
+                td += "<tr><td>" + currentTime + "</td><td>" + onSaleNumInitPriceNotNull + "</td><td>" + totalMoney + "</td><td>" + avgPrice + "</td></tr>"
+                initPriceNotNull.empty();
+                initPriceNotNull.append(td);
+                initPriceNotNull.show();
+            }
+
+
+            //统计在售商品各分类成本;(成本>0)
+            var dataClassifyOnSalePrice = ajaxJson.data.classifyOnSalePrice;
+            //console.log(data);
+            if (dataClassifyOnSalePrice.length > 0) {
+                var td = "<tr><td>分类</td><td >总数量</td><td>在售商品总成本(成本>0元)</td><td>均价(元)</td></tr>";
+                for (var i = 0; i < dataClassifyOnSalePrice.length; i++) {
+                    var classifyName = dataClassifyOnSalePrice[i].classifyName;
+                    var totalNum = dataClassifyOnSalePrice[i].totalNum;
+                    var totalPrice = dataClassifyOnSalePrice[i].totalPrice;
+                    var avgPrice = dataClassifyOnSalePrice[i].avgPrice;
+                    td += "<tr><td>" + classifyName + "</td><td>" + totalNum + "</td><td>" + totalPrice + "</td><td>" + avgPrice + "</td></tr>"
+                }
+                classifyOnSalePrice.empty();
+                classifyOnSalePrice.append(td);
+                classifyOnSalePrice.show();
+            }
+
+
+            //在售商品(包含未填写成本的商品)
+            var data3 = ajaxJson.data.onSale;
+            console.log(data3);
+            if (data3 != null) {
+                var td = "<tr><td>截止当前时间</td><td >在售商品数量</td><td>在售商品总成本(包含未填写成本的商品)</td></tr>";
+                var currentTime = data3.currentTime;
+                var onSaleNumInitPriceNotNull = data3.onSaleNum;
+                var totalMoney = data3.totalMoney;
+
+                console.log(currentTime);
+                console.log(onSaleNumInitPriceNotNull);
+                console.log(totalMoney);
+                td += "<tr><td>" + currentTime + "</td><td>" + onSaleNumInitPriceNotNull + "</td><td>" + totalMoney + "</td></tr>"
+                onSale.empty();
+                onSale.append(td);
+                onSale.show();
+            }
+
+            //统计在售商品各分类成本;(包含未填写成本的商品)
+            var dataClassifyOnSaleAll = ajaxJson.data.classifyOnSaleAll;
+            //console.log(data);
+            if (dataClassifyOnSaleAll.length > 0) {
+                var td = "<tr><td>分类</td><td >总数量</td><td>在售商品总成本(包含未填写成本的商品)</td><td>均价(元)</td></tr>";
+                for (var i = 0; i < dataClassifyOnSaleAll.length; i++) {
+                    var classifyName = dataClassifyOnSaleAll[i].classifyName;
+                    var totalNum = dataClassifyOnSaleAll[i].totalNum;
+                    var totalPrice = dataClassifyOnSaleAll[i].totalPrice;
+                    var avgPrice = dataClassifyOnSaleAll[i].avgPrice;
+                    td += "<tr><td>" + classifyName + "</td><td>" + totalNum + "</td><td>" + totalPrice + "</td><td>" + avgPrice + "</td></tr>"
+                }
+                classifyOnSaleAll.empty();
+                classifyOnSaleAll.append(td);
+                classifyOnSaleAll.show();
+            }
+
+            //活跃用户
+            var data4 = ajaxJson.data.activityUser;
+            console.log(data4);
+            if (data4.length > 0) {
+                var td = "<tr><td>序号</td><td >店铺编号</td><td>店铺名称</td><td>开店时间</td><td>在售商品数量</td>" +
+                    "<td>是否会员</td><td >成本总额(元)</td><td>成交成本(元)</td><td>成交总额(元)</td>" +
+                    "<td>毛利润(元)</td><td >毛利率(%)</td></tr>";
+                for (var i = 0; i < data4.length; i++) {
+                    var id = data4[i].id;
+                    var shopName = data4[i].shopName;
+                    var insertTime = data4[i].insertTime;
+                    var onSaleNum = data4[i].onSaleNum;
+                    var isMember = data4[i].isMember;
+                    var initPrice = data4[i].initPrice;
+                    var finishInitPrice = data4[i].finishInitPrice;
+                    var finishTotalPrice = data4[i].finishTotalPrice;
+                    var goodsProfit = data4[i].goodsProfit;
+                    var profitRate = data4[i].profitRate;
+                    td += "<tr><td>" + (i + 1) + "</td><td>" + id + "</td><td>" + shopName + "</td><td>" + insertTime + "</td><td>" + onSaleNum + "</td>" +
+                        "<td>" + isMember + "</td><td>" + initPrice + "</td><td>" + finishInitPrice + "</td><td>" + finishTotalPrice + "</td>" +
+                        "<td>" + goodsProfit + "</td><td>" + profitRate + "%</td></tr>"
+                }
+                activityUser.empty();
+                activityUser.append(td);
+                activityUser.show();
+            }
+
+        }
+
+    });
+
+</script>
+</html>

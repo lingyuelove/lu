@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinSalaryDetailMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinSalaryDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+    <result column="fk_fin_salary_id" jdbcType="INTEGER" property="fkFinSalaryId" />
+    <result column="product_attr" jdbcType="VARCHAR" property="productAttr" />
+    <result column="sale_money" jdbcType="DECIMAL" property="saleMoney" />
+    <result column="gross_profit_money" jdbcType="DECIMAL" property="grossProfitMoney" />
+    <result column="recycle_cost_money" jdbcType="DECIMAL" property="recycleCostMoney" />
+    <result column="recycle_profit_money" jdbcType="DECIMAL" property="recycleProfitMoney" />
+    <result column="service_profit_money" jdbcType="DECIMAL" property="serviceProfitMoney" />
+    <result column="sale_result_json" jdbcType="LONGVARCHAR" property="saleResultJson" />
+    <result column="scheme_type" jdbcType="VARCHAR" property="schemeType" />
+    <result column="basic_money" jdbcType="DECIMAL" property="basicMoney" />
+    <result column="else_money" jdbcType="DECIMAL" property="elseMoney" />
+    <result column="sale_push_money" jdbcType="DECIMAL" property="salePushMoney" />
+    <result column="recycle_push_money" jdbcType="DECIMAL" property="recyclePushMoney" />
+    <result column="service_push_money" jdbcType="DECIMAL" property="servicePushMoney" />
+    <result column="salary_total_money" jdbcType="DECIMAL" property="salaryTotalMoney" />
+    <result column="recycle_init_price_percent" jdbcType="DECIMAL" property="recycleInitPricePercent" />
+    <result column="recycle_unit_price" jdbcType="DECIMAL" property="recycleUnitPrice" />
+    <result column="recycle_profit_percent" jdbcType="DECIMAL" property="recycleProfitPercent" />
+    <result column="service_profit_percent" jdbcType="DECIMAL" property="serviceProfitPercent" />
+    <result column="salary_st_time" jdbcType="TIMESTAMP" property="salaryStTime" />
+    <result column="salary_et_time" jdbcType="TIMESTAMP" property="salaryEtTime" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_id, fk_fin_salary_id, product_attr, sale_money, gross_profit_money, 
+    recycle_cost_money, recycle_profit_money, service_profit_money, sale_result_json, scheme_type, basic_money,
+    else_money, sale_push_money, recycle_push_money, service_push_money, salary_total_money, 
+    recycle_init_price_percent, recycle_unit_price, recycle_profit_percent, service_profit_percent, 
+    salary_st_time, salary_et_time, insert_time, update_time, insert_admin, update_admin, 
+    remark
+  </sql>
+
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fin_salary_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="getFinSalaryDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    FROM fin_salary_detail
+    WHERE fk_shp_shop_id = #{shopId}
+    AND fk_shp_user_id = #{userId}
+    AND salary_st_time = #{startDate}
+  </select>
+
+  <!--根据月份查询该用户的薪资明细-->
+  <select id="getVoCreateSalaryDetail" resultType="com.luxuryadmin.vo.fin.VoCreateSalaryDetail">
+    select
+    (select fs.salary_state
+    from fin_salary fs
+    where fs.id = fsd.fk_fin_salary_id) 'salaryState',
+    fsd.product_attr 'proAttr',
+    fsd.`basic_money` 'basicMoney',
+    fsd.`else_money` 'elseMoney',
+    fsd.`recycle_init_price_percent` 'recycleInitPricePercent',
+    fsd.`recycle_unit_price` 'recycleUnitPrice',
+    fsd.`recycle_profit_percent` 'recycleProfitPercent',
+    fsd.`service_profit_percent` 'serviceProfitPercent',
+    fsd.`scheme_type` 'schemeType',
+    fsd.sale_result_json 'saleResultJson'
+    FROM
+    fin_salary_detail fsd
+    WHERE fsd.fk_shp_shop_id = #{shopId}
+    <if test="userId != null">
+      AND fsd.fk_shp_user_id = #{userId}
+    </if>
+    <if test="startDate != null">
+      AND fsd.salary_st_time = #{startDate}
+    </if>
+    ORDER BY fsd.insert_time DESC LIMIT 1
+  </select>
+
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete FROM fin_salary_detail
+    WHERE id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <!--删除薪资明细-->
+  <delete id="deleteFinSalaryDetail">
+    delete FROM fin_salary_detail WHERE fk_fin_salary_id IN(${finSalaryIds})
+  </delete>
+
+  <!--删除薪资明细(用于注销店铺)-->
+  <delete id="deleteFinSalaryDetailByShopId">
+    delete FROM fin_salary_detail WHERE fk_shp_shop_id =#{shopId}
+  </delete>
+
+
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinSalaryDetail">
+    insert into fin_salary_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id,
+      </if>
+      <if test="fkFinSalaryId != null">
+        fk_fin_salary_id,
+      </if>
+      <if test="productAttr != null">
+        product_attr,
+      </if>
+      <if test="saleMoney != null">
+        sale_money,
+      </if>
+      <if test="grossProfitMoney != null">
+        gross_profit_money,
+      </if>
+      <if test="recycleCostMoney != null">
+        recycle_cost_money,
+      </if>
+      <if test="recycleProfitMoney != null">
+        recycle_profit_money,
+      </if>
+      <if test="serviceProfitMoney != null">
+        service_profit_money,
+      </if>
+      <if test="schemeType != null">
+        scheme_type,
+      </if>
+      <if test="basicMoney != null">
+        basic_money,
+      </if>
+      <if test="elseMoney != null">
+        else_money,
+      </if>
+      <if test="salePushMoney != null">
+        sale_push_money,
+      </if>
+      <if test="recyclePushMoney != null">
+        recycle_push_money,
+      </if>
+      <if test="servicePushMoney != null">
+        service_push_money,
+      </if>
+      <if test="salaryTotalMoney != null">
+        salary_total_money,
+      </if>
+      <if test="recycleInitPricePercent != null">
+        recycle_init_price_percent,
+      </if>
+      <if test="recycleUnitPrice != null">
+        recycle_unit_price,
+      </if>
+      <if test="recycleProfitPercent != null">
+        recycle_profit_percent,
+      </if>
+      <if test="serviceProfitPercent != null">
+        service_profit_percent,
+      </if>
+      <if test="salaryStTime != null">
+        salary_st_time,
+      </if>
+      <if test="salaryEtTime != null">
+        salary_et_time,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="saleResultJson != null">
+        sale_result_json,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalaryId != null">
+        #{fkFinSalaryId,jdbcType=INTEGER},
+      </if>
+      <if test="productAttr != null">
+        #{productAttr,jdbcType=VARCHAR},
+      </if>
+      <if test="saleMoney != null">
+        #{saleMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="grossProfitMoney != null">
+        #{grossProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleCostMoney != null">
+        #{recycleCostMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleProfitMoney != null">
+        #{recycleProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceProfitMoney != null">
+        #{serviceProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeType != null">
+        #{schemeType,jdbcType=VARCHAR},
+      </if>
+      <if test="basicMoney != null">
+        #{basicMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="elseMoney != null">
+        #{elseMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="salePushMoney != null">
+        #{salePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recyclePushMoney != null">
+        #{recyclePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="servicePushMoney != null">
+        #{servicePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryTotalMoney != null">
+        #{salaryTotalMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleInitPricePercent != null">
+        #{recycleInitPricePercent,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleUnitPrice != null">
+        #{recycleUnitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleProfitPercent != null">
+        #{recycleProfitPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceProfitPercent != null">
+        #{serviceProfitPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryStTime != null">
+        #{salaryStTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="salaryEtTime != null">
+        #{salaryEtTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="saleResultJson != null">
+        #{saleResultJson,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinSalaryDetail">
+    update fin_salary_detail
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalaryId != null">
+        fk_fin_salary_id = #{fkFinSalaryId,jdbcType=INTEGER},
+      </if>
+      <if test="productAttr != null">
+        product_attr = #{productAttr,jdbcType=VARCHAR},
+      </if>
+      <if test="saleMoney != null">
+        sale_money = #{saleMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="grossProfitMoney != null">
+        gross_profit_money = #{grossProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleCostMoney != null">
+        recycle_cost_money = #{recycleCostMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleProfitMoney != null">
+        recycle_profit_money = #{recycleProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceProfitMoney != null">
+        service_profit_money = #{serviceProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeType != null">
+        scheme_type = #{schemeType,jdbcType=VARCHAR},
+      </if>
+      <if test="basicMoney != null">
+        basic_money = #{basicMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="elseMoney != null">
+        else_money = #{elseMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="salePushMoney != null">
+        sale_push_money = #{salePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recyclePushMoney != null">
+        recycle_push_money = #{recyclePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="servicePushMoney != null">
+        service_push_money = #{servicePushMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryTotalMoney != null">
+        salary_total_money = #{salaryTotalMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleInitPricePercent != null">
+        recycle_init_price_percent = #{recycleInitPricePercent,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleUnitPrice != null">
+        recycle_unit_price = #{recycleUnitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="recycleProfitPercent != null">
+        recycle_profit_percent = #{recycleProfitPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceProfitPercent != null">
+        service_profit_percent = #{serviceProfitPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryStTime != null">
+        salary_st_time = #{salaryStTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="salaryEtTime != null">
+        salary_et_time = #{salaryEtTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="saleResultJson != null">
+        sale_result_json = #{saleResultJson,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

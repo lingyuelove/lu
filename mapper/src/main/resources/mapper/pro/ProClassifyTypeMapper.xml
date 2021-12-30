@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProClassifyTypeMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProClassifyType">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="code" jdbcType="VARCHAR" property="code" />
+
+		<result column="name" jdbcType="VARCHAR" property="name" />
+
+		<result column="description" jdbcType="VARCHAR" property="description" />
+
+		<result column="icon_url" jdbcType="VARCHAR" property="iconUrl" />
+
+		<result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="pro_classify_type_id" jdbcType="INTEGER" property="proClassifyTypeId" />
+
+		<result column="type" jdbcType="VARCHAR" property="type" />
+
+		<result column="chose_type" jdbcType="VARCHAR" property="choseType" />
+
+		<result column="state" jdbcType="INTEGER" property="state" />
+
+		<result column="sort" jdbcType="INTEGER" property="sort" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="versions" jdbcType="INTEGER" property="versions" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		code,
+		name,
+		description,
+		icon_url,
+		fk_pro_classify_code,
+		fk_shp_shop_id,
+		pro_classify_type_id,
+		type,
+		chose_type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		del,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProClassifyType" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_classify_type
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="code!=null ">
+				code, 
+			</if>
+			<if test="name!=null ">
+				name, 
+			</if>
+			<if test="description!=null ">
+				description, 
+			</if>
+			<if test="iconUrl!=null ">
+				icon_url, 
+			</if>
+
+			<if test="fkProClassifyCode!=null ">
+				fk_pro_classify_code, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="proClassifyTypeId!=null ">
+				pro_classify_type_id,
+			</if>
+			<if test="type!=null ">
+				type, 
+			</if>
+			<if test="choseType!=null ">
+				chose_type, 
+			</if>
+			<if test="state!=null ">
+				state, 
+			</if>
+			<if test="sort!=null ">
+				sort, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="versions!=null ">
+				versions, 
+			</if>
+			<if test="del!=null ">
+				del, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="code!=null">
+				#{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name!=null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="description!=null">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="iconUrl!=null">
+				#{iconUrl,jdbcType=VARCHAR},
+			</if>
+
+			<if test="fkProClassifyCode!=null">
+				#{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="proClassifyTypeId!=null">
+				#{proClassifyTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="choseType!=null">
+				#{choseType,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				#{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				#{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				#{versions,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_classify_type 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProClassifyType" >
+		update pro_classify_type
+		<set>
+			<if test="code!=null and code!=''">
+				code = #{code,jdbcType=VARCHAR},
+			 </if>
+			<if test="name!=null and name!=''">
+				name = #{name,jdbcType=VARCHAR},
+			 </if>
+			<if test="description!=null and description!=''">
+				description = #{description,jdbcType=VARCHAR},
+			 </if>
+			<if test="iconUrl!=null and iconUrl!=''">
+				icon_url = #{iconUrl,jdbcType=VARCHAR},
+			 </if>
+
+			<if test="fkProClassifyCode!=null and fkProClassifyCode!=''">
+				fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+			 </if>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="proClassifyTypeId!=null">
+				pro_classify_type_id = #{proClassifyTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null and type!=''">
+				type = #{type,jdbcType=VARCHAR},
+			 </if>
+			<if test="choseType!=null and choseType!=''">
+				chose_type = #{choseType,jdbcType=VARCHAR},
+			 </if>
+			<if test="state!=null">
+				state = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				sort = #{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				versions = #{versions,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			 </if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		code,
+		name,
+		description,
+		icon_url,
+		fk_pro_classify_code,
+		fk_shp_shop_id,
+		pro_classify_type_id,
+		type,
+		chose_type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		del,
+		remark
+		from pro_classify_type
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+	<select id="getClassifyTypeByNameAndType" resultMap="BaseResultMap" >
+		select
+		id,
+		code,
+		name,
+		description,
+		icon_url,
+		fk_pro_classify_code,
+		fk_shp_shop_id,
+		pro_classify_type_id,
+		type,
+		chose_type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		del,
+		remark
+		from pro_classify_type
+		where type = #{type} and name= #{name}
+		<if test="classifyCode != null and classifyCode != ''">
+			AND fk_pro_classify_code = #{classifyCode}
+		</if>
+	</select>
+
+	<!--获取商品补充信息一级列表 -->
+	<select id="getClassifyTypeList" parameterType="com.luxuryadmin.param.pro.ParamClassifyTypeSearch" resultType="com.luxuryadmin.vo.pro.VoClassifyTypeList" >
+		select
+		id,
+		name,
+		fk_pro_classify_code as classifyCode,
+		(select NAME from sys_enum WHERE TYPE = 'pro_classify' AND state = 1 and CODE = fk_pro_classify_code) classifyName,
+		sort
+		from pro_classify_type
+		<where>
+			 type = '1' and del= '0'
+			<if test="classifyCode != null">
+				and fk_pro_classify_code = #{classifyCode}
+			</if>
+		</where>
+		order by fk_pro_classify_code desc ,sort asc,insert_time desc
+	</select>
+	<!--获取商品补充信息二级列表 -->
+	<select id="getClassifyTypeSonLists" resultType="com.luxuryadmin.vo.pro.VoClassifyTypeSonList" parameterType="com.luxuryadmin.param.pro.ParamClassifyTypeSearch">
+		select
+		ct.id,
+		ct.name,
+		ct.chose_type as choseType,
+		ct.fk_pro_classify_code as classifyCode,
+		(select NAME from sys_enum WHERE TYPE = 'pro_classify' AND state = 1 and CODE = ct.fk_pro_classify_code) classifyName,
+		ct.pro_classify_type_id as pId,
+		<if test="shopId != null">
+			ifnull(ts.`state`,'1') 'state',
+		</if>
+		ct.sort
+		from pro_classify_type ct
+		<if test="shopId != null">
+			left join pro_classify_type_shop ts on ct.id = ts.`fk_pro_classify_type_id` and ts.fk_shp_shop_id =#{shopId,jdbcType=INTEGER}
+		</if>
+		where   ct.type = '2' and ct.del= '0'
+		<if test="state != null and shopId !=''">
+			and ts.`state` is null
+		</if>
+		<if test="classifyCode != null">
+			and fk_pro_classify_code = #{classifyCode}
+		</if>
+		order by fk_pro_classify_code desc ,ct.sort asc,ct.insert_time desc
+	</select>
+	<!--获取商品补充信息三级列表 -->
+	<select id="getClassifyTypeGrandSonList" resultType="com.luxuryadmin.vo.pro.VoClassifyTypeGrandSonList">
+		select
+		id,
+		name,
+		pro_classify_type_id as pId,
+		sort
+		from pro_classify_type
+		where  pro_classify_type_id = #{classifyTypeId,jdbcType=INTEGER} and type = '3' and del= '0'
+		order by sort asc,insert_time desc
+	</select>
+
+	<update id="updateClassifyTypeForDel">
+		update pro_classify_type set del = '1' where type = '3' and pro_classify_type_id = #{classifyTypeId,jdbcType=INTEGER}
+	</update>
+</mapper>

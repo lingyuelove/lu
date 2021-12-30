@@ -1,0 +1,36 @@
+# Tomcat
+server:
+    tomcat:
+        uri-encoding: UTF-8
+        max-threads: 1000
+        min-spare-threads: 30
+    port: 8088
+    servlet:
+        context-path:
+
+# mysql
+spring:
+    # 环境 dev|test|pro
+    profiles:
+        active: dev
+    datasource:
+        driverClassName: com.mysql.cj.jdbc.Driver
+    # jackson时间格式化
+    jackson:
+        time-zone: GMT+8
+        date-format: yyyy-MM-dd HH:mm:ss
+
+# Mybatis配置
+mybatis:
+    type-aliases-package: tk.mybatis.springboot.model
+    mapper-locations: classpath*:mapper/**/*.xml
+    #configLocation: classpath:mybatis.xml
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#分页插件 PageHelper
+pagehelper:
+    helperDialect: mysql
+    reasonable: false
+    supportMethodsArguments: true
+    params: count=countSql

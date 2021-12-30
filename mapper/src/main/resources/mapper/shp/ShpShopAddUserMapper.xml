@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpShopAddUserMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpShopAddUser">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+    <result column="fk_be_shp_user_id" jdbcType="INTEGER" property="fkBeShpUserId" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, shop_name, fk_shp_shop_id, fk_shp_user_id, fk_be_shp_user_id, state, insert_time, 
+    finish_time, update_time, insert_admin, update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shp_shop_add_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_shop_add_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObjectAll" parameterType="com.luxuryadmin.entity.shp.ShpShopAddUser">
+    insert into shp_shop_add_user (id, shop_name, fk_shp_shop_id, 
+      fk_shp_user_id, fk_be_shp_user_id, state, 
+      insert_time, finish_time, update_time, 
+      insert_admin, update_admin, versions, 
+      del, remark)
+    values (#{id,jdbcType=INTEGER}, #{shopName,jdbcType=VARCHAR}, #{fkShpShopId,jdbcType=INTEGER}, 
+      #{fkShpUserId,jdbcType=INTEGER}, #{fkBeShpUserId,jdbcType=INTEGER}, #{state,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{versions,jdbcType=INTEGER}, 
+      #{del,jdbcType=CHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpShopAddUser">
+    insert into shp_shop_add_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="shopName != null">
+        shop_name,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id,
+      </if>
+      <if test="fkBeShpUserId != null">
+        fk_be_shp_user_id,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="finishTime != null">
+        finish_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="shopName != null">
+        #{shopName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkBeShpUserId != null">
+        #{fkBeShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpShopAddUser">
+    update shp_shop_add_user
+    <set>
+      <if test="shopName != null">
+        shop_name = #{shopName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkBeShpUserId != null">
+        fk_be_shp_user_id = #{fkBeShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpShopAddUser">
+    update shp_shop_add_user
+    set shop_name = #{shopName,jdbcType=VARCHAR},
+      fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      fk_be_shp_user_id = #{fkBeShpUserId,jdbcType=INTEGER},
+      state = #{state,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      versions = #{versions,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

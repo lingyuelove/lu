@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProPublicMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProPublic">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+        <result column="classify_code" jdbcType="VARCHAR" property="classifyCode"/>
+        <result column="third_classify" jdbcType="VARCHAR" property="thirdClassify"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="type_no" jdbcType="VARCHAR" property="typeNo"/>
+        <result column="serial_no" jdbcType="VARCHAR" property="serialNo"/>
+        <result column="watch_core_type" jdbcType="VARCHAR" property="watchCoreType"/>
+        <result column="watchcase" jdbcType="VARCHAR" property="watchcase"/>
+        <result column="watchcase_size" jdbcType="VARCHAR" property="watchcaseSize"/>
+        <result column="material" jdbcType="VARCHAR" property="material"/>
+        <result column="object_size" jdbcType="VARCHAR" property="objectSize"/>
+        <result column="clothes_size" jdbcType="VARCHAR" property="clothesSize"/>
+        <result column="public_price" jdbcType="INTEGER" property="publicPrice"/>
+        <result column="small_img" jdbcType="VARCHAR" property="smallImg"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, state, classify_code, third_classify, name, description, type_no, serial_no, watch_core_type, watchcase,
+    watchcase_size, material, object_size, clothes_size, public_price, small_img, insert_time,
+    update_time, insert_admin, update_admin, versions, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_public
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--查询公价商品-->
+    <select id="listProPublic" resultType="com.luxuryadmin.vo.pro.VoProPublic">
+        SELECT
+        id,
+        NAME,
+        description,
+        classify_code 'classifyCode',
+        NAME 'classifyCodeSub',
+        type_no 'typeNo',
+        serial_no 'serialNo',
+        watch_core_type 'watchCoreType',
+        watchcase,
+        watchcase_size watchcaseSize,
+        material,
+        object_size 'objectSize',
+        clothes_size 'clothesSize',
+        public_price 'publicPrice',
+        small_img 'smallImg'
+        FROM
+        pro_public
+        WHERE
+        state = 1
+        <if test="name != null">
+            AND name = #{name}
+        </if>
+        <if test="serialNo != null">
+            AND serial_no = #{serialNo}
+        </if>
+        <if test="typeNo != null">
+            AND type_no = #{typeNo}
+        </if>
+        <if test="queryKey != null">
+            AND (CONCAT(description,type_no,third_classify,serial_no,watchcase,watch_core_type,watchcase_size) REGEXP
+            #{queryKey}
+            or
+            CONCAT(watchcase_size,watch_core_type,watchcase,serial_no,third_classify,type_no,description) REGEXP
+            #{queryKey}
+            or REPLACE(REPLACE(CONCAT(description,type_no,third_classify,serial_no,watchcase,watch_core_type,watchcase_size),'.',''),'-','') REGEXP
+            #{queryKey}
+            or
+            REPLACE(REPLACE(CONCAT(watchcase_size,watch_core_type,watchcase,serial_no,third_classify,type_no,description),'.',''),'-','') REGEXP
+            #{queryKey}
+            )
+        </if>
+        order by name asc
+    </select>
+
+    <select id="getByPublic" parameterType="com.luxuryadmin.entity.pro.ProPublic" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        pro_public
+        <where>
+            state >=0
+            <if test="classifyCode != null">
+                and classify_code = #{classifyCode,jdbcType=VARCHAR}
+            </if>
+
+            <if test="name != null">
+                and name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="description != null">
+                and description = #{description,jdbcType=VARCHAR}
+            </if>
+            <if test="typeNo != null">
+                and type_no = #{typeNo,jdbcType=VARCHAR}
+            </if>
+            <if test="serialNo != null">
+                and serial_no = #{serialNo,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+
+
+    </select>
+
+    <!--查询公价商品-->
+    <select id="getPublicByListForAdmin" parameterType="com.luxuryadmin.param.pro.ParamPublicForAdmin"
+            resultType="com.luxuryadmin.vo.pro.VoProPublicForAdmin">
+        SELECT
+        id,
+        NAME,
+        state,
+        description,
+        type_no 'typeNo',
+        serial_no 'serialNo',
+        watch_core_type 'watchCoreType',
+        watchcase,
+        watchcase_size watchcaseSize,
+        material,
+        object_size 'objectSize',
+        clothes_size 'clothesSize',
+        public_price 'publicPrice',
+        (SELECT se.name
+        FROM sys_enum se
+        WHERE se.TYPE = 'pro_classify' AND se.state = 1 AND se.code = classify_code
+        ) 'classifyCodeName',
+        classify_code classifyCode,
+        small_img 'smallImg'
+        FROM
+        pro_public
+        <where>
+            state >=0
+            <if test="classifyCode != null">
+                and classify_code = #{classifyCode,jdbcType=VARCHAR}
+            </if>
+
+            <if test="name != null">
+                and name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+            <!--   <if test="description != null">
+                   and description like  CONCAT('%',#{description,jdbcType=VARCHAR},'%')
+               </if>-->
+            <if test="typeNo != null">
+                and type_no like CONCAT('%',#{typeNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="serialNo != null">
+                and serial_no like CONCAT('%',#{serialNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="state != null">
+                and state = #{state,jdbcType=INTEGER}
+            </if>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+        </where>
+
+        order by id desc
+
+    </select>
+    <!--查询公价商品-->
+    <select id="listAllProPublic" resultType="com.luxuryadmin.entity.pro.ProPublic">
+        SELECT
+        id,
+        NAME,
+        description,
+        type_no 'typeNo',
+        serial_no 'serialNo',
+        watch_core_type 'watchCoreType',
+        watchcase,
+        watchcase_size watchcaseSize,
+        material,
+        object_size 'objectSize',
+        clothes_size 'clothesSize',
+        public_price 'publicPrice',
+        small_img 'smallImg'
+        FROM
+        pro_public
+        WHERE
+        state = 1
+       and small_img LIKE '%http%' AND small_img !='https://www.xmaibu.com'
+
+    </select>
+
+    <!--根据品牌查询系列-->
+    <select id="querySerialNo" resultType="com.luxuryadmin.vo.pro.VoProPublic">
+        SELECT serial_no 'serialNo' FROM pro_public WHERE state = 1 AND NAME = #{name} GROUP BY serial_no ORDER BY serial_no ASC
+    </select>
+
+    <!--根据品牌或系列查询型号-->
+    <select id="queryTypeNo" resultType="com.luxuryadmin.vo.pro.VoProPublic">
+        SELECT
+        type_no 'typeNo'
+        FROM
+        pro_public
+        WHERE state = 1
+        AND NAME = #{name}
+        <if test="serialNo != null">
+            AND serial_no = #{serialNo}
+        </if>
+        GROUP BY type_no
+        ORDER BY type_no ASC
+    </select>
+
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_public
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <!--批量插入-->
+    <insert id="saveBatch" parameterType="java.util.List">
+        insert into pro_public ( state, classify_code,
+        third_classify, name, type_no, serial_no,
+        watch_core_type, watchcase, watchcase_size,
+        material, object_size, clothes_size,
+        public_price, small_img, insert_time,
+        update_time, insert_admin, update_admin,
+        versions, remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ( #{item.state,jdbcType=INTEGER}, #{item.classifyCode,jdbcType=VARCHAR},
+            #{item.thirdClassify,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.typeNo,jdbcType=VARCHAR},
+            #{item.serialNo,jdbcType=VARCHAR}, #{item.watchCoreType,jdbcType=VARCHAR},
+            #{item.watchcase,jdbcType=VARCHAR}, #{item.watchcaseSize,jdbcType=VARCHAR},
+            #{item.material,jdbcType=VARCHAR}, #{item.objectSize,jdbcType=VARCHAR},
+            #{item.clothesSize,jdbcType=VARCHAR},
+            #{item.publicPrice,jdbcType=INTEGER}, #{item.smallImg,jdbcType=VARCHAR},
+            #{item.insertTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.insertAdmin,jdbcType=INTEGER},
+            #{item.updateAdmin,jdbcType=INTEGER},
+            #{item.versions,jdbcType=INTEGER}, #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProPublic">
+        insert into pro_public
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="classifyCode != null">
+                classify_code,
+            </if>
+            <if test="thirdClassify != null">
+                third_classify,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="typeNo != null">
+                type_no,
+            </if>
+            <if test="serialNo != null">
+                serial_no,
+            </if>
+            <if test="watchCoreType != null">
+                watch_core_type,
+            </if>
+            <if test="watchcase != null">
+                watchcase,
+            </if>
+            <if test="watchcaseSize != null">
+                watchcase_size,
+            </if>
+            <if test="material != null">
+                material,
+            </if>
+            <if test="objectSize != null">
+                object_size,
+            </if>
+            <if test="clothesSize != null">
+                clothes_size,
+            </if>
+            <if test="publicPrice != null">
+                public_price,
+            </if>
+            <if test="smallImg != null">
+                small_img,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="classifyCode != null">
+                #{classifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdClassify != null">
+                #{thirdClassify,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="typeNo != null">
+                #{typeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="serialNo != null">
+                #{serialNo,jdbcType=VARCHAR},
+            </if>
+            <if test="watchCoreType != null">
+                #{watchCoreType,jdbcType=VARCHAR},
+            </if>
+            <if test="watchcase != null">
+                #{watchcase,jdbcType=VARCHAR},
+            </if>
+            <if test="watchcaseSize != null">
+                #{watchcaseSize,jdbcType=VARCHAR},
+            </if>
+            <if test="material != null">
+                #{material,jdbcType=VARCHAR},
+            </if>
+            <if test="objectSize != null">
+                #{objectSize,jdbcType=VARCHAR},
+            </if>
+            <if test="clothesSize != null">
+                #{clothesSize,jdbcType=VARCHAR},
+            </if>
+            <if test="publicPrice != null">
+                #{publicPrice,jdbcType=INTEGER},
+            </if>
+            <if test="smallImg != null">
+                #{smallImg,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProPublic">
+        update pro_public
+        <set>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="classifyCode != null">
+                classify_code = #{classifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdClassify != null">
+                third_classify = #{thirdClassify,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="typeNo != null">
+                type_no = #{typeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="serialNo != null">
+                serial_no = #{serialNo,jdbcType=VARCHAR},
+            </if>
+            <if test="watchCoreType != null">
+                watch_core_type = #{watchCoreType,jdbcType=VARCHAR},
+            </if>
+            <if test="watchcase != null">
+                watchcase = #{watchcase,jdbcType=VARCHAR},
+            </if>
+            <if test="watchcaseSize != null">
+                watchcase_size = #{watchcaseSize,jdbcType=VARCHAR},
+            </if>
+            <if test="material != null">
+                material = #{material,jdbcType=VARCHAR},
+            </if>
+            <if test="objectSize != null">
+                object_size = #{objectSize,jdbcType=VARCHAR},
+            </if>
+            <if test="clothesSize != null">
+                clothes_size = #{clothesSize,jdbcType=VARCHAR},
+            </if>
+            <if test="publicPrice != null">
+                public_price = #{publicPrice,jdbcType=INTEGER},
+            </if>
+            <if test="smallImg != null">
+                small_img = #{smallImg,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <update id="updateBatchSmallImg" parameterType="java.util.List">
+        UPDATE pro_public
+        SET
+        small_img = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.smallImg}
+        </foreach>
+        END,
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+</mapper>

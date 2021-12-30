@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>劳力士价格查询</title>
+</head>
+<script src="https://file.luxuryadmin.com/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#GetPrice").click(function () {
+            queryPrice();
+        });
+
+    });
+
+    function queryPrice() {
+        var myType = document.getElementById("myType").value;
+        window.location.href = "https://www.rolex.cn/search.html#q=" + myType;
+    }
+</script>
+<style type="text/css">
+    input {
+        width: 320px;
+        height: 80px;
+        font-size: 50px;
+        text-align: center;
+        align-content: center;
+        border: 1px;
+        border-style: solid;
+    }
+
+</style>
+<body>
+<form style="text-align: left;margin-top: 150px;margin-left: 220px;">
+    <input type="text" id="myType" name="myType"/>
+    <input type="button" id="GetPrice" value="劳力士价格查询" style="font-size: 40px;margin-top: 50px"/>
+</form>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.sys.SysConfigMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.sys.SysConfig">
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="param_aes_switch" jdbcType="CHAR" property="paramAesSwitch"/>
+        <result column="param_sign_switch" jdbcType="CHAR" property="paramSignSwitch"/>
+        <result column="ip_sms_limit" jdbcType="INTEGER" property="ipSmsLimit"/>
+        <result column="sms_limit" jdbcType="INTEGER" property="smsLimit"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <select id="getSysConfigById1" resultMap="BaseResultMap">
+        select * from sys_config where id = 1
+    </select>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.sys.SysConfig">
+        insert into sys_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="paramAesSwitch != null">
+                param_aes_switch,
+            </if>
+            <if test="paramSignSwitch != null">
+                param_sign_switch,
+            </if>
+            <if test="ipSmsLimit != null">
+                ip_sms_limit,
+            </if>
+            <if test="smsLimit != null">
+                sms_limit,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="paramAesSwitch != null">
+                #{paramAesSwitch,jdbcType=CHAR},
+            </if>
+            <if test="paramSignSwitch != null">
+                #{paramSignSwitch,jdbcType=CHAR},
+            </if>
+            <if test="ipSmsLimit != null">
+                #{ipSmsLimit,jdbcType=INTEGER},
+            </if>
+            <if test="smsLimit != null">
+                #{smsLimit,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+</mapper>

@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpUser">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="wx_nickname" jdbcType="VARCHAR" property="wxNickname"/>
+
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+
+        <result column="vip_type" jdbcType="VARCHAR" property="vipType"/>
+
+        <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl"/>
+
+        <result column="master_type" jdbcType="VARCHAR" property="masterType"/>
+
+        <result column="is_member" jdbcType="VARCHAR" property="isMember"/>
+
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+
+        <result column="member_state" jdbcType="INTEGER" property="memberState"/>
+
+        <result column="try_start_time" jdbcType="TIMESTAMP" property="tryStartTime"/>
+
+        <result column="try_end_time" jdbcType="TIMESTAMP" property="tryEndTime"/>
+
+        <result column="pay_start_time" jdbcType="TIMESTAMP" property="payStartTime"/>
+
+        <result column="pay_end_time" jdbcType="TIMESTAMP" property="payEndTime"/>
+
+        <result column="login_ip" jdbcType="VARCHAR" property="loginIp"/>
+
+        <result column="province" jdbcType="VARCHAR" property="province"/>
+
+        <result column="city" jdbcType="VARCHAR" property="city"/>
+
+        <result column="district" jdbcType="VARCHAR" property="district"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="CHAR" property="del"/>
+
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		wx_nickname,
+		username,
+		nickname,
+		state,
+		head_img_url,
+		vip_type,
+		master_type,
+		is_member,
+		open_id,
+		member_state,
+		try_start_time,
+		try_end_time,
+		pay_start_time,
+		pay_end_time,
+		login_ip,
+		province,
+		city,
+		district,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.MpUser" keyProperty="id" useGeneratedKeys="true">
+        insert into mp_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="wxNickname!=null ">
+                wx_nickname,
+            </if>
+            <if test="username!=null ">
+                username,
+            </if>
+            <if test="nickname!=null ">
+                nickname,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="headImgUrl!=null ">
+                head_img_url,
+            </if>
+            <if test="masterType!=null ">
+                master_type,
+            </if>
+            <if test="vipType!=null ">
+                vip_type,
+            </if>
+            <if test="isMember!=null ">
+                is_member,
+            </if>
+            <if test="openId!=null ">
+                open_id,
+            </if>
+            <if test="memberState!=null ">
+                member_state,
+            </if>
+            <if test="tryStartTime!=null ">
+                try_start_time,
+            </if>
+            <if test="tryEndTime!=null ">
+                try_end_time,
+            </if>
+            <if test="payStartTime!=null ">
+                pay_start_time,
+            </if>
+            <if test="payEndTime!=null ">
+                pay_end_time,
+            </if>
+            <if test="loginIp!=null ">
+                login_ip,
+            </if>
+            <if test="province!=null ">
+                province,
+            </if>
+            <if test="city!=null ">
+                city,
+            </if>
+            <if test="district!=null ">
+                district,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+            <if test="remark!=null ">
+                remark,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="wxNickname!=null">
+                #{wxNickname,jdbcType=VARCHAR},
+            </if>
+            <if test="username!=null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname!=null">
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="headImgUrl!=null">
+                #{headImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="masterType!=null">
+                #{masterType,jdbcType=VARCHAR},
+            </if>
+            <if test="vipType!=null">
+                #{vipType,jdbcType=VARCHAR},
+            </if>
+            <if test="isMember!=null">
+                #{isMember,jdbcType=VARCHAR},
+            </if>
+            <if test="openId!=null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="memberState!=null">
+                #{memberState,jdbcType=INTEGER},
+            </if>
+            <if test="tryStartTime!=null">
+                #{tryStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tryEndTime!=null">
+                #{tryEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payStartTime!=null">
+                #{payStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payEndTime!=null">
+                #{payEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="loginIp!=null">
+                #{loginIp,jdbcType=VARCHAR},
+            </if>
+            <if test="province!=null">
+                #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city!=null">
+                #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="district!=null">
+                #{district,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark!=null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  mp_user 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.MpUser">
+        update mp_user
+        <set>
+            <if test="wxNickname!=null and wxNickname!=''">
+                wx_nickname = #{wxNickname,jdbcType=VARCHAR},
+            </if>
+            <if test="username!=null and username!=''">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname!=null and nickname!=''">
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="headImgUrl!=null and headImgUrl!=''">
+                head_img_url = #{headImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="masterType!=null and masterType!=''">
+                master_type = #{masterType,jdbcType=VARCHAR},
+            </if>
+            <if test="vipType!=null and masterType!=''">
+                vip_type = #{vipType,jdbcType=VARCHAR},
+            </if>
+            <if test="isMember!=null and isMember!=''">
+                is_member = #{isMember,jdbcType=VARCHAR},
+            </if>
+            <if test="openId!=null and openId!=''">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="memberState!=null">
+                member_state = #{memberState,jdbcType=INTEGER},
+            </if>
+            <if test="tryStartTime!=null">
+                try_start_time = #{tryStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tryEndTime!=null">
+                try_end_time = #{tryEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payStartTime!=null">
+                pay_start_time = #{payStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payEndTime!=null">
+                pay_end_time = #{payEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="loginIp!=null and loginIp!=''">
+                login_ip = #{loginIp,jdbcType=VARCHAR},
+            </if>
+            <if test="province!=null and province!=''">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city!=null and city!=''">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="district!=null and district!=''">
+                district = #{district,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+    <update id="updatePastUserInfo" parameterType="java.util.Date">
+        UPDATE mp_user
+        SET member_state = 0
+        WHERE
+            is_member = 'no'
+            AND member_state = 1
+            AND del = 0
+            and try_end_time &lt; #{date}
+    </update>
+    <update id="updateVipUserInfo" parameterType="java.util.Date">
+        UPDATE mp_user
+        SET is_member = 'no',
+        member_state = 0
+        WHERE
+            is_member = 'yes'
+            AND member_state IN ( 2, 3 )
+            AND del = 0
+            AND pay_end_time &lt; #{date}
+            and vip_type = 'mpvip'
+    </update>
+    <update id="updateSdjVipByMpVipUsername" parameterType="java.util.List">
+        update mp_user set vip_type = 'sdj',is_member = 'yes',member_state = 2,update_time = now()
+        where username in
+        <foreach collection="yesSdjVipPhones" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateSdjVipPast" parameterType="java.util.List">
+        update mp_user set is_member = 'no' , member_state = '0' ,update_time = now()
+        where username in
+        <foreach collection="noSdjVipPhones" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		wx_nickname,
+		username,
+		nickname,
+		state,
+		head_img_url,
+		master_type,
+		vip_type,
+		is_member,
+		open_id,
+		member_state,
+		try_start_time,
+		try_end_time,
+		pay_start_time,
+		pay_end_time,
+		login_ip,
+		province,
+		city,
+		district,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from mp_user
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+    <select id="getUserInfoByOpenId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_user
+        where open_id = #{openId}
+        and del = 0
+    </select>
+    <select id="getUserInfoByUsername" resultMap="BaseResultMap"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_user
+        where username = #{username}
+        and del = 0
+    </select>
+    <select id="getUserInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_user
+        where id = #{userId}
+        and del = 0
+    </select>
+    <select id="getUserName" resultType="java.lang.String">
+        select username from mp_user
+        WHERE
+            is_member = 'no'
+            AND member_state = 1
+            AND del = 0
+            and try_end_time &lt; #{date}
+    </select>
+    <select id="getVipUserName" resultMap="BaseResultMap" parameterType="java.util.Date">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_user
+        WHERE
+        is_member = 'yes'
+        AND member_state IN ( 2, 3 )
+        AND del = 0
+    </select>
+    <select id="listAddVipUser" resultType="com.luxuryadmin.vo.user.VOAddVipUserList">
+        SELECT
+            mp_pay_order.id AS id,
+            mp_user.username AS username,
+            mp_pay_order.insert_time AS insertTime,
+            ( SELECT nickname FROM mp_user WHERE id = mp_pay_order.insert_admin ) AS nickname,
+            mp_user.pay_end_time AS payEndTime
+        FROM
+            mp_pay_order
+            LEFT JOIN mp_user ON mp_user.id = mp_pay_order.fk_mp_user_id
+        WHERE
+            mp_pay_order.create_type = '1'
+	AND mp_user.del = '0'
+    </select>
+
+
+</mapper>

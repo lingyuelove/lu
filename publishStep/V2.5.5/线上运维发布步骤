@@ -1,0 +1,37 @@
+发布步骤:
+一、模块添加权限配置
+
+2、消息模块 ->商品相关
+商品锁单 msg:pro:lock
+
+3、分享模块 ->小程序访客
+小程序访客 appletAccessUser
+查看 share:see:appletAccessUser
+图标 /default/functionIcon/appletAccessUser.png
+4、销售模块 ->寄卖取回
+寄卖取回 entrustReturn
+查看 pro:entrust:entrustReturn
+寄卖商品取回 pro:recycle:add
+图标 /default/functionIcon/entrustReturn.png
+
+
+6、仓库模块 ->已删除
+已删除 deleteHistory
+查看 proOrOrd:list:deleteHistory
+已删除图标 /default/functionIcon/deleteHistory.png
+二、执行sql操作[V2.5.5-zs.sql]文件
+
+
+
+
+
+
+
+新增仓库模块
+仓库 allProduct /default/functionIcon/allProduct.png
+1.查看自有商品 pro:check:ownProduct2
+2.查看寄卖商品 pro:check:entrustProduct2
+3.查看其它商品 pro:check:otherProduct2
+
+到期商品 expireProduct /default/functionIcon/expireProduct.png
+查看

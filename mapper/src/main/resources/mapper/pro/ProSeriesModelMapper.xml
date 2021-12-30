@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProSeriesModelMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProSeriesModel">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="name" jdbcType="VARCHAR" property="name" />
+
+		<result column="fk_pro_sub_series_name" jdbcType="VARCHAR" property="fkProSubSeriesName" />
+
+		<result column="fk_pro_classify_sub_name" jdbcType="VARCHAR" property="fkProClassifySubName" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="type" jdbcType="VARCHAR" property="type" />
+
+		<result column="state" jdbcType="INTEGER" property="state" />
+
+		<result column="sort" jdbcType="INTEGER" property="sort" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		name,
+		fk_pro_sub_series_name,
+		fk_pro_classify_sub_name,
+		fk_shp_shop_id,
+		type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+	</sql>
+	<select id="getSeriesModel" resultMap="BaseResultMap" >
+		select
+		id,
+		name,
+		fk_pro_sub_series_name,
+		fk_pro_classify_sub_name,
+		fk_shp_shop_id,
+		type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from pro_series_model
+		where name = #{name,jdbcType=VARCHAR} and fk_pro_classify_sub_name = #{classifySubName,jdbcType=VARCHAR} and fk_pro_sub_series_name = #{subSeriesName,jdbcType=VARCHAR}
+
+	</select>
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProSeriesModel" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_series_model
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id,
+			</if>
+			<if test="name!=null ">
+				name,
+			</if>
+			<if test="fkProSubSeriesName!=null ">
+				fk_pro_sub_series_name,
+			</if>
+			<if test="fkProClassifySubName!=null ">
+				fk_pro_classify_sub_name,
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id,
+			</if>
+			<if test="type!=null ">
+				type,
+			</if>
+			<if test="state!=null ">
+				state,
+			</if>
+			<if test="sort!=null ">
+				sort,
+			</if>
+			<if test="insertTime!=null ">
+				insert_time,
+			</if>
+			<if test="updateTime!=null ">
+				update_time,
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin,
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin,
+			</if>
+			<if test="del!=null ">
+				del,
+			</if>
+			<if test="remark!=null ">
+				remark,
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="name!=null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="fkProSubSeriesName!=null">
+				#{fkProSubSeriesName,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifySubName!=null">
+				#{fkProClassifySubName,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				#{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				#{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_series_model
+
+		where id = #{id}
+
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProSeriesModel" >
+		update pro_series_model
+		<set>
+			<if test="name!=null and name!=''">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="fkProSubSeriesName!=null">
+				fk_pro_sub_series_name = #{fkProSubSeriesName,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifySubName!=null">
+				fk_pro_classify_sub_name = #{fkProClassifySubName,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null and type!=''">
+				type = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				state = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				sort = #{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		name,
+		fk_pro_sub_series_name,
+		fk_pro_classify_sub_name,
+		fk_shp_shop_id,
+		type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from pro_series_model
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+	<select id="getSeriesModelById" resultType="com.luxuryadmin.vo.pro.VoProSubSeries" >
+		select
+		sm.id,
+		sm.name as seriesModelName,
+		sm.fk_pro_sub_series_name as subSeriesName,
+		sm.fk_pro_classify_sub_name as classifySubName,
+		sm.type
+		from pro_series_model sm
+		where sm.id = #{id,jdbcType=INTEGER} and  sm.del = '0'
+
+	</select>
+
+	<select id="getSeriesModelByName" resultType="com.luxuryadmin.vo.pro.VoProSubSeries" >
+		select
+		sm.id,
+		sm.name as seriesModelName,
+		sm.fk_pro_sub_series_name as subSeriesName,
+		sm.fk_pro_classify_sub_name as classifySubName,
+		sm.type
+		from pro_series_model sm
+		where sm.name = #{name} and sm.fk_shp_shop_id in(-9,#{shopId}) and  sm.del = '0'
+
+	</select>
+	<select id="listSeriesModelPage" parameterType="com.luxuryadmin.param.pro.ParamProClassifySubSonQuery" resultType="com.luxuryadmin.vo.pro.VoProSubSeries" >
+		select
+		sm.id,
+		sm.name as seriesModelName,
+		sm.fk_pro_sub_series_name as subSeriesName,
+		sm.fk_pro_classify_sub_name as classifySubName,
+		sm.type
+		from pro_series_model sm
+
+		<where>
+			  sm.del = '0'
+			<if test="subSeriesName != null and subSeriesName != ''">
+				and sm.fk_pro_sub_series_name = #{subSeriesName}
+			</if>
+			<if test="classifySubName != null and classifySubName != ''">
+				and sm.fk_pro_classify_sub_name = #{classifySubName}
+			</if>
+			<if test="name != null and name != ''">
+				AND sm.name like  CONCAT('%',#{name},'%')
+			</if>
+		</where>
+		ORDER BY
+		CASE sm.`name`
+		WHEN '(未知)' THEN
+		2
+		ELSE
+		1
+		END,
+		CONVERT(sm.`name` USING gbk) ASC;
+	</select>
+	<update id="deleteSeriesModelClassifySub" parameterType="com.luxuryadmin.entity.pro.ProSubSeries" >
+		update pro_series_model set del =  '1'
+		<where>
+			<if test="classifySubName != null and classifySubName != ''">
+				fk_pro_classify_sub_name=#{classifySubName}
+			</if>
+			<if test="subSeriesName != null and subSeriesName != ''">
+				fk_pro_sub_series_name=#{subSeriesName}
+			</if>
+		</where>
+
+
+	</update>
+</mapper>

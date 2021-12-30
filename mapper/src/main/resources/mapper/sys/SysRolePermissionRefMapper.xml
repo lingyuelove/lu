@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.sys.SysRolePermissionRefMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.sys.SysRolePermissionRef">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_sys_role_id" jdbcType="INTEGER" property="fkSysRoleId" />
+    <result column="fk_sys_permission_id" jdbcType="INTEGER" property="fkSysPermissionId" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_sys_role_id, fk_sys_permission_id, insert_time, update_time, insert_admin, 
+    update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_permission_ref
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!-- 根据条件查询角色权限 -->
+    <select id="listPermByRole" parameterType="com.luxuryadmin.entity.sys.SysRolePermissionRef" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" />
+      from sys_role_permission_ref
+      where (1=1)
+      <if test="id != null">
+        and id = #{id}
+      </if>
+      <if test="fkSysRoleId != null">
+        and fk_sys_role_id = #{fkSysRoleId}
+      </if>
+      <if test="fkSysPermissionId != null">
+        and fk_sys_permission_id = #{fkSysPermissionId}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="updateTime != null">
+        and update_time = #{updateTime}
+      </if>
+      <if test="insertAdmin != null">
+        and insert_admin = #{insertAdmin}
+      </if>
+      <if test="updateAdmin != null">
+        and update_admin = #{updateAdmin}
+      </if>
+      <if test="versions != null">
+        and versions = #{versions}
+      </if>
+      <if test="del != null">
+        and del = #{del}
+      </if>
+      <if test="remark != null">
+        and remark = #{remark}
+      </if>
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from sys_role_permission_ref
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByRoleId" parameterType="java.lang.Integer">
+      delete from sys_role_permission_ref where fk_sys_role_id = #{id}
+    </delete>
+    <delete id="deleteRoleByPermissionId" parameterType="java.lang.Integer">
+      delete from sys_role_permission_ref where fk_sys_permission_id = #{permissionId}
+    </delete>
+    <insert id="saveObjectAll" parameterType="com.luxuryadmin.entity.sys.SysRolePermissionRef">
+    insert into sys_role_permission_ref (id, fk_sys_role_id, fk_sys_permission_id, 
+      insert_time, update_time, insert_admin, 
+      update_admin, versions, del, 
+      remark)
+    values (#{id,jdbcType=INTEGER}, #{fkSysRoleId,jdbcType=INTEGER}, #{fkSysPermissionId,jdbcType=INTEGER}, 
+      #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{insertAdmin,jdbcType=INTEGER}, 
+      #{updateAdmin,jdbcType=INTEGER}, #{versions,jdbcType=INTEGER}, #{del,jdbcType=CHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.sys.SysRolePermissionRef">
+    insert into sys_role_permission_ref
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkSysRoleId != null">
+        fk_sys_role_id,
+      </if>
+      <if test="fkSysPermissionId != null">
+        fk_sys_permission_id,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkSysRoleId != null">
+        #{fkSysRoleId,jdbcType=INTEGER},
+      </if>
+      <if test="fkSysPermissionId != null">
+        #{fkSysPermissionId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.sys.SysRolePermissionRef">
+    update sys_role_permission_ref
+    <set>
+      <if test="fkSysRoleId != null">
+        fk_sys_role_id = #{fkSysRoleId,jdbcType=INTEGER},
+      </if>
+      <if test="fkSysPermissionId != null">
+        fk_sys_permission_id = #{fkSysPermissionId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.sys.SysRolePermissionRef">
+    update sys_role_permission_ref
+    set fk_sys_role_id = #{fkSysRoleId,jdbcType=INTEGER},
+      fk_sys_permission_id = #{fkSysPermissionId,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      versions = #{versions,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="saveList" parameterType="java.util.List">
+    insert into sys_role_permission_ref
+    (fk_sys_role_id,fk_sys_permission_id,insert_admin,del,versions,insert_time)
+    values
+    <foreach collection="list" item="item" index="index" separator="," >
+      (
+
+      #{item.fkSysRoleId},
+      #{item.fkSysPermissionId},
+      #{item.insertAdmin},
+      #{item.del},
+      #{item.versions},
+      #{item.insertTime}
+      )
+    </foreach>
+  </insert>
+</mapper>

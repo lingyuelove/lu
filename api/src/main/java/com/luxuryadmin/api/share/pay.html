@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>一键导入图片</title>
+</head>
+<script src="https://file.luxuryadmin.com/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+    //var domain = "http://192.168.0.250:8080";
+    var domain = "https://test-m.luxuryadmin.com";
+    $(document).ready(function () {
+        $("#getShopNumber").click(function () {
+            var ajaxRul = $.ajax({url: domain + "/shop/wxPay/h5/createPayOrder?token=7b09e8c710bd4996a99dd008095aa030", type: "post", async: false});
+            var ajaxJson = JSON.parse(ajaxRul.responseText);
+            if (ajaxJson.code !== 'ok') {
+                alert(ajaxJson.msg);
+                return false;
+            }
+            var data = ajaxJson.data.h5_url;
+            alert(data);
+            //console.log();
+            //console.log(ajaxJson.data.length);
+            //console.log(ajaxJson.data[0].name);
+            window.location.href = data;
+
+        });
+        $("#confirm").click(function () {
+            importImg();
+        });
+
+    });
+    var timestamp1 = (new Date()).valueOf();
+
+    function importImg() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        var phone = document.getElementById("phone").value;
+        var shopNumber = document.getElementById("shopNumber").value;
+        if (username === "" || password === "" || phone === "" || shopNumber === "") {
+            alert("所有值为必填")
+            return false;
+        }
+        if (confirm("are you sure continue?")) {
+            var param = "username=" + username + "&password=" + password + "&phone=" + phone + "&shopNumber=" + shopNumber + "&timestamp=" + timestamp1;
+            //window.location.href = "https://m.luxuryadmin.com/tool/putIntoImg?" + param
+            var url = domain + "/tool/putIntoImg?" + param;
+            $("#showDiv").attr("style", "display: block;");
+            $.ajax({
+                type: "get",
+                async: true,
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                cache: false,
+                success: function (response) {
+                    $("#showDiv").attr("style", "display: none;");
+                    //返回的数据用data.d获取内容
+                    //移除原有的行;
+                    if (response.code === 'ok') {
+                        alert(response.data);
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (err) {
+                    $("#showDiv").attr("style", "display: none;");
+                    alert("请求服务器失败!");
+                }
+            });
+        }
+    }
+
+
+</script>
+<style type="text/css">
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    div {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: white;
+        text-align: center;
+    }
+
+    input {
+        width: 440px;
+        height: 80px;
+        font-size: 50px;
+        text-align: center;
+        align-content: center;
+        margin-top: 20px;
+        border: 1px;
+        border-style: solid;
+    }
+
+
+</style>
+<body>
+
+<form style="text-align: left;margin-top: 150px;margin-left: 220px;">
+    <input type="button" id="getShopNumber" value="pay" style="width:230px;font-size: 40px;margin-top: 50px"/>
+    <br/>
+</form>
+</body>
+</html>

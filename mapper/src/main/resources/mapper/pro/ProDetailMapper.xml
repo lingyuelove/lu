@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProDetailMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProDetail">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="accessory" jdbcType="VARCHAR" property="accessory"/>
+        <result column="source" jdbcType="VARCHAR" property="source"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>
+        <result column="customer_remark" jdbcType="VARCHAR" property="customerRemark"/>
+        <result column="repair_card" jdbcType="CHAR" property="repairCard"/>
+        <result column="repair_card_time" jdbcType="VARCHAR" property="repairCardTime"/>
+        <result column="unique_code" jdbcType="VARCHAR" property="uniqueCode"/>
+        <result column="card_code_img" jdbcType="VARCHAR" property="cardCodeImg"/>
+        <result column="product_img" jdbcType="VARCHAR" property="productImg"/>
+        <result column="video_url" jdbcType="VARCHAR" property="videoUrl"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="remark_img_url" jdbcType="VARCHAR" property="remarkImgUrl"/>
+        <result column="customer_info" jdbcType="VARCHAR" property="customerInfo"/>
+        <result column="auto_number" jdbcType="VARCHAR" property="autoNumber"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_pro_product_id, fk_shp_shop_id, accessory,source,customer_name,
+        customer_phone, customer_remark, repair_card, repair_card_time,
+        unique_code, card_code_img, product_img, insert_time, update_time,
+        update_admin, versions, del, remark,customer_info,video_url,remark_img_url,auto_number
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_detail
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--根据商品业务id获取商品详情id-->
+    <select id="getProDetailIdByShopIdAndBizId" resultType="java.lang.Integer">
+        SELECT
+            (SELECT det.id
+            FROM pro_detail det
+            WHERE det.fk_pro_product_id = pro.`id` ) 'proDetailId'
+        FROM pro_product pro
+        WHERE pro.`biz_id` = #{bizId} AND pro.fk_shp_shop_id = #{shopId}
+    </select>
+    <!--根据商品业务id获取商品唯一编码;-->
+    <select id="getUniqueCodeByShopIdBizId" resultType="java.lang.String">
+        select
+          det.`unique_code`
+        from
+          pro_detail det
+          left join pro_product pro
+            on det.`fk_pro_product_id` = pro.`id`
+        where pro.`biz_id` = #{bizId}
+          and pro.`fk_shp_shop_id` = #{shopId}
+    </select>
+
+
+    <!-- 根据商品id,获取详情-->
+    <select id="getProDetailByProId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_detail
+        where fk_pro_product_id = #{proId}
+
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteProDetailByProIds">
+         delete from pro_detail where fk_pro_product_id in (${ids})
+    </delete>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProDetail">
+        insert into pro_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="accessory != null">
+                accessory,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="customerPhone != null">
+                customer_phone,
+            </if>
+            <if test="customerRemark != null">
+                customer_remark,
+            </if>
+            <if test="repairCard != null">
+                repair_card,
+            </if>
+            <if test="repairCardTime != null">
+                repair_card_time,
+            </if>
+            <if test="uniqueCode != null">
+                unique_code,
+            </if>
+            <if test="cardCodeImg != null">
+                card_code_img,
+            </if>
+            <if test="productImg != null">
+                product_img,
+            </if>
+            <if test="videoUrl != null">
+                video_url,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="customerInfo != null">
+                customer_info,
+            </if>
+            <if test="remarkImgUrl != null">
+                remark_img_url,
+            </if>
+            <if test="autoNumber != null">
+                auto_number,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId != null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="accessory != null">
+                #{accessory,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerPhone != null">
+                #{customerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="customerRemark != null">
+                #{customerRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="repairCard != null">
+                #{repairCard,jdbcType=CHAR},
+            </if>
+            <if test="repairCardTime != null">
+                #{repairCardTime,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueCode != null">
+                #{uniqueCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cardCodeImg != null">
+                #{cardCodeImg,jdbcType=VARCHAR},
+            </if>
+            <if test="productImg != null">
+                #{productImg,jdbcType=VARCHAR},
+            </if>
+            <if test="videoUrl != null">
+                #{videoUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="customerInfo != null">
+                #{customerInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="remarkImgUrl != null">
+                #{remarkImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="autoNumber != null">
+                #{autoNumber,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!--更新实体字段-->
+    <sql id="updateColumn">
+        <set>
+            <if test="fkProProductId != null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="accessory != null">
+                accessory = #{accessory,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerPhone != null">
+                customer_phone = #{customerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="customerRemark != null">
+                customer_remark = #{customerRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="repairCard != null">
+                repair_card = #{repairCard,jdbcType=CHAR},
+            </if>
+            <if test="repairCardTime != null">
+                repair_card_time = #{repairCardTime,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueCode != null">
+                unique_code = #{uniqueCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cardCodeImg != null">
+                card_code_img = #{cardCodeImg,jdbcType=VARCHAR},
+            </if>
+            <if test="productImg != null">
+                product_img = #{productImg,jdbcType=VARCHAR},
+            </if>
+            <if test="videoUrl != null">
+                video_url = #{videoUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="customerInfo != null">
+                customer_info = #{customerInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="remarkImgUrl != null">
+                remark_img_url = #{remarkImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="autoNumber != null">
+                auto_number = #{autoNumber,jdbcType=VARCHAR},
+            </if>
+        </set>
+    </sql>
+    <!--根据id更新实体-->
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProDetail">
+        update pro_detail
+        <include refid="updateColumn"/>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateUniqueCodeByProId">
+        update pro_detail set unique_code = #{uniqueCode} where fk_pro_product_id = #{proId}
+    </update>
+</mapper>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.org.OrgOrganizationTempMapper">
+
+    <select id="getOrganizationTempPageByApp" resultType="com.luxuryadmin.vo.org.VoOrganizationTempPageByApp">
+        select
+        oot.id as id
+        ,oot.fk_org_organization_id as organizationId
+        ,oot.fk_pro_temp_id as tempId
+        ,oot.temp_seat_name as tempSeatName
+        ,oot.show_seat as showSeat
+        ,oot.insert_time as insertTime
+        , ss.name as shopName
+        , su.nickname as insertAdminName
+        from org_organization_temp oot
+        left join pro_temp pt on oot.fk_pro_temp_id =pt.id
+        left join shp_shop ss on pt.fk_shp_shop_id =ss.id
+        left join shp_user su on oot.insert_admin =su.id
+        <where>1=1
+            <if test="organizationId != null">
+                and fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by oot.insert_time desc
+    </select>
+    <select id="getOrganizationTempPageByApplets" resultType="com.luxuryadmin.vo.org.VoOrganizationTempPageByApplets">
+        select
+        oot.id as id
+        ,oot.fk_org_organization_id as organizationId
+        ,oot.fk_pro_temp_id as tempId
+        ,oot.temp_seat_name as tempSeatName
+        ,oot.show_seat as showSeat
+        , ss.name as shopName
+        from org_organization_temp oot
+        left join pro_temp pt on oot.fk_pro_temp_id =pt.id
+        left join shp_shop ss on pt.fk_shp_shop_id =ss.id
+        <where>1=1
+            <if test="organizationId != null">
+                and oot.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="searchName != null">
+                and (ss.number = #{searchName} or ss.name like CONCAT('%',#{searchName},'%')  or oot.show_seat = #{searchName})
+            </if>
+        </where>
+        order by oot.insert_time desc
+    </select>
+
+    <select id="getObjectById" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.org.OrgOrganizationTemp">
+        select
+        id
+        ,fk_org_organization_id as fkOrgOrganizationId
+        ,fk_shp_shop_id  as fkShpShopId
+        ,temp_seat_name as tempSeatName
+        ,show_seat as showSeat
+        ,insert_time as insertTime
+        ,update_time as updateTime
+        ,insert_admin as insertAdmin
+        ,update_admin as updateAdmin
+        , remark
+        from org_organization_temp
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getByTempId" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.org.OrgOrganizationTemp">
+        select *
+        from org_organization_temp
+        where fk_pro_temp_id = #{tempId,jdbcType=INTEGER} and fk_org_organization_id = #{organizationId,jdbcType=INTEGER} limit 1
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete
+        from org_organization_temp
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByOrganizationId" parameterType="java.lang.Integer">
+        delete
+        from org_organization_temp
+        where fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.org.OrgOrganizationTemp" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into org_organization_temp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkOrgOrganizationId != null">
+                fk_org_organization_id ,
+            </if>
+            <if test="fkProTempId != null">
+                fk_pro_temp_id ,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id ,
+            </if>
+            <if test="tempSeatName != null">
+                temp_seat_name ,
+            </if>
+            <if test="showSeat != null">
+                show_seat ,
+            </if>
+            <if test="insertTime != null">
+                insert_time ,
+            </if>
+            <if test="updateTime != null">
+                update_time ,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin ,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin ,
+            </if>
+            <if test="remark != null">
+                remark ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrgOrganizationId != null">
+                #{fkOrgOrganizationId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProTempId != null">
+                #{fkProTempId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="tempSeatName != null">
+                #{tempSeatName,jdbcType=VARCHAR},
+            </if>
+            <if test="showSeat != null">
+                #{showSeat,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.org.OrgOrganizationTemp">
+        update org_organization_temp
+        <set>
+            <if test="fkOrgOrganizationId != null">
+                fk_org_organization_id = #{fkOrgOrganizationId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProTempId != null">
+                fk_pro_temp_id = #{fkProTempId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="tempSeatName != null">
+                temp_seat_name = #{tempSeatName,jdbcType=VARCHAR},
+            </if>
+            <if test="showSeat != null">
+                show_seat = #{showSeat,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getProductCount" resultType="Integer">
+        select
+        sum(IFNULL((tp.num),pp.total_num))
+        from  pro_temp_product tp
+        left join pro_product pp on tp.fk_pro_product_id = pp.id
+        <if test="organizationId != null">
+            left join org_organization_temp ot on ot.fk_pro_temp_id =tp.fk_pro_temp_id
+        </if>
+        <where>pp.fk_pro_state_code BETWEEN 10 AND 39
+            <if test="organizationId != null">
+                and ot.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="tempId != null">
+                and tp.fk_pro_temp_id = #{tempId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <select id="getShopCount" resultType="Integer">
+        select count(1) from (select
+        ot.fk_shp_shop_id
+        from  org_organization_temp ot
+        left join pro_temp pt
+        on pt.id=ot.fk_pro_temp_id
+        <where>1=1
+            <if test="organizationId != null">
+                and ot.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="shopId != null">
+                and  ot.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+            </if>
+        </where>
+        group by pt.fk_shp_shop_id) a
+
+    </select>
+    <select id="getProductPrice" resultType="DECIMAL">
+        select
+        sum(IFNULL((tp.num),pp.total_num)*(IFNULL((tp.trade_price),pp.trade_price)))
+        from  pro_temp_product tp
+        left join pro_product pp on tp.fk_pro_product_id = pp.id
+        left join org_organization_temp ot on ot.fk_pro_temp_id =tp.fk_pro_temp_id
+        <where>pp.fk_pro_state_code BETWEEN 10 AND 39
+            <if test="organizationId != null">
+                and ot.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="shopId != null">
+                and  tp.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>

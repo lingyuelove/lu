@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProConveyProductMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProConveyProduct">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+
+		<result column="fk_pro_convey_id" jdbcType="INTEGER" property="fkProConveyId" />
+
+		<result column="receive_product_id" jdbcType="INTEGER" property="receiveProductId" />
+
+		<result column="name" jdbcType="VARCHAR" property="name" />
+
+		<result column="description" jdbcType="VARCHAR" property="description" />
+
+		<result column="num" jdbcType="INTEGER" property="num" />
+
+		<result column="old_num" jdbcType="INTEGER" property="oldNum" />
+
+		<result column="finish_price" jdbcType="DECIMAL" property="finishPrice" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		fk_pro_product_id,
+		fk_pro_convey_id,
+		receive_product_id,
+		name,
+		description,
+		num,
+		old_num,
+		finish_price,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProConveyProduct" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_convey_product
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkProProductId!=null ">
+				fk_pro_product_id, 
+			</if>
+			<if test="fkProConveyId!=null ">
+				fk_pro_convey_id, 
+			</if>
+			<if test="name!=null ">
+				name, 
+			</if>
+			<if test="description!=null ">
+				description, 
+			</if>
+			<if test="num!=null ">
+				num, 
+			</if>
+			 <if test="oldNum!=null ">
+				 old_num,
+			 </if>
+			<if test="finishPrice!=null ">
+				finish_price, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				#{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProConveyId!=null">
+				#{fkProConveyId,jdbcType=INTEGER},
+			</if>
+			<if test="name!=null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="description!=null">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="num!=null">
+				#{num,jdbcType=INTEGER},
+			</if>
+			<if test="oldNum!=null">
+				#{oldNum,jdbcType=INTEGER},
+			</if>
+			<if test="finishPrice!=null">
+				#{finishPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+    <insert id="addConveyProductList" parameterType="com.luxuryadmin.param.pro.ParamConveyProductAdd">
+		insert into pro_convey_product (fk_shp_shop_id, fk_pro_convey_id,
+		fk_pro_product_id,insert_admin,insert_time)
+		values
+		<foreach collection="proIdList" item="item" separator=",">
+			(#{shopId}, #{conveyId}, #{item}, #{userId},now())
+		</foreach>
+	</insert>
+	<update id="updateProductConveyState" parameterType="com.luxuryadmin.param.pro.ParamConveyProductAdd">
+		update pro_product set convey_state = 'conveySend' where id IN (${proIds})
+	</update>
+
+	<delete id="deleteObject" >
+		delete from  pro_convey_product 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProConveyProduct" >
+		update pro_convey_product
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProConveyId!=null">
+				fk_pro_convey_id = #{fkProConveyId,jdbcType=INTEGER},
+			</if>
+			<if test="receiveProductId!=null">
+				receive_product_id = #{receiveProductId,jdbcType=INTEGER},
+			</if>
+			<if test="name!=null and name!=''">
+				name = #{name,jdbcType=VARCHAR},
+			 </if>
+			<if test="description!=null and description!=''">
+				description = #{description,jdbcType=VARCHAR},
+			 </if>
+			<if test="num!=null">
+				num = #{num,jdbcType=INTEGER},
+			</if>
+			<if test="oldNum!=null">
+				old_num = #{oldNum,jdbcType=INTEGER},
+			</if>
+			<if test="finishPrice!=null">
+				finish_price = #{finishPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+	<update id="updateConveyPrice" parameterType="java.lang.Integer">
+		update pro_convey_product set finish_price = null where fk_pro_convey_id= #{conveyId,jdbcType=INTEGER}
+	</update>
+	<!--编辑寄卖传送商品列表的价格 数量 -->
+	<update id="updateConveyList" parameterType="java.lang.Integer">
+		update pro_convey_product pc
+		left join pro_product pp on pc.fk_pro_product_id = pp.id set
+		 pc.num = IFNULL(pc.num,pp.total_num -ifnull((
+		SELECT
+		sum( lock_num )
+		FROM
+		pro_lock_record
+		WHERE
+		pp.id = fk_pro_product_id
+		AND state = 0
+		),0))
+		,pc.name= IFNULL(pc.name,pp.name)
+		,pc.description= IFNULL(pc.description,pp.description)
+		<if test="defaultPrice=='initPrice' and defaultPrice != null">
+			,pc.finish_price= IFNULL(pc.finish_price,pp.init_price)
+		</if>
+		<if test="defaultPrice=='salePrice' and defaultPrice != null">
+			,pc.finish_price= IFNULL(pc.finish_price,pp.sale_price)
+		</if>
+		<if test="defaultPrice=='agencyPrice' and defaultPrice != null">
+			,pc.finish_price= IFNULL(pc.finish_price,pp.agency_price)
+		</if>
+		<if test="defaultPrice=='tradePrice' and defaultPrice != null">
+			,pc.finish_price= IFNULL(pc.finish_price,pp.trade_price)
+		</if>
+
+		where pc.fk_pro_convey_id =#{conveyId}
+		and pp.fk_pro_state_code>0
+	</update>
+	<update id="removeProductForConveyId" parameterType="java.lang.Integer">
+		delete from  pro_convey_product
+
+		where fk_pro_convey_id =#{conveyId}
+	</update>
+	<update id="updateProductForConveyId" parameterType="java.lang.Integer">
+		update  pro_product pp
+		left join pro_convey_product pc on pc.fk_pro_product_id = pp.id set
+		pp.convey_state= 'warehouse'
+		where pc.fk_pro_convey_id =#{conveyId}
+	</update>
+
+	<delete id="removeProductForNoNum" parameterType="java.lang.Integer">
+		delete pc from  pro_convey_product pc  left join pro_product pp on pc.fk_pro_product_id = pp.id
+		where  ifnull((
+		SELECT
+		sum( lock_num )
+		FROM
+		pro_lock_record
+		WHERE
+		pp.id = fk_pro_product_id
+		AND state = 0
+		),0) >= pp.total_num
+		and pc.fk_pro_convey_id = #{conveyId}
+	</delete>
+
+
+    <select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_product_id,
+		fk_pro_convey_id,
+		name,
+		description,
+		num,
+		old_num,
+		finish_price,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		remark
+		from pro_convey_product
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+	<select id="listConveyProduct" resultMap="BaseResultMap"
+			parameterType="java.lang.Integer">
+		select
+		pro_convey_product.id,
+		pro_convey_product.fk_shp_shop_id,
+		pro_convey_product.fk_pro_product_id,
+		pro_convey_product.fk_pro_convey_id,
+		pro_convey_product.name,
+		pro_convey_product.description,
+		pro_convey_product.num,
+		pro_convey_product.finish_price,
+		pro_convey_product.insert_time,
+		pro_convey_product.update_time,
+		pro_convey_product.insert_admin,
+		pro_convey_product.update_admin,
+		pro_convey_product.remark
+		from pro_convey_product
+		left join pro_product on pro_convey_product.fk_pro_product_id = pro_product.id
+		where pro_convey_product.fk_pro_convey_id = #{conveyId}
+		and pro_product.fk_pro_state_code>0
+	</select>
+	<!-- -->
+    <select id="getByProductId" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_product_id,
+		receive_product_id,
+		fk_pro_convey_id,
+		name,
+		description,
+		num,
+		finish_price,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		remark
+		from pro_convey_product pcp
+
+		where
+		<if test="type=='receive' and type != null">
+			pcp.receive_product_id = #{productId}
+		</if>
+		<if test="type=='send' and type != null">
+			pcp.fk_pro_product_id = #{productId}
+		</if>
+	</select>
+	<select id="getByProductIdAndType" resultType="com.luxuryadmin.entity.pro.ProConveyProduct">
+		select
+		pcp.id,
+		pcp.fk_shp_shop_id fkShpShopId,
+		pcp.fk_pro_product_id fkProProductId,
+		pcp.fk_pro_convey_id fkProConveyId,
+		pcp.receive_product_id receiveProductId,
+		ifnull( pcp.name, pro.name) as name,
+		ifnull( pcp.description, pro.description) as description,
+		ifnull( pcp.num, pro.total_num - ifnull( (SELECT sum( lock_num ) FROM pro_lock_record  WHERE pro.id = fk_pro_product_id AND state = 0 ),0)) 'num'  ,
+		<if test="defaultPrice=='initPrice' and defaultPrice != null">
+			ifnull( pcp.finish_price, pro.init_price) 'finishPrice',
+		</if>
+		<if test="defaultPrice=='salePrice' and defaultPrice != null">
+			ifnull( pcp.finish_price, pro.sale_price) 'finishPrice',
+		</if>
+		<if test="defaultPrice=='agencyPrice' and defaultPrice != null">
+			ifnull( pcp.finish_price, pro.agency_price) 'finishPrice',
+		</if>
+		<if test="defaultPrice=='tradePrice' and defaultPrice != null">
+			ifnull( pcp.finish_price, pro.trade_price) 'finishPrice',
+		</if>
+		pcp.insert_time,
+		pcp.update_time,
+		pcp.insert_admin,
+		pcp.update_admin,
+		pcp.remark
+		from pro_convey_product pcp
+		<choose>
+			<when test='type == "receive" and type != null'>
+				LEFT JOIN pro_product pro
+				ON pcp.`receive_product_id` = pro.`id`
+			</when>
+			<otherwise>
+				LEFT JOIN pro_product pro
+				ON pcp.`fk_pro_product_id` = pro.`id`
+			</otherwise>
+		</choose>
+		where
+		<if test="type=='receive' and type != null">
+			pcp.receive_product_id = #{productId}
+		</if>
+		<if test="type=='send' and type != null">
+			pcp.fk_pro_product_id = #{productId}
+		</if>
+	</select>
+
+
+</mapper>

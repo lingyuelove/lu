@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpDetailMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="shopkeeper" jdbcType="VARCHAR" property="shopkeeper" />
+    <result column="shopkeeper_phone" jdbcType="VARCHAR" property="shopkeeperPhone" />
+    <result column="more_img" jdbcType="VARCHAR" property="moreImg" />
+    <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+    <result column="company_tax" jdbcType="VARCHAR" property="companyTax" />
+    <result column="license_img_url" jdbcType="VARCHAR" property="licenseImgUrl" />
+    <result column="valid_img_url" jdbcType="VARCHAR" property="validImgUrl" />
+    <result column="valid_video_url" jdbcType="VARCHAR" property="validVideoUrl" />
+    <result column="upload_state" jdbcType="VARCHAR" property="uploadState" />
+    <result column="qq" jdbcType="VARCHAR" property="qq" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id,province, city, shopkeeper, shopkeeper_phone, more_img,
+    company_name, company_tax, license_img_url, valid_video_url, valid_img_url, upload_state,
+    qq, email,insert_time, update_time, update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shp_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="getObjectByShopId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List" />
+      from shp_detail
+      where fk_shp_shop_id = #{id,jdbcType=INTEGER}
+    </select>
+  <!--获取店铺认证信息-->
+  <select id="getShopValidInfo" resultType="com.luxuryadmin.vo.shp.VoShopValidInfo">
+    select
+    license_img_url 'licenseImgUrl',
+    valid_img_url 'validImgUrl',
+    valid_video_url 'validVideoUrl'
+    from shp_detail
+    where fk_shp_shop_id = #{shopId}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpDetail" useGeneratedKeys="true" keyProperty="id">
+    insert into shp_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="province != null">
+        province,
+      </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="shopkeeper != null">
+        shopkeeper,
+      </if>
+      <if test="shopkeeperPhone != null">
+        shopkeeper_phone,
+      </if>
+      <if test="moreImg != null">
+        more_img,
+      </if>
+      <if test="companyName != null">
+        company_name,
+      </if>
+      <if test="companyTax != null">
+        company_tax,
+      </if>
+      <if test="licenseImgUrl != null">
+        license_img_url,
+      </if>
+      <if test="validImgUrl != null">
+        valid_img_url,
+      </if>
+      <if test="validVideoUrl != null">
+        valid_video_url,
+      </if>
+      <if test="uploadState != null">
+        upload_state,
+      </if>
+      <if test="qq != null">
+        qq,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="province != null">
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeper != null">
+        #{shopkeeper,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeperPhone != null">
+        #{shopkeeperPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="moreImg != null">
+        #{moreImg,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="companyTax != null">
+        #{companyTax,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseImgUrl != null">
+        #{licenseImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validImgUrl != null">
+        #{validImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validVideoUrl != null">
+        #{validVideoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadState != null">
+        #{uploadState,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpDetail">
+    update shp_detail
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id =  #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeper != null">
+        shopkeeper = #{shopkeeper,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeperPhone != null">
+        shopkeeper_phone = #{shopkeeperPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="moreImg != null">
+        more_img = #{moreImg,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="companyTax != null">
+        company_tax = #{companyTax,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseImgUrl != null">
+        license_img_url = #{licenseImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validImgUrl != null">
+        valid_img_url = #{validImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validVideoUrl != null">
+        valid_video_url = #{validVideoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadState != null">
+        upload_state = #{uploadState,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--根据shopId更新实体;-->
+  <update id="updateShpDetailByShopId" parameterType="com.luxuryadmin.entity.shp.ShpDetail">
+    update shp_detail
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id =  #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeper != null">
+        shopkeeper = #{shopkeeper,jdbcType=VARCHAR},
+      </if>
+      <if test="shopkeeperPhone != null">
+        shopkeeper_phone = #{shopkeeperPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="moreImg != null">
+        more_img = #{moreImg,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="companyTax != null">
+        company_tax = #{companyTax,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseImgUrl != null">
+        license_img_url = #{licenseImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validImgUrl != null">
+        valid_img_url = #{validImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="validVideoUrl != null">
+        valid_video_url = #{validVideoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadState != null">
+        upload_state = #{uploadState,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+  </update>
+</mapper>

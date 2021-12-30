@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinBillMapper">
+
+    <select id="getProductPrice" resultType="DECIMAL">
+        select
+        IFNULL(sum(total_num*init_price),0)
+        from pro_product pp
+        <where>
+            pp.total_num > 0
+            and pp.fk_pro_state_code BETWEEN 10 and 39
+            <if test="shopId != null and shopId != ''">
+                AND pp.fk_shp_shop_id = #{shopId}
+            </if>
+            <if test="attributeCode != null and attributeCode != ''">
+                AND pp.fk_pro_attribute_code = #{attributeCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="getBillPageByApp" parameterType="java.lang.Integer" resultType="com.luxuryadmin.vo.fin.VoBillPageByApp">
+        select
+        fb.id as billId,
+        fb.name ,
+        fb.money,
+        fb.total_money as totalMoney,
+        fb.types ,
+        fb.insert_time as insertTime,
+        fb.insert_admin as insertAdmin,
+        su.nickname as insertAdminName
+        from fin_bill fb
+        left join shp_user su on fb.insert_admin =su.id
+        <where>
+            <if test="shopId != null">
+                AND fb.fk_shp_shop_id = #{shopId}
+            </if>
+            <if test="state != null and state != ''">
+                AND fb.state = #{state}
+            </if>
+        </where>
+    </select>
+
+    <select id="getObjectById" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.fin.FinBill">
+        select
+        id,
+        fk_shp_shop_id as fkShpShopId,
+        name ,
+        money,
+        total_money as totalMoney,
+        types,
+        insert_time as insertTime,
+        update_time as updateTime,
+        insert_admin as insertAdmin,
+        update_admin as updateAdmin,
+        state,
+        remark
+        from fin_bill
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinBill" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into fin_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="name != null">
+                name ,
+            </if>
+            <if test="money != null">
+                money,
+            </if>
+            <if test="oldMoney != null">
+                old_money,
+            </if>
+            <if test="totalMoney != null">
+                total_money,
+            </if>
+            <if test="types != null">
+                types,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="money != null">
+                #{money,jdbcType=DECIMAL},
+            </if>
+            <if test="oldMoney != null">
+                #{oldMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="totalMoney != null">
+                #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="types != null">
+                #{types,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinBill">
+        update fin_bill
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="money != null">
+                money = #{money,jdbcType=VARCHAR},
+            </if>
+            <if test="totalMoney != null">
+                total_money = #{totalMoney,jdbcType=VARCHAR},
+            </if>
+            <if test="types != null">
+                types = #{types,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getMakeMoney" resultType="DECIMAL">
+        select
+        sum(money-IFNULL((init_price),0))
+        from fin_fund_record fr
+        <where>1=1
+            <include refid="getMoneySearch" />
+        </where>
+    </select>
+
+    <select id="getMoneyForType" resultType="DECIMAL">
+        select
+        IFNULL(sum(money),0)
+        from fin_fund_record fr
+        <where>
+            1=1
+            <include refid="getMoneySearch" />
+        </where>
+    </select>
+
+    <sql id="getMoneySearch">
+        <if test="shopId != null and shopId != ''">
+            AND fr.fk_shp_shop_id = #{shopId}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND fr.insert_time <![CDATA[>=]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND fr.insert_time <![CDATA[<=]]> #{endTime}
+        </if>
+        <if test="billId != null and billId != ''">
+            AND fr.fk_fin_bill_id = #{billId}
+        </if>
+        <if test="fundType != null and fundType != ''">
+            AND fr.fund_type = #{fundType}
+        </if>
+        <if test="state != null">
+            AND fr.state  = #{state}
+        </if>
+    </sql>
+</mapper>

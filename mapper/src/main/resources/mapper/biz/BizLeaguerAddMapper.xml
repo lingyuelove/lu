@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizLeaguerAddMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizLeaguerAdd">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_inviter_shop_id" jdbcType="INTEGER" property="fkInviterShopId"/>
+        <result column="fk_be_inviter_shop_id" jdbcType="INTEGER" property="fkBeInviterShopId"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="become_friend_time" jdbcType="TIMESTAMP" property="becomeFriendTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_inviter_shop_id, fk_be_inviter_shop_id, state, insert_time, become_friend_time,
+        update_time, insert_admin, update_admin, versions, del, remark
+    </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from biz_leaguer_add
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--获取好友申请记录-->
+    <select id="listBizLeaguerAddByShopId" resultType="com.luxuryadmin.vo.biz.VoBizLeaguerAdd">
+        SELECT
+        shop.`id` 'leaguerShopId',
+        shop.`name` 'leaguerShopName',
+        shop.number 'leaguerShopNumber',
+        shop.`head_img_url` 'headImgUrl',
+        leaAdd.`id` 'leaguerAddId',
+        leaAdd.`fk_be_inviter_shop_id` 'shopId',
+        leaAdd.`state` 'state',
+        leaAdd.`update_time` 'insertTime',
+        leaAdd.`remark` 'requestMsg',
+        leaAdd.`source` 'source',
+        (SELECT lea.state
+        FROM biz_leaguer lea
+        WHERE lea.fk_inviter_shop_id = #{shopId}
+        AND lea.fk_be_inviter_shop_id = leaAdd.`fk_inviter_shop_id`) 'leaguerState' ,
+        (SELECT CONCAT(det.`province`, det.`city`)
+        FROM shp_detail det
+        WHERE det.fk_shp_shop_id = #{shopId}) 'address'
+        FROM
+        biz_leaguer_add leaAdd
+        LEFT JOIN shp_shop shop
+        ON leaAdd.`fk_inviter_shop_id` = shop.`id`
+        WHERE leaAdd.`fk_be_inviter_shop_id` = #{shopId} and leaAdd.`state` > 0
+        order by leaAdd.`update_time` desc
+    </select>
+
+    <!--
+    根据被添加好友【店铺ID】查询所有未被处理的消息
+   【biz_leaguer_add.state】 状态为 10:已发请求(待确认); 12:已发请求(已过期);
+    -->
+    <select id="selectUnHandleCountByShopId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT
+        COUNT(0)
+        FROM
+        biz_leaguer_add
+        WHERE
+        fk_be_inviter_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        AND
+        state IN (10,12)
+    </select>
+
+    <!--查找添加友商记录-->
+    <select id="getLeaguerAddByShopIdAndLeaguerShopId" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        biz_leaguer_add
+        WHERE fk_inviter_shop_id = #{shopId}
+        AND fk_be_inviter_shop_id = #{leaguerShopId}
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from biz_leaguer_add
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteLeaguerAddForShop" parameterType="java.lang.Integer">
+        delete from biz_leaguer_add
+        where fk_inviter_shop_id = #{shopId}
+        or fk_be_inviter_shop_id = #{shopId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerAdd">
+        insert into biz_leaguer_add
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkInviterShopId != null">
+                fk_inviter_shop_id,
+            </if>
+            <if test="fkBeInviterShopId != null">
+                fk_be_inviter_shop_id,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="becomeFriendTime != null">
+                become_friend_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkInviterShopId != null">
+                #{fkInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviterShopId != null">
+                #{fkBeInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="becomeFriendTime != null">
+                #{becomeFriendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerAdd">
+        update biz_leaguer_add
+        <set>
+            <if test="fkInviterShopId != null">
+                fk_inviter_shop_id = #{fkInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviterShopId != null">
+                fk_be_inviter_shop_id = #{fkBeInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="becomeFriendTime != null">
+                become_friend_time = #{becomeFriendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--是否允许友商查看店铺商品-->
+    <update id="updateBizLeaguerAdd" parameterType="com.luxuryadmin.entity.biz.BizLeaguerAdd">
+        update biz_leaguer_add
+        <set>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="becomeFriendTime != null">
+                become_friend_time = #{becomeFriendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id}
+        and fk_inviter_shop_id = #{fkInviterShopId}
+        and fk_be_inviter_shop_id = #{fkBeInviterShopId}
+    </update>
+
+
+</mapper>

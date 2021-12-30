@@ -1,0 +1,35 @@
+一、后台店铺权限修改
+    1.销售模块
+        1.5【维修保养】
+            1.5.2新增【添加】
+            权限：sale:service:add
+            接口：/addShpService
+
+            1.5.3新增【修改】
+            权限：sale:service:update
+            接口：/updateShpService
+                 /finishShpService
+                 /cancelShpService
+
+            1.5.4新增【删除】
+            权限：sale:service:delete
+            接口：/deleteShpService
+
+
+
+    4.店铺模块
+        4.6【其他记账】
+            4.6.1【查看】不修改
+                权限：shop:check:shopBill
+                接口：/listFinShopRecord
+
+            新增
+            4.6.2【记一笔】
+                权限：shop:bill:add
+                接口：/addFinShopRecord
+
+            4.6.3【删除】
+                权限：shop:bill:delete
+                接口：/deleteFinShopRecord
+
+

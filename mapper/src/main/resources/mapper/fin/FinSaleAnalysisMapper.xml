@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinSaleAnalysisMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinSaleAnalysis">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="biz_date" jdbcType="DATE" property="bizDate"/>
+        <result column="store_cost" jdbcType="DECIMAL" property="storeCost"/>
+        <result column="store_count" jdbcType="INTEGER" property="storeCount"/>
+        <result column="sale_cost" jdbcType="DECIMAL" property="saleCost"/>
+        <result column="sale_price" jdbcType="DECIMAL" property="salePrice"/>
+        <result column="sale_order_count" jdbcType="INTEGER" property="saleOrderCount"/>
+        <result column="gross_profit" jdbcType="DECIMAL" property="grossProfit"/>
+        <result column="gross_profit_rate" jdbcType="DOUBLE" property="grossProfitRate"/>
+        <result column="add_pro_count" jdbcType="INTEGER" property="addProCount"/>
+        <result column="add_pro_cost" jdbcType="DECIMAL" property="addProCost"/>
+        <result column="add_private_pro_count" jdbcType="INTEGER" property="addPrivateProCount"/>
+        <result column="add_private_pro_cost" jdbcType="DECIMAL" property="addPrivateProCost"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, biz_date, store_cost, store_count, sale_cost, sale_price, sale_order_count, 
+    gross_profit, gross_profit_rate, add_pro_count, add_pro_cost, add_private_pro_count, 
+    add_private_pro_cost, insert_time, del, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fin_sale_analysis
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--根据店铺id,查询日期; 获取销售统计数据;-->
+    <select id="listFinSaleAnalyses" resultType="com.luxuryadmin.entity.fin.FinSaleAnalysis">
+        select
+        sum(store_cost) 'storeCost',
+        sum(store_count) 'storeCount',
+        sum(sale_cost) 'saleCost',
+        sum(sale_price) 'salePrice',
+        sum(sale_order_count) 'saleOrderCount',
+        sum(gross_profit) 'grossProfit',
+        ROUND((sum(gross_profit)/SUM(sale_price)*100),2) 'grossProfitRate',
+        sum(add_pro_count) 'addProCount',
+        sum(add_pro_cost) 'addProCost',
+        sum(add_private_pro_count) 'addPrivateProCount',
+        sum(add_private_pro_cost) 'addPrivateProCost'
+        from fin_sale_analysis
+        where fk_shp_shop_id = #{shopId}
+            AND biz_date &gt;= #{startDate}
+            AND biz_date &lt;= #{endDate}
+    </select>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinSaleAnalysis">
+        insert into fin_sale_analysis
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="bizDate != null">
+                biz_date,
+            </if>
+            <if test="storeCost != null">
+                store_cost,
+            </if>
+            <if test="storeCount != null">
+                store_count,
+            </if>
+            <if test="saleCost != null">
+                sale_cost,
+            </if>
+            <if test="salePrice != null">
+                sale_price,
+            </if>
+            <if test="saleOrderCount != null">
+                sale_order_count,
+            </if>
+            <if test="grossProfit != null">
+                gross_profit,
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate,
+            </if>
+            <if test="addProCount != null">
+                add_pro_count,
+            </if>
+            <if test="addProCost != null">
+                add_pro_cost,
+            </if>
+            <if test="addPrivateProCount != null">
+                add_private_pro_count,
+            </if>
+            <if test="addPrivateProCost != null">
+                add_private_pro_cost,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="bizDate != null">
+                #{bizDate,jdbcType=DATE},
+            </if>
+            <if test="storeCost != null">
+                #{storeCost,jdbcType=DECIMAL},
+            </if>
+            <if test="storeCount != null">
+                #{storeCount,jdbcType=INTEGER},
+            </if>
+            <if test="saleCost != null">
+                #{saleCost,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="saleOrderCount != null">
+                #{saleOrderCount,jdbcType=INTEGER},
+            </if>
+            <if test="grossProfit != null">
+                #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                #{grossProfitRate,jdbcType=DOUBLE},
+            </if>
+            <if test="addProCount != null">
+                #{addProCount,jdbcType=INTEGER},
+            </if>
+            <if test="addProCost != null">
+                #{addProCost,jdbcType=DECIMAL},
+            </if>
+            <if test="addPrivateProCount != null">
+                #{addPrivateProCount,jdbcType=INTEGER},
+            </if>
+            <if test="addPrivateProCost != null">
+                #{addPrivateProCost,jdbcType=DECIMAL},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinSaleAnalysis">
+        update fin_sale_analysis
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="bizDate != null">
+                biz_date = #{bizDate,jdbcType=DATE},
+            </if>
+            <if test="storeCost != null">
+                store_cost = #{storeCost,jdbcType=DECIMAL},
+            </if>
+            <if test="storeCount != null">
+                store_count = #{storeCount,jdbcType=INTEGER},
+            </if>
+            <if test="saleCost != null">
+                sale_cost = #{saleCost,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="saleOrderCount != null">
+                sale_order_count = #{saleOrderCount,jdbcType=INTEGER},
+            </if>
+            <if test="grossProfit != null">
+                gross_profit = #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate = #{grossProfitRate,jdbcType=DOUBLE},
+            </if>
+            <if test="addProCount != null">
+                add_pro_count = #{addProCount,jdbcType=INTEGER},
+            </if>
+            <if test="addProCost != null">
+                add_pro_cost = #{addProCost,jdbcType=DECIMAL},
+            </if>
+            <if test="addPrivateProCount != null">
+                add_private_pro_count = #{addPrivateProCount,jdbcType=INTEGER},
+            </if>
+            <if test="addPrivateProCost != null">
+                add_private_pro_cost = #{addPrivateProCost,jdbcType=DECIMAL},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

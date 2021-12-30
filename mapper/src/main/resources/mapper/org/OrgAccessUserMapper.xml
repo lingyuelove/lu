@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.org.OrgAccessUserMapper">
+
+    <select id="getAccessUserByApp" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.vo.org.VoAccessUserPageByApp">
+        select
+        au.id as id
+        ,au.fk_org_organization_id as organizationId
+        ,au.phone as phone
+        ,au.insert_time as insertTime
+        ,au.insert_admin as insertAdmin
+        ,su.nickname as insertAdminName
+        ,au.access_type as accessType
+        from
+        org_access_user au
+        left join shp_user su on au.insert_admin =su.id
+        <where>au.access_type>0
+            <if test="organizationId != null">
+                and au.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="accessType != null">
+                and au.access_type = #{accessType,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by au.insert_time desc
+    </select>
+
+    <select id="getAccessUser" parameterType="java.lang.String" resultType="com.luxuryadmin.entity.org.OrgAccessUser">
+        select
+        id
+        ,fk_shp_shop_id as fkShpShopId
+        ,fk_org_organization_id as fkOrgOrganizationId
+        ,phone as phone
+        ,access_type as accessType
+        ,insert_time as insertTime
+        ,update_time as updateTime
+        ,insert_admin as insertAdmin
+        ,update_admin as updateAdmin
+        , remark
+        from
+        org_access_user au
+        <where>
+            <if test="accessType != null">
+                au.access_type>0
+            </if>
+            <if test="phone != null">
+                and au.phone = #{phone,jdbcType=VARCHAR}
+            </if>
+            <if test="organizationId != null">
+                and au.fk_org_organization_id =   #{organizationId,jdbcType=INTEGER}
+            </if>
+        </where>
+        limit 1
+    </select>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.org.OrgAccessUser">
+        select
+        id,
+        fk_shp_shop_id as fkShpShopId,
+        phone,
+        fk_org_organization_id  fkOrgOrganizationId,
+        access_type  accessType,
+        insert_time  insertTime,
+        update_time  updateTime,
+        insert_admin  insertAdmin,
+        update_admin  updateAdmin,
+        remark
+        from org_access_user
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.org.OrgOrganization" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into org_access_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkOrgOrganizationId != null">
+                fk_org_organization_id ,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="accessType != null">
+                access_type,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrgOrganizationId != null">
+                #{fkOrgOrganizationId,jdbcType=INTEGER},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="accessType != null">
+                #{accessType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.org.OrgAccessUser">
+        update org_access_user
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrgOrganizationId != null">
+                fk_org_organization_id = #{fkOrgOrganizationId,jdbcType=INTEGER},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="accessType != null">
+                access_type = #{accessType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getAccessUserList" parameterType="java.lang.String" resultType="com.luxuryadmin.vo.org.VoAccessUserPageByApp">
+        select
+        au.id as id
+        ,au.fk_org_organization_id as organizationId
+        ,au.phone as phone
+        ,au.insert_time as insertTime
+        ,au.insert_admin as insertAdmin
+        ,su.nickname as insertAdminName
+        ,au.access_type as accessType
+        from
+        org_access_user au
+        left join shp_user su on au.insert_admin =su.id
+        <where>au.access_type>0
+            <if test="phone != null">
+                and au.phone like CONCAT('%',#{phone,jdbcType=VARCHAR})
+            </if>
+            <if test="organizationId != null">
+                and au.fk_org_organization_id = #{organizationId,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by au.insert_time desc
+    </select>
+</mapper>

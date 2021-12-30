@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.temp.TempMapper">
+
+    <!--获取商品详情里面的图片地址;-->
+
+    <select id="listProDetail" resultType="com.luxuryadmin.entity.pro.ProDetail">
+        select
+        id,
+        fk_shp_shop_id 'fkShpShopId' ,
+        fk_pro_product_id 'fkProProductId',
+        card_code_img 'cardCodeImg',
+        product_img 'productImg'
+        from
+        pro_detail
+    </select>
+
+    <!--获取用户注册数和店铺注册数-->
+    <select id="listRegisterNum" resultType="java.util.HashMap">
+		SELECT
+          t.biz_date 'bizDate',
+          t.注册用户数 'userNum',
+          COUNT(shp.id) 'shopNum' ,
+         format(ifnull(COUNT(shp.id)/ t.注册用户数*100,0),2) 'rate'
+        FROM
+          (SELECT
+            sd.biz_date,
+            COUNT(su.id) '注册用户数'
+          FROM
+            sys_date sd
+            LEFT JOIN shp_user su
+              ON sd.biz_date = DATE_FORMAT(su.insert_time, '%Y-%m-%d')
+          GROUP BY sd.biz_date
+          ORDER BY biz_date ASC) t
+          LEFT JOIN shp_shop shp
+            ON t.biz_date = DATE_FORMAT(shp.insert_time, '%Y-%m-%d')
+        GROUP BY t.biz_date
+        ORDER BY t.biz_date DESC  limit 15
+    </select>
+    <!--统计在售商品,成本>0-->
+    <select id="countOnSaleInitPriceNotNull" resultType="java.util.HashMap">
+        SELECT
+        NOW()'currentTime',
+        SUM(total_num)'onSaleNumInitPriceNotNull',
+        FORMAT(SUM(init_price*0.01),2) 'totalMoney',
+        format(SUM(init_price * 0.01)/SUM(total_num),2) 'avgPrice'
+        FROM pro_product
+        WHERE fk_pro_state_code BETWEEN 20 AND 39 AND init_price >0
+        and fk_shp_shop_id != 10017
+    </select>
+
+    <!--统计在售商品-->
+    <select id="countOnSale" resultType="java.util.HashMap">
+        SELECT
+        NOW()'currentTime',
+        SUM(total_num)'onSaleNum',
+        FORMAT(SUM(init_price*0.01),2) 'totalMoney'
+        FROM pro_product
+        WHERE fk_pro_state_code BETWEEN 20 AND 39
+        and fk_shp_shop_id != 10017
+    </select>
+
+
+    <!--获取活跃用户-->
+    <select id="listActivityUser" resultType="java.util.HashMap">
+    SELECT
+      onSaleNum,
+      initPrice,
+      id,
+      insertTime,
+      shopName,
+      isMember,
+      FORMAT(finishInitPrice,0) 'finishInitPrice',
+      FORMAT(finishTotalPrice,0) 'finishTotalPrice',
+      FORMAT(goodsProfit,0) 'goodsProfit',
+      FORMAT(profitRate,2)  'profitRate',
+      goodsProfit 'orderByColumn'
+    FROM
+      (SELECT
+        有效商品数量 'onSaleNum',
+        FORMAT(成本总价, 0) 'initPrice',
+        店铺标识符 'id',
+        开店时间 'insertTime',
+        店铺名称 'shopName',
+        是否会员 'isMember',
+        IFNULL(temp.成交成本, 0) 'finishInitPrice',
+        IFNULL(temp.成交总额, 0) 'finishTotalPrice',
+        IFNULL(temp.成交总额 - temp.成交成本, 0 ) 'goodsProfit',
+        IFNULL((temp.成交总额 - temp.成交成本  ) / 成交总额 * 100, 0) 'profitRate'
+      FROM
+        (SELECT
+          SUM(total_num) '有效商品数量',
+          SUM(init_price * total_num) * 0.01 '成本总价',
+          (SELECT
+            number
+          FROM
+            shp_shop
+          WHERE id IN (fk_shp_shop_id)) '店铺标识符',
+          (SELECT
+            insert_time
+          FROM
+            shp_shop
+          WHERE id IN (fk_shp_shop_id)) '开店时间',
+          (SELECT
+            NAME
+          FROM
+            shp_shop
+          WHERE id IN (fk_shp_shop_id)) '店铺名称',
+          (SELECT
+            is_member
+          FROM
+            shp_shop
+          WHERE id IN (fk_shp_shop_id)) '是否会员',
+          (SELECT
+            SUM(
+              (SELECT
+                pro.init_price * 0.01
+              FROM
+                pro_product pro
+              WHERE pro.id = od.`fk_pro_product_id`)
+            )
+          FROM
+            ord_order od
+          WHERE od.state = 20
+            AND od.fk_shp_shop_id = pro.fk_shp_shop_id
+            AND finish_time >= #{st}) '成交成本',
+          (SELECT
+            SUM(od.finish_price) * 0.01
+          FROM
+            ord_order od
+          WHERE od.state = 20
+            AND od.fk_shp_shop_id = pro.fk_shp_shop_id
+            AND finish_time >= #{st}) '成交总额'
+        FROM
+          pro_product pro
+        WHERE fk_pro_state_code BETWEEN 20
+          AND 39
+          AND (init_price > 0
+            OR trade_price > 0)
+          AND pro.fk_shp_shop_id != 10017
+        GROUP BY fk_shp_shop_id) temp
+      WHERE 有效商品数量 BETWEEN #{startNum}
+        AND #{endNum}) t
+    ORDER BY orderByColumn DESC
+    </select>
+
+    <!--统计注册用户和注册店铺-->
+    <select id="countRegisterUserAndShop" resultType="java.util.HashMap">
+        SELECT
+          *,
+          FORMAT(
+            registerShop / registerUser * 100,
+            2
+          ) 'rate',
+          FORMAT(payingUser / registerShop * 100, 2) 'payingUserRate'
+        FROM
+          (SELECT
+            NOW() 'currentTime',
+            COUNT(DISTINCT su.id) 'registerUser',
+            COUNT(shop.id) 'registerShop',
+            SUM(IF(shop.is_member = 'yes', 1, 0)) 'payingUser'
+          FROM
+            shp_user su
+            LEFT JOIN shp_shop shop
+              ON su.`id` = shop.`fk_shp_user_id`) temp
+    </select>
+
+    <!--统计在售商品各分类成本-->
+    <select id="countOnSaleProClassify" resultType="java.util.HashMap">
+        select
+          se.`name` 'classifyName',
+          sum(pro.total_num) 'totalNum',
+          format(sum(pro.init_price) * 0.01, 2) 'totalPrice',
+        format(SUM(pro.init_price)/SUM(pro.total_num)*0.01,2) 'avgPrice'
+        from
+          pro_product pro
+          left join sys_enum se
+            on pro.`fk_pro_classify_code` = se.`code`
+            and se.type = 'pro_classify'
+        where pro.fk_pro_state_code BETWEEN 20
+          AND 39
+          <if test="isInitPriceNotNull">
+              AND (
+              pro.init_price > 0
+              OR pro.trade_price > 0
+              )
+          </if>
+          AND pro.fk_shp_shop_id != 10017
+        group by pro.fk_pro_classify_code
+        order by totalNum asc
+    </select>
+
+
+</mapper>

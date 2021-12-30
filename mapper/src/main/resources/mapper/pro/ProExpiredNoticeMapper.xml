@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProExpiredNoticeMapper">
+
+    <select id="getExpiredProductLists"
+            resultType="com.luxuryadmin.vo.pro.VoExpiredProductByList">
+        select
+        pp.biz_id as bizId
+        ,pp.fk_shp_shop_id as fkShpShopId
+        ,pp.fk_shp_shop_id as shopId
+        ,pp.fk_pro_attribute_code as attributeCode
+        ,pp.fk_pro_attribute_code as attributeUs
+        ,pp.target_user as targetUser
+        ,pp.small_img as smallImg
+        ,pp.name as name
+        ,pp.init_price as initPrice
+        ,pp.trade_price as tradePrice
+        ,pp.agency_price as agencyPrice
+        ,pp.sale_price as salePrice
+        ,pp.insert_time as insertTime
+        ,to_days(date_sub(NOW(), INTERVAL #{expiredProductSearch.expiredDay} DAY ))
+        - to_days(pp.insert_time) as productExpiredDay
+        from pro_product pp
+        LEFT JOIN pro_detail det ON pp.`id` = det.`fk_pro_product_id`
+        <where>
+            <include refid="expiredProductSearch"/>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="expiredProductSearch.sortKey == 'price'">
+                pp.trade_price ${expiredProductSearch.sortValue}
+            </when>
+            <when test="expiredProductSearch.sortKey== 'time'">
+                pp.insert_time ${expiredProductSearch.sortValue}
+            </when>
+            <when test="expiredProductSearch.sortKey== 'updateTime'">
+                pp.update_time ${expiredProductSearch.sortValue}
+            </when>
+            <otherwise>
+                pp.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+    <sql id="expiredProductSearch">
+        pp.insert_time <![CDATA[<]]> date_sub(NOW(), INTERVAL #{expiredProductSearch.expiredDay} DAY ) and
+        pp.fk_pro_state_code BETWEEN 10 and 39
+        and pp.del = '0'
+        <if test="expiredProductSearch.shopId != null ">
+            AND pp.fk_shp_shop_id = #{expiredProductSearch.shopId}
+        </if>
+        <if test="expiredProductSearch.attributeCodeList != null ">
+            AND pp.fk_pro_attribute_code in
+            <foreach collection="expiredProductSearch.attributeCodeList" item="item" index="index" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="expiredProductSearch.classifyCodeList != null and expiredProductSearch.classifyCode == null">
+            AND pp.fk_pro_classify_code in
+            <foreach collection="expiredProductSearch.classifyCodeList" item="item" index="index" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="expiredProductSearch.classifyCode != null ">
+            AND pp.fk_pro_classify_code = #{expiredProductSearch.classifyCode}
+        </if>
+        <if test="expiredProductSearch.proName != null and expiredProductSearch.proName!=''">
+            AND (
+            CONCAT(pp.name,pp.description,pp.remark) REGEXP #{expiredProductSearch.proName}
+            OR CONCAT(pp.remark,pp.description,pp.name) REGEXP #{expiredProductSearch.proName}
+            <if test="expiredProductSearch.uniqueCode != null and expiredProductSearch.uniqueCode!=''">
+                OR det.unique_code REGEXP #{expiredProductSearch.uniqueCode}
+            </if>
+            )
+        </if>
+    </sql>
+    <!--统计g过期的总商品件数和总价格 总价格 库存*销售价 产品修改为库存*成本价-->
+    <select id="getExpiredProductTotalMoneyAndCount"  resultType="java.util.Map">
+        SELECT
+        IFNULL(SUM(pp.total_num), 0) 'totalNum',
+        IFNULL(FORMAT(SUM(pp.total_num * pp.init_price)/100.00,2), 0) 'totalPrice'
+        FROM
+        pro_product pp
+        LEFT JOIN pro_detail det ON pp.`id` = det.`fk_pro_product_id`
+        <where>
+            <include refid="expiredProductSearch"/>
+        </where>
+    </select>
+    <select id="getExpiredListByShopId"
+            resultType="com.luxuryadmin.vo.pro.VoExpiredNoticeByList">
+        select
+        en.id as expiredNoticeId
+        ,en.fk_shp_shop_id as fkShpShopId
+        ,en.attribute_name as attributeName
+        ,en.classify_name as classifyName
+        ,en.fk_pro_attribute_codes as fkProAttributeCodes
+        ,en.fk_pro_classify_codes as fkProClassifyCodes
+        ,en.expired_day as expiredDay
+        ,en.insert_time as insertTime
+        ,en.insert_admin as userId
+        ,su.nickname as userName
+        from pro_expired_notice en
+        left join shp_user su on en.insert_admin =su.id
+        <where>1=1
+            <if test="shopId != null ">
+                AND en.fk_shp_shop_id = #{shopId}
+            </if>
+        </where>
+        order by en.insert_time desc
+    </select>
+
+    <select id="getByExpiredNotice" parameterType="com.luxuryadmin.entity.pro.ProExpiredNotice"
+            resultType="com.luxuryadmin.entity.pro.ProExpiredNotice">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.attribute_name as attributeName
+        ,a.classify_name as classifyName
+        ,a.fk_pro_attribute_codes as fkProAttributeCodes
+        ,a.fk_pro_classify_codes as fkProClassifyCodes
+        ,a.expired_day as expiredDay
+        ,a.insert_time as insertTime
+        from pro_expired_notice a
+        <where>
+            <if test="fkShpShopId != null and fkShpShopId != ''">
+                AND a.fk_shp_shop_id = #{fkShpShopId}
+            </if>
+            <if test="fkProAttributeCodes != null and fkProAttributeCodes != ''">
+                AND a.fk_pro_attribute_codes = #{fkProAttributeCodes}
+            </if>
+            <if test="fkProClassifyCodes != null and fkProClassifyCodes != ''">
+                AND a.fk_pro_classify_codes = #{fkProClassifyCodes}
+            </if>
+            <if test="expiredDay != null and expiredDay != ''">
+                AND a.expired_day = #{expiredDay}
+            </if>
+        </where>
+        limit 1
+    </select>
+    <select id="getObjectById"
+            resultType="com.luxuryadmin.entity.pro.ProExpiredNotice">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.attribute_name as attributeName
+        ,a.classify_name as classifyName
+        ,a.fk_pro_attribute_codes as fkProAttributeCodes
+        ,a.fk_pro_classify_codes as fkProClassifyCodes
+        ,a.expired_day as expiredDay
+        ,a.insert_time as insertTime
+        from pro_expired_notice a
+        <where>
+            id=#{id}
+        </where>
+        limit 1
+    </select>
+    <select id="listObject"
+            resultType="com.luxuryadmin.entity.pro.ProExpiredNotice">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.attribute_name as attributeName
+        ,a.classify_name as classifyName
+        ,a.fk_pro_attribute_codes as fkProAttributeCodes
+        ,a.fk_pro_classify_codes as fkProClassifyCodes
+        ,a.expired_day as expiredDay
+        ,a.insert_time as insertTime
+        from pro_expired_notice a
+
+    </select>
+    <!--添加盘点-->
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProExpiredNotice" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into pro_expired_notice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="attributeName != null">
+                attribute_name,
+            </if>
+            <if test="classifyName != null">
+                classify_name,
+            </if>
+            <if test="fkProAttributeCodes != null">
+                fk_pro_attribute_codes,
+            </if>
+            <if test="fkProClassifyCodes != null">
+                fk_pro_classify_codes,
+            </if>
+            <if test="expiredDay != null">
+                expired_day,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="attributeName != null ">
+                #{attributeName,jdbcType=VARCHAR},
+            </if>
+            <if test="classifyName != null ">
+                #{classifyName,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProAttributeCodes != null">
+                #{fkProAttributeCodes,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifyCodes != null">
+                #{fkProClassifyCodes,jdbcType=VARCHAR},
+            </if>
+            <if test="expiredDay != null">
+                #{expiredDay,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null ">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null ">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null ">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteObject">
+        delete from pro_expired_notice where id = #{id}
+    </delete>
+
+</mapper>

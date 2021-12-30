@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.sys.SysPermissionMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.sys.SysPermission">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="permission" jdbcType="VARCHAR" property="permission" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="icon_url" jdbcType="VARCHAR" property="iconUrl" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, parent_id, name, code, url, permission, type, icon_url, sort, insert_time, update_time,
+    insert_admin, update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_permission
+    where id = #{id}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from sys_permission
+    where id = #{id}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.sys.SysPermission" useGeneratedKeys="true" keyProperty="id">
+    insert into sys_permission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="permission != null">
+        permission,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="iconUrl != null">
+        icon_url,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="permission != null">
+        #{permission,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="iconUrl != null">
+        #{iconUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.sys.SysPermission">
+    update sys_permission
+    <set>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="permission != null">
+        permission = #{permission,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="iconUrl != null">
+        icon_url = #{iconUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--获取菜单管理 所有权限通用-->
+  <select id="listAppSysPermission" resultType="com.luxuryadmin.vo.sys.VoSysPermission">
+        select
+        id, parent_id as 'parentId', name,code,remark, url, permission, type, icon_url as 'iconUrl',sort
+        from sys_permission ORDER BY type asc,sort ASC,parentId asc,id ASC
+   </select>
+  <select id="getPermissionByUserAndUrl" resultType="java.lang.String">
+    SELECT
+     permission
+    FROM  sys_permission p
+    WHERE (exists(
+    select a.id from sys_role_permission_ref a
+    join sys_role b on a.fk_sys_role_id = b.id
+    join sys_user_role_ref c on c.fk_sys_role_id = b.id
+    join sys_user d on d.id = c.fk_sys_user_id
+    where p.id = a.fk_sys_permission_id AND d.id =  #{userId}
+    ))
+
+    and p.del = 0
+
+  </select>
+  <select id="queryByUser" resultType="com.luxuryadmin.vo.sys.VoSysPermission" parameterType="int">
+    SELECT * FROM (
+    SELECT  id, parent_id 'parentId', name, code, sort,
+    url, permission, type, icon_url 'iconUrl',remark,versions
+    FROM  sys_permission p
+    WHERE (exists(
+    select a.id from sys_role_permission_ref a
+    join sys_role b on a.fk_sys_role_id = b.id
+    join sys_user_role_ref c on c.fk_sys_role_id = b.id
+    join sys_user d on d.id = c.fk_sys_user_id
+    where p.id = a.fk_sys_permission_id AND d.id =  #{username}
+    ))
+    <!--  or (p.url like '%:code' and p.url like '/online%' )
+      or p.url = '/online')-->
+    and p.del = 0
+
+    ) h order by h.sort ASC
+  </select>
+  <!-- 根据id删除权限，删除多个 -->
+  <delete id="deleteObjects" parameterType="java.lang.String">
+    delete from shp_permission
+    where id in (${ids})
+  </delete>
+  <delete id="deleteByParentId" parameterType="java.lang.Integer">
+    delete from shp_permission
+    where parent_id = #{parentId}
+  </delete>
+
+  <!--该权限是否存在-->
+  <select id="existsSysPermissionName" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM sys_permission perm WHERE perm.`parent_id` = #{parentId} AND perm.`name` = #{name}
+    <if test="id != null">
+      and perm.`id` != #{id}
+    </if>
+    </select>
+
+  <!--code是否存在-->
+  <select id="existsSysPermissionCode" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM sys_permission perm WHERE perm.`code` = #{code} and type = 0
+    <if test="id != null">
+      and perm.`id` != #{id}
+    </if>
+    </select>
+  <!--code是否存在-->
+  <select id="existsSysPermission" resultType="java.lang.Integer">
+    SELECT COUNT(perm.`id`) FROM sys_permission perm WHERE perm.`permission` = #{permission}
+    <if test="id != null">
+      and perm.`id` != #{id}
+    </if>
+  </select>
+  <!-- 查询具体某个接口的权限 -->
+    <select id="listByPath" parameterType="java.lang.String" resultMap="BaseResultMap">
+      select permission from sys_permission
+    </select>
+
+  <select id="listByUser" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" /> from sys_permission
+      where id in
+      ( select srpr.fk_sys_permission_id from sys_user_role_ref surr,sys_role_permission_ref srpr
+        where surr.fk_sys_role_id = srpr.fk_sys_role_id
+        and surr.fk_sys_user_id = #{id} )
+  </select>
+  <select id="getByParentId" resultType="com.luxuryadmin.entity.sys.SysPermission"
+          parameterType="java.lang.Integer">
+    select <include refid="Base_Column_List" /> from sys_permission
+    where parent_id = #{parentId}
+  </select>
+  <select id="getCountByParentId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*) from sys_permission
+    where parent_id = #{parentId}
+  </select>
+
+</mapper>

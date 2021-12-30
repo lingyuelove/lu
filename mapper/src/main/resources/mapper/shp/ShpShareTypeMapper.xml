@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpShareTypeMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpShareType">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="code" jdbcType="VARCHAR" property="code" />
+
+		<result column="hours" jdbcType="DECIMAL" property="hours" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="versions" jdbcType="INTEGER" property="versions" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+	<select id="getShareTypeByCode" resultType="com.luxuryadmin.vo.shp.VoShpShareType" >
+		select
+		id,
+		code,
+		hours,
+		insert_time insertTime,
+		versions,
+		add_num addNum
+		from shp_share_type
+		where code = #{code}
+
+	</select>
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpShareType" keyProperty="id" useGeneratedKeys="true" >
+		insert into shp_share_type
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="code!=null ">
+				code, 
+			</if>
+			<if test="hours!=null ">
+				hours, 
+			</if>
+			 <if test="addNum!=null ">
+				 add_num,
+			 </if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="versions!=null ">
+				versions, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="code!=null">
+				#{code,jdbcType=VARCHAR},
+			</if>
+			<if test="hours!=null">
+				#{hours,jdbcType=DECIMAL},
+			</if>
+			<if test="addNum!=null">
+				#{addNum,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				#{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  shp_share_type 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpShareType" >
+		update shp_share_type
+		<set>
+			<if test="code!=null and code!=''">
+				code = #{code,jdbcType=VARCHAR},
+			 </if>
+			<if test="hours!=null">
+				hours = #{hours,jdbcType=DECIMAL},
+			</if>
+			<if test="addNum!=null">
+				add_num = #{addNum,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				versions = #{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		code,
+		hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_share_type
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizLeaguerOrderMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizLeaguerOrder">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_buyer_shop_id" jdbcType="INTEGER" property="fkBuyerShopId" />
+    <result column="fk_seller_shop_id" jdbcType="INTEGER" property="fkSellerShopId" />
+    <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+    <result column="fk_ord_order_id" jdbcType="INTEGER" property="fkOrdOrderId" />
+    <result column="fk_op_channel_id" jdbcType="INTEGER" property="fkOpChannelId" />
+    <result column="finish_price" jdbcType="INTEGER" property="finishPrice" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="booking_time" jdbcType="TIMESTAMP" property="bookingTime" />
+    <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime" />
+    <result column="seller_confirm_time" jdbcType="TIMESTAMP" property="sellerConfirmTime" />
+    <result column="buyer_confirm_time" jdbcType="TIMESTAMP" property="buyerConfirmTime" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_buyer_shop_id, fk_seller_shop_id, fk_pro_product_id, fk_ord_order_id, fk_op_channel_id, 
+    finish_price, number, state, booking_time, cancel_time, seller_confirm_time, buyer_confirm_time, 
+    insert_time, update_time, insert_admin, update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_leaguer_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from biz_leaguer_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObjectAll" parameterType="com.luxuryadmin.entity.biz.BizLeaguerOrder">
+    insert into biz_leaguer_order (id, fk_buyer_shop_id, fk_seller_shop_id, 
+      fk_pro_product_id, fk_ord_order_id, fk_op_channel_id, 
+      finish_price, number, state, 
+      booking_time, cancel_time, seller_confirm_time, 
+      buyer_confirm_time, insert_time, update_time, 
+      insert_admin, update_admin, versions, 
+      del, remark)
+    values (#{id,jdbcType=INTEGER}, #{fkBuyerShopId,jdbcType=INTEGER}, #{fkSellerShopId,jdbcType=INTEGER}, 
+      #{fkProProductId,jdbcType=INTEGER}, #{fkOrdOrderId,jdbcType=INTEGER}, #{fkOpChannelId,jdbcType=INTEGER}, 
+      #{finishPrice,jdbcType=INTEGER}, #{number,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, 
+      #{bookingTime,jdbcType=TIMESTAMP}, #{cancelTime,jdbcType=TIMESTAMP}, #{sellerConfirmTime,jdbcType=TIMESTAMP}, 
+      #{buyerConfirmTime,jdbcType=TIMESTAMP}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{versions,jdbcType=INTEGER}, 
+      #{del,jdbcType=CHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerOrder">
+    insert into biz_leaguer_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkBuyerShopId != null">
+        fk_buyer_shop_id,
+      </if>
+      <if test="fkSellerShopId != null">
+        fk_seller_shop_id,
+      </if>
+      <if test="fkProProductId != null">
+        fk_pro_product_id,
+      </if>
+      <if test="fkOrdOrderId != null">
+        fk_ord_order_id,
+      </if>
+      <if test="fkOpChannelId != null">
+        fk_op_channel_id,
+      </if>
+      <if test="finishPrice != null">
+        finish_price,
+      </if>
+      <if test="number != null">
+        number,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="bookingTime != null">
+        booking_time,
+      </if>
+      <if test="cancelTime != null">
+        cancel_time,
+      </if>
+      <if test="sellerConfirmTime != null">
+        seller_confirm_time,
+      </if>
+      <if test="buyerConfirmTime != null">
+        buyer_confirm_time,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkBuyerShopId != null">
+        #{fkBuyerShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkSellerShopId != null">
+        #{fkSellerShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkProProductId != null">
+        #{fkProProductId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOrdOrderId != null">
+        #{fkOrdOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOpChannelId != null">
+        #{fkOpChannelId,jdbcType=INTEGER},
+      </if>
+      <if test="finishPrice != null">
+        #{finishPrice,jdbcType=INTEGER},
+      </if>
+      <if test="number != null">
+        #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingTime != null">
+        #{bookingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cancelTime != null">
+        #{cancelTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sellerConfirmTime != null">
+        #{sellerConfirmTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="buyerConfirmTime != null">
+        #{buyerConfirmTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerOrder">
+    update biz_leaguer_order
+    <set>
+      <if test="fkBuyerShopId != null">
+        fk_buyer_shop_id = #{fkBuyerShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkSellerShopId != null">
+        fk_seller_shop_id = #{fkSellerShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkProProductId != null">
+        fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOrdOrderId != null">
+        fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOpChannelId != null">
+        fk_op_channel_id = #{fkOpChannelId,jdbcType=INTEGER},
+      </if>
+      <if test="finishPrice != null">
+        finish_price = #{finishPrice,jdbcType=INTEGER},
+      </if>
+      <if test="number != null">
+        number = #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingTime != null">
+        booking_time = #{bookingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cancelTime != null">
+        cancel_time = #{cancelTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sellerConfirmTime != null">
+        seller_confirm_time = #{sellerConfirmTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="buyerConfirmTime != null">
+        buyer_confirm_time = #{buyerConfirmTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.biz.BizLeaguerOrder">
+    update biz_leaguer_order
+    set fk_buyer_shop_id = #{fkBuyerShopId,jdbcType=INTEGER},
+      fk_seller_shop_id = #{fkSellerShopId,jdbcType=INTEGER},
+      fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+      fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+      fk_op_channel_id = #{fkOpChannelId,jdbcType=INTEGER},
+      finish_price = #{finishPrice,jdbcType=INTEGER},
+      number = #{number,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR},
+      booking_time = #{bookingTime,jdbcType=TIMESTAMP},
+      cancel_time = #{cancelTime,jdbcType=TIMESTAMP},
+      seller_confirm_time = #{sellerConfirmTime,jdbcType=TIMESTAMP},
+      buyer_confirm_time = #{buyerConfirmTime,jdbcType=TIMESTAMP},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      versions = #{versions,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

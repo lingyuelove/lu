@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpPermTplMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpPermTpl">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_shp_user_type_id" jdbcType="INTEGER" property="fkShpUserTypeId" />
+    <result column="fk_shp_perm_index_id" jdbcType="INTEGER" property="fkShpPermIndexId" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_type_id, fk_shp_perm_index_id, insert_time, insert_admin
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shp_perm_tpl
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--根据模板名称去获取对应的权限-->
+  <select id="listPermTplByUserTypeId" resultType="com.luxuryadmin.vo.shp.VoUserPermission">
+        SELECT
+          id,
+          fk_shp_perm_index_id 'permId'
+        FROM
+          shp_perm_tpl
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_type_id = #{userTypeId}
+    </select>
+
+  <select id="listTplPermIdByUserTypeId" resultType="java.lang.Integer">
+        SELECT
+          fk_shp_perm_index_id 'permId'
+        FROM
+          shp_perm_tpl
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_type_id = #{userTypeId}
+    </select>
+
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_perm_tpl
+    where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+  <!--删除模板权限 -->
+  <delete id="deleteShpPermTplByShopIdAndUserId">
+        DELETE
+        FROM
+          shp_perm_tpl
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_type_id = #{userTypeId}
+    </delete>
+
+  <!--删除对应的权限模板-->
+  <delete id="deleteShpUserPermTpl">
+        delete from shp_perm_tpl
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_type_id = #{userTypeId}
+    </delete>
+  <!--删除店铺权限模板-->
+  <delete id="deleteShpPermTplByShopId">
+        delete from shp_perm_tpl WHERE fk_shp_shop_id = #{shopId}
+    </delete>
+
+  <!--批量添加角色对应的权限-->
+  <insert id="saveBatch" parameterType="com.luxuryadmin.entity.shp.ShpPermTpl">
+    insert into shp_perm_tpl
+    (fk_shp_shop_id,fk_shp_user_type_id,
+     fk_shp_perm_index_id,insert_time, insert_admin)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.fkShpShopId,jdbcType=INTEGER},#{item.fkShpUserTypeId,jdbcType=INTEGER},
+      #{item.fkShpPermIndexId,jdbcType=INTEGER},#{item.insertTime,jdbcType=TIMESTAMP},
+      #{item.insertAdmin,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpPermTpl">
+    insert into shp_perm_tpl
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkShpUserTypeId != null">
+        fk_shp_user_type_id,
+      </if>
+      <if test="fkShpPermIndexId != null">
+        fk_shp_perm_index_id,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserTypeId != null">
+        #{fkShpUserTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpPermIndexId != null">
+        #{fkShpPermIndexId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpPermTpl">
+    update shp_perm_tpl
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserTypeId != null">
+        fk_shp_user_type_id = #{fkShpUserTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpPermIndexId != null">
+        fk_shp_perm_index_id = #{fkShpPermIndexId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

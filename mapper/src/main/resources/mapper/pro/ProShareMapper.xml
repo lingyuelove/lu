@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProShareMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProShare">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode"/>
+        <result column="shop_number" jdbcType="VARCHAR" property="shopNumber"/>
+        <result column="user_number" jdbcType="INTEGER" property="userNumber"/>
+        <result column="show_price" jdbcType="VARCHAR" property="showPrice"/>
+        <result column="pro_id" jdbcType="LONGVARCHAR" property="proId"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="union_user_id" jdbcType="INTEGER" property="unionUserId"/>
+        <result column="share_batch" jdbcType="VARCHAR" property="shareBatch"/>
+        <result column="share_name" jdbcType="VARCHAR" property="shareName"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="show_name" jdbcType="VARCHAR" property="showName"/>
+        <result column="share_img" jdbcType="VARCHAR" property="shareImg"/>
+        <result column="del" jdbcType="VARCHAR" property="del"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.luxuryadmin.entity.pro.ProShare">
+        <result column="pro_id" jdbcType="LONGVARCHAR" property="proId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_id, fk_pro_classify_code, shop_number, user_number, pro_id
+    show_price, type, union_user_id, share_batch, share_name, insert_time, end_time,
+    show_name, share_img, del
+  </sql>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from pro_share
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <!--删除店铺商品分享记录-->
+    <delete id="deleteProShareByShopId">
+        delete from pro_share where fk_shp_shop_id = #{shopId}
+    </delete>
+    <!--根据店铺编号,用户编号和分享批号来获取分享的产品id-->
+    <select id="getProIdsByShareBatch" resultType="com.luxuryadmin.vo.pro.VoShareProduct">
+        SELECT
+        fk_shp_shop_id 'shopId',
+        pro_id 'proId',
+        show_price 'showPrice',
+        fk_pro_classify_code 'classifyCode',
+        share_name 'shareName'
+        FROM
+        pro_share
+        WHERE shop_number = #{shopNumber}
+        AND user_number = #{userNumber}
+        AND share_batch = #{shareBatch} and del = '0'
+    </select>
+
+    <!--根据店铺编号获取小程序访客记录 从2021-07-13 00:00:00开始记录-->
+    <select id="getShareByList" resultType="com.luxuryadmin.vo.pro.VoShareList">
+        SELECT
+        id,
+        fk_shp_shop_id 'shopId',
+        fk_shp_user_id 'userId',
+        pro_id 'proId',
+        share_name 'shareName',
+        share_img 'shareImg',
+        show_name 'showName',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ps.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ps.`fk_shp_user_id`) 'userName',
+        insert_time 'insertTime'
+        FROM
+        pro_share ps
+        WHERE fk_shp_shop_id = #{shopId} and del = '0' and insert_time <![CDATA[>]]> "2021-07-14 18:00:00"
+        order by ps.id desc
+    </select>
+    <!--获取分享的商品-->
+    <select id="getShareProductForTempId" resultType="com.luxuryadmin.vo.pro.VoShareSearchList">
+        SELECT
+        pp.name `name`,
+        <if test="tempId != null">
+            (SELECT pt.`name` FROM pro_temp pt
+            WHERE pt.id = #{tempId}) 'tempName',
+        </if>
+        pp.small_img `smallImg`
+        FROM
+        pro_product pp
+        <if test="tempId != null">
+            left join pro_temp_product tp on pp.id = tp.fk_pro_product_id
+        </if>
+        WHERE pp.fk_shp_shop_id = #{shopId}
+        AND pp.fk_pro_state_code BETWEEN 20 AND 39
+        <if test="tempId != null">
+            and tp.fk_pro_temp_id = #{tempId}
+        </if>
+        order by
+        <if test="tempId != null">
+            tp.id desc,
+        </if>
+        pp.id desc
+    </select>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProShare" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into pro_share
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="fkProClassifyCode != null">
+                fk_pro_classify_code,
+            </if>
+            <if test="shopNumber != null">
+                shop_number,
+            </if>
+            <if test="userNumber != null">
+                user_number,
+            </if>
+            <if test="showPrice != null">
+                show_price,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="unionUserId != null">
+                union_user_id,
+            </if>
+            <if test="shareBatch != null">
+                share_batch,
+            </if>
+            <if test="shareName != null">
+                share_name,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="showName != null">
+                show_name,
+            </if>
+            <if test="shareImg != null">
+                share_img,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="proId != null">
+                pro_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProClassifyCode != null">
+                #{fkProClassifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="shopNumber != null">
+                #{shopNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="userNumber != null">
+                #{userNumber,jdbcType=INTEGER},
+            </if>
+            <if test="showPrice != null">
+                #{showPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="unionUserId != null">
+                #{unionUserId,jdbcType=INTEGER},
+            </if>
+            <if test="shareBatch != null">
+                #{shareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="shareName != null">
+                #{shareName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="showName != null">
+                #{showName,jdbcType=VARCHAR},
+            </if>
+            <if test="shareImg != null">
+                #{shareImg,jdbcType=VARCHAR},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="proId != null">
+                #{proId,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProShare">
+        update pro_share
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProClassifyCode != null">
+                fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="shopNumber != null">
+                shop_number = #{shopNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="userNumber != null">
+                user_number = #{userNumber,jdbcType=INTEGER},
+            </if>
+            <if test="showPrice != null">
+                show_price = #{showPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="unionUserId != null">
+                union_user_id = #{unionUserId,jdbcType=INTEGER},
+            </if>
+            <if test="shareBatch != null">
+                share_batch = #{shareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="shareName != null">
+                share_name = #{shareName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="showName != null">
+                show_name = #{showName,jdbcType=VARCHAR},
+            </if>
+            <if test="shareImg != null">
+                share_img = #{shareImg,jdbcType=VARCHAR},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="proId != null">
+                pro_id = #{proId,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateToDeleteState" parameterType="java.lang.Integer">
+        update pro_share
+
+        set del = '1',
+
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--根据店铺查询当日分享次数-->
+    <select id="listProShareByShopId" resultType="java.lang.Integer">
+        SELECT
+        *
+        FROM
+        pro_share
+        WHERE fk_shp_shop_id = #{fkShpShopId} and to_days(insert_time) = to_days(now())
+    </select>
+    <!--根据分享批号查询分享详情-->
+    <select id="getShareForShareBatch" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        pro_share
+        WHERE share_batch = #{shareBatch} and del = '0'
+    </select>
+
+    <!--获取商家联盟-->
+    <select id="listUnionShareUser" resultType="com.luxuryadmin.vo.pro.VoUnionAccess">
+        SELECT
+        ps.`fk_pro_share_batch` 'shareBatch' ,
+        su.`nickname` ,
+        ps.`nick_name` 'wxNickname',
+        ps.`avatar_url` 'userImg',
+        ps.`gender` 'sex',
+        ps.`insert_time` 'insertTime',
+        ps.phone
+        FROM
+        pro_share_see_user ps
+        LEFT JOIN shp_user su
+        ON ps.`fk_shp_user_id` = su.`id`
+        WHERE ps.type = '1'
+        <if test="nickname != null">
+            AND ps.nick_name LIKE #{nickname}
+        </if>
+        <if test="phone != null">
+            AND ps.phone = #{phone}
+        </if>
+        <if test="userId != null">
+            AND ps.`fk_shp_user_id` = #{userId}
+        </if>
+        <if test="startTime != null">
+            AND ps.`insert_time` >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND #{endTime} >= ps.`insert_time`
+        </if>
+
+
+        ORDER BY ps.id DESC
+    </select>
+
+    <!--获取大于某个日期的访问人次-->
+    <select id="countAccessUserCount" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        (SELECT
+        COUNT(*) 'num'
+        FROM
+        pro_share_see_user ps
+        WHERE ps.type = 1
+        <if test="nickname != null">
+            AND ps.nick_name LIKE #{nickname}
+        </if>
+        <if test="phone != null">
+            AND ps.phone = #{phone}
+        </if>
+        <if test="userId != null">
+            AND ps.`fk_shp_user_id` = #{userId}
+        </if>
+        <if test="startTime != null">
+            AND ps.`insert_time` >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND #{endTime} >= ps.`insert_time`
+        </if>
+        GROUP BY open_id,
+        nick_name) t
+    </select>
+
+    <!--获取大于某个日期的访问次数-->
+    <select id="countAccessCount" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        pro_share_see_user ps
+        WHERE ps.type = 1
+        <if test="nickname != null">
+            AND ps.nick_name LIKE #{nickname}
+        </if>
+        <if test="phone != null">
+            AND ps.phone = #{phone}
+        </if>
+        <if test="userId != null">
+            AND ps.`fk_shp_user_id` = #{userId}
+        </if>
+        <if test="startTime != null">
+            AND ps.`insert_time` >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND #{endTime} >= ps.`insert_time`
+        </if>
+    </select>
+</mapper>

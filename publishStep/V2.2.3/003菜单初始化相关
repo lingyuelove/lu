@@ -1,0 +1,11 @@
+一、首页菜单
+    1.店铺模块
+      (1)操作日志:operationLog
+          /default/functionIcon/operateLog.png
+          shp:list:operateLog
+
+          /listShpOperateLog 接口已添加权限
+
+二、初始化接口
+    1.运营统计数据(可能会跑十几分钟才出结果)，因为要初始化上线以来每一天的数据
+        http://localhost:8080/sys/testStatDailyCount?token=bdhc919283798dase31eSsf

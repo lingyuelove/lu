@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProCheckMapper">
+
+    <select id="getCheckListForApi" parameterType="com.luxuryadmin.param.pro.ParamCheckListForApiBySearch"
+            resultType="com.luxuryadmin.vo.pro.VoCheckListForApi">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.check_name as checkName
+        ,a.check_state as checkState
+        ,a.insert_time as insertTime
+        ,a.start_time as startTime
+        ,a.end_time as endTime
+        ,a.fk_pro_temp_id as tempId
+        ,a.type as type
+        ,g.nickname as insertUserName
+        from pro_check a
+
+        left join shp_user g on a.insert_admin = g.id
+        <where>
+            1=1
+            <if test="checkListForApiBySearch.fkShpShopId != null and checkListForApiBySearch.fkShpShopId != ''">
+                AND a.fk_shp_shop_id = #{checkListForApiBySearch.fkShpShopId}
+            </if>
+            <if test="checkListForApiBySearch.checkState != null and checkListForApiBySearch.checkState != ''">
+                AND a.check_state = #{checkListForApiBySearch.checkState}
+            </if>
+        </where>
+        order by a.insert_time desc, a.id desc
+</select>
+    <select id="getById"
+            resultType="com.luxuryadmin.entity.pro.ProCheck">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.check_name as checkName
+        ,a.check_state as checkState
+        ,a.sale_price_start as salePriceStart
+        ,a.sale_price_end as salePriceEnd
+        ,a.fk_pro_attribute_codes as fkProAttributeCodes
+        ,a.fk_pro_classify_codes as fkProClassifyCodes
+        ,a.insert_time as insertTime
+        ,a.start_time as startTime
+        ,a.end_time as endTime
+        ,a.fk_pro_temp_id as fkProTempId
+        ,a.type as type
+        from pro_check a
+
+        <where>
+            id=#{id}
+        </where>
+        limit 1
+    </select>
+
+    <select id="getByShopId"
+            resultType="com.luxuryadmin.entity.pro.ProCheck">
+        select
+        a.id
+        ,a.fk_shp_shop_id as fkShpShopId
+        ,a.check_name as checkName
+        ,a.check_state as checkState
+        ,a.sale_price_start as salePriceStart
+        ,a.sale_price_end as salePriceEnd
+        ,a.fk_pro_attribute_codes as fkProAttributeCodes
+        ,a.fk_pro_classify_codes as fkProClassifyCodes
+        ,a.insert_time as insertTime
+        ,a.start_time as startTime
+        ,a.end_time as endTime
+        from pro_check a
+
+        <where>
+            ( a.end_time > now() and a.check_state = '10') and a.fk_shp_shop_id=#{shopId}
+        </where>
+        limit 1
+    </select>
+    <!--添加盘点-->
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProCheck" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into pro_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProTempId != null">
+                fk_pro_temp_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="checkName != null">
+                check_name,
+            </if>
+            <if test="checkState != null">
+                check_state,
+            </if>
+            <if test="salePriceStart != null">
+                sale_price_start,
+            </if>
+            <if test="salePriceEnd != null">
+                sale_price_end,
+            </if>
+            <if test="fkProAttributeCodes != null">
+                fk_pro_attribute_codes,
+            </if>
+            <if test="fkProClassifyCodes != null">
+                fk_pro_classify_codes,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProTempId != null">
+                #{fkProTempId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null ">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="checkName != null ">
+                #{checkName,jdbcType=VARCHAR},
+            </if>
+            <if test="checkState != null ">
+                #{checkState,jdbcType=VARCHAR},
+            </if>
+            <if test="salePriceStart != null">
+                #{salePriceStart,jdbcType=DECIMAL},
+            </if>
+            <if test="salePriceEnd != null">
+                #{salePriceEnd,jdbcType=DECIMAL},
+            </if>
+            <if test="fkProAttributeCodes != null">
+                #{fkProAttributeCodes,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifyCodes != null">
+                #{fkProClassifyCodes,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null ">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null ">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null ">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateCheckState">
+        update pro_check set check_state = "30" where fk_shp_shop_id = #{shopId} and end_time <![CDATA[<=]]> now()
+    </update>
+    <update id="updateCheck">
+        update pro_check set  check_state= #{checkState}  where id = #{id}
+    </update>
+    <delete id="deleteCheck">
+        delete from pro_check where id = #{id}
+    </delete>
+
+    <!--删除盘点数据(用于注销店铺)-->
+    <delete id="deleteProCheckByShopId">
+        delete from pro_check where fk_shp_shop_id = #{shopId}
+    </delete>
+</mapper>

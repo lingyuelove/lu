@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpOrderDailyCountMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpOrderDailyCount">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="count_date" jdbcType="DATE" property="countDate" />
+    <result column="count_month" jdbcType="INTEGER" property="countMonth" />
+    <result column="count_year" jdbcType="INTEGER" property="countYear" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="ord_num" jdbcType="INTEGER" property="ordNum" />
+    <result column="ord_amount" jdbcType="DECIMAL" property="ordAmount" />
+    <result column="ord_net_profit" jdbcType="DECIMAL" property="ordNetProfit" />
+    <result column="ord_cancel_num" jdbcType="INTEGER" property="ordCancelNum" />
+    <result column="ord_cancel_amount" jdbcType="DECIMAL" property="ordCancelAmount" />
+    <result column="in_repo_num_self" jdbcType="INTEGER" property="inRepoNumSelf" />
+    <result column="in_repo_num_consignment" jdbcType="INTEGER" property="inRepoNumConsignment" />
+    <result column="in_repo_num_pledge" jdbcType="INTEGER" property="inRepoNumPledge" />
+    <result column="in_repo_num_other" jdbcType="INTEGER" property="inRepoNumOther" />
+    <result column="in_repo_amount_self" jdbcType="DECIMAL" property="inRepoAmountSelf" />
+    <result column="in_repo_amount_consignment" jdbcType="DECIMAL" property="inRepoAmountConsignment" />
+    <result column="in_repo_amount_pledge" jdbcType="DECIMAL" property="inRepoAmountPledge" />
+    <result column="in_repo_amount_other" jdbcType="DECIMAL" property="inRepoAmountOther" />
+    <result column="in_repo_num_total" jdbcType="INTEGER" property="inRepoNumTotal" />
+    <result column="in_repo_amount_total" jdbcType="DECIMAL" property="inRepoAmountTotal" />
+    <result column="onshelves_prod_num" jdbcType="INTEGER" property="onshelvesProdNum" />
+    <result column="service_settle_num" jdbcType="INTEGER" property="serviceSettleNum" />
+    <result column="service_settle_sell_amount" jdbcType="DECIMAL" property="serviceSettleSellAmount" />
+    <result column="service_settle_cost_amount" jdbcType="DECIMAL" property="serviceSettleCostAmount" />
+    <result column="service_settle_profit_amount" jdbcType="DECIMAL" property="serviceSettleProfitAmount" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, count_date, count_month, count_year, fk_shp_shop_id, ord_num, ord_amount, ord_net_profit, 
+    ord_cancel_num, ord_cancel_amount, in_repo_num_self, in_repo_num_consignment, in_repo_num_pledge, 
+    in_repo_num_other, in_repo_amount_self, in_repo_amount_consignment, in_repo_amount_pledge, 
+    in_repo_amount_other, in_repo_num_total, in_repo_amount_total, onshelves_prod_num,
+    service_settle_num, service_settle_sell_amount, service_settle_cost_amount, service_settle_profit_amount,
+    insert_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shp_order_daily_count
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectCountByCountDate" resultType="java.lang.Integer">
+    SELECT
+        COUNT(1)
+    FROM
+        shp_order_daily_count
+    WHERE
+        DATE(count_date) = DATE(#{countDate})
+  </select>
+  <select id="selectShpOrdDailyCountVoByShopIdAndOrderType" resultType="com.luxuryadmin.vo.shp.VoShpOrderDailyCount">
+    SELECT
+        SUM(od.`total_num`) as orderNum,
+        SUM(od.finish_price)/100 as orderAmount,
+        (SUM(od.finish_price) - SUM(pro.init_price * od.`total_num`))/100 as orderNetProfit
+        FROM
+            ord_order od
+        LEFT JOIN
+            pro_product pro
+        ON
+            od.`fk_pro_product_id` = pro.id
+        WHERE
+            od.`fk_shp_shop_id` = #{shopId}
+        <choose>
+          <when test="orderType=='cancel'">
+            AND  state between -20 and -20
+            AND  DATE(cancel_time) = DATE(#{countDate})
+          </when>
+          <when test="orderType=='normal'">
+            AND  state between 20 and 29
+            AND  DATE(od.insert_time) = DATE(#{countDate})
+          </when>
+          <otherwise>
+            '',
+          </otherwise>
+        </choose>
+  </select>
+
+  <select id="selectShpInRepoProdDailyCountVoByShopIdAndProdType"
+          resultType="com.luxuryadmin.vo.shp.VoShpInRepoProdDailyCount">
+    SELECT
+      SUM(1) as inRepoNum,
+      SUM(pro.init_price)/100 as inRepoAmount
+    FROM
+        pro_product pro
+    WHERE
+        pro.`fk_shp_shop_id` = #{shopId}
+    AND
+        DATE(insert_time) = DATE(#{countDate})
+    <if test="fkProAttributeCode != null">
+       AND fk_pro_attribute_code = #{fkProAttributeCode,jdbcType=INTEGER}
+    </if>
+  </select>
+
+  <!-- 根据统计日期查询有统计数据的店铺ID列表 -->
+  <select id="queryShpShopIdListByCountDate" resultType="java.lang.Integer">
+    SELECT
+        fk_shp_shop_id
+    FROM
+        shp_order_daily_count
+    WHERE
+        DATE(count_date) = DATE(#{countDate})
+  </select>
+
+
+  <select id="selectByShopIdAndCountDate" resultMap="BaseResultMap">
+    SELECT
+        <include refid="Base_Column_List" />
+    FROM
+        shp_order_daily_count
+    WHERE
+        DATE(count_date) = DATE(#{countDate})
+    AND
+        fk_shp_shop_id = #{shopId}
+  </select>
+  <select id="selectByShopIdAndCountDateForMonth" resultType="com.luxuryadmin.vo.shp.VoShpOrderDailyCountForMonth">
+    SELECT
+    count_date countDate
+    , count_month countMonth
+    , fk_shp_shop_id as shopId
+    ,IFNULL(sum(ord_num),0) as ordNum
+    ,IFNULL(sum(ord_amount),0) as ordAmount
+    ,IFNULL(sum(ord_net_profit),0) as ordNetProfit
+    ,IFNULL(sum(ord_cancel_num),0) as ordCancelNum
+    ,IFNULL(sum(ord_cancel_amount),0) as ordCancelAmount
+    ,IFNULL(sum(in_repo_num_self),0) as inRepoNumSelf
+    ,IFNULL(sum(in_repo_num_consignment),0) as inRepoNumConsignment
+    ,IFNULL(sum(in_repo_num_pledge),0) as inRepoNumPledge
+    ,IFNULL(sum(in_repo_num_other),0) as inRepoNumOther
+    ,IFNULL(sum(in_repo_amount_self),0) as inRepoAmountSelf
+    ,IFNULL(sum(in_repo_amount_consignment),0) as inRepoAmountConsignment
+    ,IFNULL(sum(in_repo_amount_pledge),0) as inRepoAmountPledge
+    ,IFNULL(sum(in_repo_amount_other),0) as inRepoAmountOther
+    ,IFNULL(sum(in_repo_num_total),0) as inRepoNumTotal
+    ,IFNULL(sum(in_repo_amount_total),0) as inRepoAmountTotal
+    ,IFNULL(sum(onshelves_prod_num),0) as onshelvesProdNum
+    ,IFNULL(sum(service_settle_num),0) as serviceSettleNum
+    ,IFNULL(sum(service_settle_sell_amount),0) as serviceSettleSellAmount
+    ,IFNULL(sum(service_settle_cost_amount),0) as serviceSettleCostAmount
+    ,IFNULL(sum(service_settle_profit_amount),0) as serviceSettleProfitAmount
+
+    FROM
+    shp_order_daily_count
+    WHERE
+    count_month = #{countMonth}
+    AND
+    count_year = #{countYear}
+    AND
+    fk_shp_shop_id = #{shopId}
+
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from shp_order_daily_count
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.luxuryadmin.entity.shp.ShpOrderDailyCount">
+    insert into shp_order_daily_count (id, count_date, count_month, 
+      count_year, fk_shp_shop_id, ord_num, 
+      ord_amount, ord_net_profit, ord_cancel_num, 
+      ord_cancel_amount, in_repo_num_self, in_repo_num_consignment, 
+      in_repo_num_pledge, in_repo_num_other, in_repo_amount_self, 
+      in_repo_amount_consignment, in_repo_amount_pledge, 
+      in_repo_amount_other, in_repo_num_total, in_repo_amount_total, 
+      onshelves_prod_num,service_settle_num, service_settle_sell_amount,
+      service_settle_cost_amount, service_settle_profit_amount,
+      insert_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{countDate,jdbcType=DATE}, #{countMonth,jdbcType=INTEGER}, 
+      #{countYear,jdbcType=INTEGER}, #{fkShpShopId,jdbcType=INTEGER}, #{ordNum,jdbcType=INTEGER}, 
+      #{ordAmount,jdbcType=DECIMAL}, #{ordNetProfit,jdbcType=DECIMAL}, #{ordCancelNum,jdbcType=INTEGER}, 
+      #{ordCancelAmount,jdbcType=DECIMAL}, #{inRepoNumSelf,jdbcType=INTEGER}, #{inRepoNumConsignment,jdbcType=INTEGER}, 
+      #{inRepoNumPledge,jdbcType=INTEGER}, #{inRepoNumOther,jdbcType=INTEGER}, #{inRepoAmountSelf,jdbcType=DECIMAL}, 
+      #{inRepoAmountConsignment,jdbcType=DECIMAL}, #{inRepoAmountPledge,jdbcType=DECIMAL}, 
+      #{inRepoAmountOther,jdbcType=DECIMAL}, #{inRepoNumTotal,jdbcType=INTEGER}, #{inRepoAmountTotal,jdbcType=DECIMAL},
+      #{serviceSettleNum,jdbcType=INTEGER}, #{serviceSettleSellAmount,jdbcType=DECIMAL},
+      #{serviceSettleCostAmount,jdbcType=DECIMAL}, #{serviceSettleProfitAmount,jdbcType=DECIMAL},
+      #{onshelvesProdNum,jdbcType=INTEGER},#{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.luxuryadmin.entity.shp.ShpOrderDailyCount">
+    insert into shp_order_daily_count
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="countDate != null">
+        count_date,
+      </if>
+      <if test="countMonth != null">
+        count_month,
+      </if>
+      <if test="countYear != null">
+        count_year,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="ordNum != null">
+        ord_num,
+      </if>
+      <if test="ordAmount != null">
+        ord_amount,
+      </if>
+      <if test="ordNetProfit != null">
+        ord_net_profit,
+      </if>
+      <if test="ordCancelNum != null">
+        ord_cancel_num,
+      </if>
+      <if test="ordCancelAmount != null">
+        ord_cancel_amount,
+      </if>
+      <if test="inRepoNumSelf != null">
+        in_repo_num_self,
+      </if>
+      <if test="inRepoNumConsignment != null">
+        in_repo_num_consignment,
+      </if>
+      <if test="inRepoNumPledge != null">
+        in_repo_num_pledge,
+      </if>
+      <if test="inRepoNumOther != null">
+        in_repo_num_other,
+      </if>
+      <if test="inRepoAmountSelf != null">
+        in_repo_amount_self,
+      </if>
+      <if test="inRepoAmountConsignment != null">
+        in_repo_amount_consignment,
+      </if>
+      <if test="inRepoAmountPledge != null">
+        in_repo_amount_pledge,
+      </if>
+      <if test="inRepoAmountOther != null">
+        in_repo_amount_other,
+      </if>
+      <if test="inRepoNumTotal != null">
+        in_repo_num_total,
+      </if>
+      <if test="inRepoAmountTotal != null">
+        in_repo_amount_total,
+      </if>
+      <if test="onshelvesProdNum != null">
+        onshelves_prod_num,
+      </if>
+      <if test="serviceSettleNum != null">
+        service_settle_num,
+      </if>
+      <if test="serviceSettleSellAmount != null">
+        service_settle_sell_amount,
+      </if>
+      <if test="serviceSettleCostAmount != null">
+        service_settle_cost_amount,
+      </if>
+      <if test="serviceSettleProfitAmount != null">
+        service_settle_profit_amount,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="countDate != null">
+        #{countDate,jdbcType=DATE},
+      </if>
+      <if test="countMonth != null">
+        #{countMonth,jdbcType=INTEGER},
+      </if>
+      <if test="countYear != null">
+        #{countYear,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="ordNum != null">
+        #{ordNum,jdbcType=INTEGER},
+      </if>
+      <if test="ordAmount != null">
+        #{ordAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="ordNetProfit != null">
+        #{ordNetProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="ordCancelNum != null">
+        #{ordCancelNum,jdbcType=INTEGER},
+      </if>
+      <if test="ordCancelAmount != null">
+        #{ordCancelAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoNumSelf != null">
+        #{inRepoNumSelf,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumConsignment != null">
+        #{inRepoNumConsignment,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumPledge != null">
+        #{inRepoNumPledge,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumOther != null">
+        #{inRepoNumOther,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoAmountSelf != null">
+        #{inRepoAmountSelf,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountConsignment != null">
+        #{inRepoAmountConsignment,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountPledge != null">
+        #{inRepoAmountPledge,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountOther != null">
+        #{inRepoAmountOther,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoNumTotal != null">
+        #{inRepoNumTotal,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoAmountTotal != null">
+        #{inRepoAmountTotal,jdbcType=DECIMAL},
+      </if>
+      <if test="onshelvesProdNum != null">
+        #{onshelvesProdNum,jdbcType=INTEGER},
+      </if>
+      <if test="serviceSettleNum != null">
+        #{serviceSettleNum,jdbcType=INTEGER},
+      </if>
+      <if test="serviceSettleSellAmount != null">
+        #{serviceSettleSellAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceSettleCostAmount != null">
+        #{serviceSettleCostAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceSettleProfitAmount != null">
+        #{serviceSettleProfitAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.shp.ShpOrderDailyCount">
+    update shp_order_daily_count
+    <set>
+      <if test="countDate != null">
+        count_date = #{countDate,jdbcType=DATE},
+      </if>
+      <if test="countMonth != null">
+        count_month = #{countMonth,jdbcType=INTEGER},
+      </if>
+      <if test="countYear != null">
+        count_year = #{countYear,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="ordNum != null">
+        ord_num = #{ordNum,jdbcType=INTEGER},
+      </if>
+      <if test="ordAmount != null">
+        ord_amount = #{ordAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="ordNetProfit != null">
+        ord_net_profit = #{ordNetProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="ordCancelNum != null">
+        ord_cancel_num = #{ordCancelNum,jdbcType=INTEGER},
+      </if>
+      <if test="ordCancelAmount != null">
+        ord_cancel_amount = #{ordCancelAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoNumSelf != null">
+        in_repo_num_self = #{inRepoNumSelf,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumConsignment != null">
+        in_repo_num_consignment = #{inRepoNumConsignment,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumPledge != null">
+        in_repo_num_pledge = #{inRepoNumPledge,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoNumOther != null">
+        in_repo_num_other = #{inRepoNumOther,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoAmountSelf != null">
+        in_repo_amount_self = #{inRepoAmountSelf,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountConsignment != null">
+        in_repo_amount_consignment = #{inRepoAmountConsignment,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountPledge != null">
+        in_repo_amount_pledge = #{inRepoAmountPledge,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoAmountOther != null">
+        in_repo_amount_other = #{inRepoAmountOther,jdbcType=DECIMAL},
+      </if>
+      <if test="inRepoNumTotal != null">
+        in_repo_num_total = #{inRepoNumTotal,jdbcType=INTEGER},
+      </if>
+      <if test="inRepoAmountTotal != null">
+        in_repo_amount_total = #{inRepoAmountTotal,jdbcType=DECIMAL},
+      </if>
+      <if test="onshelvesProdNum != null">
+        onshelves_prod_num = #{onshelvesProdNum,jdbcType=INTEGER},
+      </if>
+      <if test="serviceSettleNum != null">
+        service_settle_num = #{serviceSettleNum,jdbcType=INTEGER},
+      </if>
+      <if test="serviceSettleSellAmount != null">
+        service_settle_sell_amount = #{serviceSettleSellAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceSettleCostAmount != null">
+        service_settle_cost_amount = #{serviceSettleCostAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceSettleProfitAmount != null">
+        service_settle_profit_amount = #{serviceSettleProfitAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpOrderDailyCount">
+    update shp_order_daily_count
+    set count_date = #{countDate,jdbcType=DATE},
+      count_month = #{countMonth,jdbcType=INTEGER},
+      count_year = #{countYear,jdbcType=INTEGER},
+      fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      ord_num = #{ordNum,jdbcType=INTEGER},
+      ord_amount = #{ordAmount,jdbcType=DECIMAL},
+      ord_net_profit = #{ordNetProfit,jdbcType=DECIMAL},
+      ord_cancel_num = #{ordCancelNum,jdbcType=INTEGER},
+      ord_cancel_amount = #{ordCancelAmount,jdbcType=DECIMAL},
+      in_repo_num_self = #{inRepoNumSelf,jdbcType=INTEGER},
+      in_repo_num_consignment = #{inRepoNumConsignment,jdbcType=INTEGER},
+      in_repo_num_pledge = #{inRepoNumPledge,jdbcType=INTEGER},
+      in_repo_num_other = #{inRepoNumOther,jdbcType=INTEGER},
+      in_repo_amount_self = #{inRepoAmountSelf,jdbcType=DECIMAL},
+      in_repo_amount_consignment = #{inRepoAmountConsignment,jdbcType=DECIMAL},
+      in_repo_amount_pledge = #{inRepoAmountPledge,jdbcType=DECIMAL},
+      in_repo_amount_other = #{inRepoAmountOther,jdbcType=DECIMAL},
+      in_repo_num_total = #{inRepoNumTotal,jdbcType=INTEGER},
+      in_repo_amount_total = #{inRepoAmountTotal,jdbcType=DECIMAL},
+      onshelves_prod_num = #{onshelvesProdNum,jdbcType=INTEGER},
+      service_settle_num = #{serviceSettleNum,jdbcType=INTEGER},
+      service_settle_sell_amount = #{serviceSettleSellAmount,jdbcType=DECIMAL},
+      service_settle_cost_amount = #{serviceSettleCostAmount,jdbcType=DECIMAL},
+      service_settle_profit_amount = #{serviceSettleProfitAmount,jdbcType=DECIMAL},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

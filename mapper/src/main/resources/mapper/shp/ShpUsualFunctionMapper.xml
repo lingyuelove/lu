@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpUsualFunctionMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpUsualFunction">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="fk_shp_permission_id" jdbcType="INTEGER" property="fkShpPermissionId"/>
+        <result column="icon_url" jdbcType="VARCHAR" property="iconUrl"/>
+        <result column="parent_name" jdbcType="VARCHAR" property="parentName"/>
+        <result column="parent_code" jdbcType="VARCHAR" property="parentCode"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, code, name, fk_shp_shop_id, fk_shp_user_id, fk_shp_permission_id,
+    icon_url, parent_name, parent_code, parent_id, sort, insert_time
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_usual_function
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--获取用户的常用功能-->
+    <select id="listShpUsualFunction" resultType="com.luxuryadmin.vo.shp.VoUsualFunction">
+      SELECT
+        CODE,
+        NAME,
+        fk_shp_permission_id 'permId',
+        icon_url 'iconUrl',
+        parent_name 'parentName',
+        parent_code 'parentCode',
+        parent_id 'parentId',
+        sort
+      FROM
+        shp_usual_function
+      WHERE fk_shp_shop_id = #{shopId}
+        AND fk_shp_user_id = #{userId}
+      ORDER BY sort ASC
+  </select>
+    <!--获取用户拥有的全部功能-->
+    <select id="listAllFunction" resultType="com.luxuryadmin.vo.shp.VoUsualFunction">
+        SELECT
+          parPerm.`id` 'permId',
+          parPerm.`name`,
+          parPerm.`code`,
+          parPerm.`http_url` 'httpUrl',
+          parPerm.`icon_url` 'iconUrl',
+          parPerm.`parent_id` 'parentId',
+          graPerm.`name` 'parentName',
+          graPerm.`code` 'parentCode',
+          parPerm.`new_state` 'newState',
+          parPerm.`cost_state` 'costState',
+          parPerm.versions 'version'
+        FROM
+          shp_user_permission_ref perm
+          LEFT JOIN shp_permission shpPerm
+            ON perm.`fk_shp_permission_id` = shpPerm.`id` OR (shpPerm.`versions` = 90 AND shpPerm.`type` = 2)
+          left join shp_permission parPerm
+            on shpPerm.`parent_id` = parPerm.`id`
+            and parPerm.`type` = 1 and parPerm.display = 1
+          left join shp_permission graPerm
+            on parPerm.`parent_id` = graPerm.`id`
+            and graPerm.`type` = 0 and parPerm.display = 1
+        WHERE perm.`fk_shp_user_id` = #{userId}
+          AND perm.`fk_shp_shop_id` = #{shopId}
+          and parPerm.`id` is not null
+        group by parPerm.id
+        ORDER BY graPerm.`sort` ASC,
+          parPerm.`sort` ASC,
+          graPerm.`id` ASC
+    </select>
+
+    <!--获取经营者拥有的全部功能-->
+    <select id="listBossAllFunction" resultType="com.luxuryadmin.vo.shp.VoUsualFunction">
+        SELECT
+          parPerm.`id` 'permId',
+          parPerm.`name`,
+          parPerm.`code`,
+          parPerm.`http_url` 'httpUrl',
+          parPerm.`icon_url` 'iconUrl',
+          parPerm.`parent_id` 'parentId',
+          graPerm.`name` 'parentName',
+          graPerm.`code` 'parentCode',
+          parPerm.`new_state` 'newState',
+          parPerm.`cost_state` 'costState',
+          parPerm.versions 'version'
+        FROM
+          shp_permission shpPerm
+          LEFT JOIN shp_permission parPerm
+            ON shpPerm.`parent_id` = parPerm.`id`
+            AND parPerm.`type` = 1
+            AND parPerm.display = 1
+          LEFT JOIN shp_permission graPerm
+            ON parPerm.`parent_id` = graPerm.`id`
+            AND graPerm.`type` = 0
+            AND parPerm.display = 1
+        WHERE parPerm.`id` IS NOT NULL
+        GROUP BY parPerm.id
+        ORDER BY graPerm.`sort` ASC,
+          parPerm.`sort` ASC,
+          graPerm.`id` ASC
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_usual_function
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <!--删除具体用户在该店铺的常用功能-->
+    <delete id="deleteUsualFunction">
+        DELETE
+        FROM
+          shp_usual_function
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_id = #{userId}
+    </delete>
+
+    <!--根据permIds参数对比,把不存在于permIds里面的常用功能给去掉-->
+    <delete id="removeFuncAndPermIdNotExists">
+        DELETE
+        FROM
+          shp_usual_function
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_permission_id NOT IN (${permIds});
+    </delete>
+
+    <!--批量添加常用功能-->
+    <insert id="saveBatch" parameterType="com.luxuryadmin.entity.shp.ShpUsualFunction">
+        insert into shp_usual_function (code, name,
+        fk_shp_shop_id, fk_shp_user_id, fk_shp_permission_id,
+        icon_url, parent_name, parent_code, parent_id,
+        sort, insert_time
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.code,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
+            #{item.fkShpShopId,jdbcType=INTEGER}, #{item.fkShpUserId,jdbcType=INTEGER},
+            #{item.fkShpPermissionId,jdbcType=INTEGER},
+            #{item.iconUrl,jdbcType=VARCHAR},#{item.parentName,jdbcType=VARCHAR}, #{item.parentCode,jdbcType=VARCHAR},
+            #{item.parentId,jdbcType=INTEGER},
+            #{item.sort,jdbcType=INTEGER}, #{item.insertTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpUsualFunction">
+        insert into shp_usual_function
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="fkShpPermissionId != null">
+                fk_shp_permission_id,
+            </if>
+            <if test="iconUrl != null">
+                icon_url,
+            </if>
+            <if test="parentName != null">
+                parent_name,
+            </if>
+            <if test="parentCode != null">
+                parent_code,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpPermissionId != null">
+                #{fkShpPermissionId,jdbcType=INTEGER},
+            </if>
+            <if test="iconUrl != null">
+                #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="parentName != null">
+                #{parentName,jdbcType=VARCHAR},
+            </if>
+            <if test="parentCode != null">
+                #{parentCode,jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpUsualFunction">
+        update shp_usual_function
+        <set>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpPermissionId != null">
+                fk_shp_permission_id = #{fkShpPermissionId,jdbcType=INTEGER},
+            </if>
+            <if test="iconUrl != null">
+                icon_url = #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="parentName != null">
+                parent_name = #{parentName,jdbcType=VARCHAR},
+            </if>
+            <if test="parentCode != null">
+                parent_code = #{parentCode,jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

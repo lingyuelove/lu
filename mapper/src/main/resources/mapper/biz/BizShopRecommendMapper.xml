@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizShopRecommendMapper">
+    <select id="getRecommendLeaguerList" resultType="com.luxuryadmin.vo.biz.VoLeaguerRecommend">
+        select
+        sr.fk_shp_shop_id as shopId,
+        ss.`name` as shopName,
+        shpDet.`city` 'address',
+        ss.number as shopNumber,
+        ss.head_img_url as headImgUrl
+        from biz_shop_recommend sr
+        left join shp_shop ss on sr.fk_shp_shop_id = ss.id
+        LEFT JOIN shp_detail shpDet
+        ON ss.`id` = shpDet.`fk_shp_shop_id`
+        left join biz_leaguer_config lc on sr.fk_shp_shop_id =lc.fk_shp_shop_id
+        left join (select fk_be_inviter_shop_id from biz_leaguer where fk_inviter_shop_id = #{shopId} and state ="20")
+        la ON sr.fk_shp_shop_id = la.fk_be_inviter_shop_id
+        where lc.recommend = "1" and la.fk_be_inviter_shop_id is null and sr.fk_shp_shop_id != #{shopId}
+        order by sr.insert_time desc
+
+    </select>
+
+    <select id="getByShowRecommend" resultType="com.luxuryadmin.vo.biz.VoLeaguerRecommend">
+        select
+        sr.fk_shp_shop_id as shopId,
+        ss.`name` as shopName,
+        shpDet.`city` 'address',
+        ss.head_img_url as headImgUrl
+        from biz_shop_recommend sr
+        left join shp_shop ss on sr.fk_shp_shop_id = ss.id
+        LEFT JOIN shp_detail shpDet
+        ON ss.`id` = shpDet.`fk_shp_shop_id`
+        left join biz_leaguer_config lc on sr.fk_shp_shop_id =lc.fk_shp_shop_id
+        left join (select fk_be_inviter_shop_id from biz_leaguer_add where fk_inviter_shop_id = #{shopId} and state
+        >=10) la ON sr.fk_shp_shop_id = la.fk_be_inviter_shop_id
+        left join (select fk_inviter_shop_id from biz_leaguer_add where fk_be_inviter_shop_id = #{shopId} and state
+        >=10) las ON sr.fk_shp_shop_id = las.fk_inviter_shop_id
+        where la.fk_be_inviter_shop_id is null and las.fk_inviter_shop_id is null and lc.recommend = "1" and sr.fk_shp_shop_id != #{shopId}
+        order by rand()
+        limit 2
+    </select>
+
+    <select id="getRecommendAdminPage" parameterType="com.luxuryadmin.param.biz.ParamRecommendAdminBySearch"
+            resultType="com.luxuryadmin.vo.biz.VoRecommendAdminList">
+        select
+        sr.id as id,
+        sr.fk_shp_shop_id as shopId,
+        sr.insert_time as insertTime,
+        sr.state as state,
+        ss.`name` as shopName,
+        ss.number as shopNumber,
+        shpDet.`city` 'address',
+        ss.head_img_url as headImgUrl
+        from biz_shop_recommend sr
+        left join biz_leaguer bl on sr.fk_shp_shop_id = bl.fk_inviter_shop_id
+        left join shp_shop ss on sr.fk_shp_shop_id = ss.id
+        LEFT JOIN shp_detail shpDet
+        ON ss.`id` = shpDet.`fk_shp_shop_id`
+        where 1=1
+        <if test="searchName != null">
+            and (ss.`name` like CONCAT('%',#{searchName},'%') or ss.number like CONCAT('%',#{searchName},'%'))
+        </if>
+        group by sr.id
+        order by sr.insert_time desc
+    </select>
+
+    <select id="getByShopId" resultType="com.luxuryadmin.entity.biz.BizShopRecommend">
+        select
+        *
+        from biz_shop_recommend sr
+        where fk_shp_shop_id = #{shopId}
+        order by sr.insert_time desc
+        limit 1
+    </select>
+    <delete id="deleteShopRecommendForShopId" >
+        delete from  biz_shop_recommend
+
+        where fk_shp_shop_id = #{shopId}
+    </delete>
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizShopRecommend">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+
+        <result column="fk_shp_shop_number" jdbcType="VARCHAR" property="fkShpShopNumber"/>
+
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+
+        <result column="recommend_num" jdbcType="INTEGER" property="recommendNum"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+    </resultMap>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizShopRecommend" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into biz_shop_recommend
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkShpShopId!=null ">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpShopNumber!=null ">
+                fk_shp_shop_number,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="recommendNum!=null ">
+                recommend_num,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="remark!=null ">
+                remark,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopNumber!=null">
+                #{fkShpShopNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="recommendNum!=null">
+                #{recommendNum,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark!=null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+    </insert>
+
+    <delete id="deleteObject">
+        delete from biz_shop_recommend
+        where id = #{id}
+    </delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizShopRecommend">
+        update biz_shop_recommend
+        <set>
+            <if test="fkShpShopId!=null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopNumber!=null and fkShpShopNumber!=''">
+                fk_shp_shop_number = #{fkShpShopNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="recommendNum!=null">
+                recommend_num = #{recommendNum,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+        select
+        id,
+        fk_shp_shop_id,
+        fk_shp_shop_number,
+        state,
+        recommend_num,
+        insert_time,
+        update_time,
+        insert_admin,
+        update_admin,
+        remark
+        from biz_shop_recommend
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+</mapper>

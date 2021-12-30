@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpPayOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpPayOrder">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_mp_user_id" jdbcType="INTEGER" property="fkMpUserId"/>
+
+        <result column="transaction_id" jdbcType="VARCHAR" property="transactionId"/>
+
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+
+        <result column="total_money" jdbcType="DECIMAL" property="totalMoney"/>
+
+        <result column="discount_money" jdbcType="DECIMAL" property="discountMoney"/>
+
+        <result column="real_money" jdbcType="DECIMAL" property="realMoney"/>
+
+        <result column="vip_type" jdbcType="VARCHAR" property="vipType"/>
+
+        <result column="order_type" jdbcType="VARCHAR" property="orderType"/>
+
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+        <result column="pay_channel" jdbcType="VARCHAR" property="payChannel"/>
+
+        <result column="trade_type" jdbcType="VARCHAR" property="tradeType"/>
+
+        <result column="create_type" jdbcType="VARCHAR" property="createType"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_mp_user_id,
+		transaction_id,
+		order_no,
+		total_money,
+		discount_money,
+		real_money,
+		vip_type,
+		order_type,
+		state,
+		pay_channel,
+		trade_type,
+		create_type,
+		insert_time,
+		update_time,
+		pay_time,
+		finish_time,
+		insert_admin,
+		update_admin,
+		remark
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.MpPayOrder" keyProperty="id" useGeneratedKeys="true">
+        insert into mp_pay_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkMpUserId!=null ">
+                fk_mp_user_id,
+            </if>
+            <if test="transactionId!=null ">
+                transaction_id,
+            </if>
+            <if test="orderNo!=null ">
+                order_no,
+            </if>
+            <if test="totalMoney!=null ">
+                total_money,
+            </if>
+            <if test="discountMoney!=null ">
+                discount_money,
+            </if>
+            <if test="realMoney!=null ">
+                real_money,
+            </if>
+            <if test="vipType!=null ">
+                vip_type,
+            </if>
+            <if test="orderType!=null ">
+                order_type,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="payChannel!=null ">
+                pay_channel,
+            </if>
+            <if test="tradeType!=null ">
+                trade_type,
+            </if>
+            <if test="createType!=null ">
+                create_type,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="payTime!=null ">
+                pay_time,
+            </if>
+            <if test="finishTime!=null ">
+                finish_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="remark!=null ">
+                remark,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkMpUserId!=null">
+                #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="transactionId!=null">
+                #{transactionId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo!=null">
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalMoney!=null">
+                #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="discountMoney!=null">
+                #{discountMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="realMoney!=null">
+                #{realMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="vipType!=null">
+                #{vipType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType!=null">
+                #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="payChannel!=null">
+                #{payChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType!=null">
+                #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="createType!=null">
+                #{createType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime!=null">
+                #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime!=null">
+                #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark!=null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  mp_pay_order 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.MpPayOrder">
+        update mp_pay_order
+        <set>
+            <if test="fkMpUserId!=null">
+                fk_mp_user_id = #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="transactionId!=null and transactionId!=''">
+                transaction_id = #{transactionId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo!=null and orderNo!=''">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="totalMoney!=null">
+                total_money = #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="discountMoney!=null">
+                discount_money = #{discountMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="realMoney!=null">
+                real_money = #{realMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="vipType!=null and vipType!=''">
+                vip_type = #{vipType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType!=null and orderType!=''">
+                order_type = #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="payChannel!=null and payChannel!=''">
+                pay_channel = #{payChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType!=null and tradeType!=''">
+                trade_type = #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="createType!=null and createType!=''">
+                create_type = #{createType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime!=null">
+                pay_time = #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime!=null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_mp_user_id,
+		transaction_id,
+		order_no,
+		total_money,
+		discount_money,
+		real_money,
+		vip_type,
+		order_type,
+		state,
+		pay_channel,
+		trade_type,
+		create_type,
+		insert_time,
+		update_time,
+		pay_time,
+		finish_time,
+		insert_admin,
+		update_admin,
+		remark
+		from mp_pay_order
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="getOrderInfoByOrderNo" resultMap="BaseResultMap"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from mp_pay_order
+        where order_no = #{orderNo}
+        <if test="userId != null and userId != ''">
+            and fk_mp_user_id = #{userId}
+        </if>
+        and state = 10
+    </select>
+
+
+</mapper>

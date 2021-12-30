@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.op.OpMessageShopUserRefMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.op.OpMessageShopUserRef">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="message_id" jdbcType="BIGINT" property="messageId" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+    <result column="click_state" jdbcType="VARCHAR" property="clickState" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="click_state" jdbcType="VARCHAR" property="clickState" />
+    <result column="extra_param" jdbcType="VARCHAR" property="extraParam" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, message_id, fk_shp_shop_id, fk_shp_user_id, click_state, insert_time, update_time, 
+    del,extra_param
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from op_message_shop_user_ref
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from op_message_shop_user_ref
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="delOpMessageByDateRange">
+      delete from op_message_shop_user_ref
+      where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+      <if test="startTime != null">
+        and insert_time >= #{startTime}
+      </if>
+      <if test="endTime != null">
+        and #{endTime} >= insert_time
+      </if>
+      and message_id IN(
+        select
+            id
+        from
+            op_message
+        where
+            type = 'shop'
+      )
+    </delete>
+    <insert id="insert" parameterType="com.luxuryadmin.entity.op.OpMessageShopUserRef">
+    insert into op_message_shop_user_ref (id, message_id, fk_shp_shop_id, 
+      fk_shp_user_id, click_state, insert_time, 
+      update_time, del,extra_param)
+    values (#{id,jdbcType=BIGINT}, #{messageId,jdbcType=BIGINT}, #{fkShpShopId,jdbcType=INTEGER},
+      #{fkShpUserId,jdbcType=INTEGER}, #{clickState,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}, #{del,jdbcType=CHAR}), #{extraParam,jdbcType=VARCHAR}
+  </insert>
+  <insert id="insertSelective" parameterType="com.luxuryadmin.entity.op.OpMessageShopUserRef">
+    insert into op_message_shop_user_ref
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="messageId != null">
+        message_id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id,
+      </if>
+      <if test="clickState != null">
+        click_state,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="extraParam != null">
+        extra_param,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="messageId != null">
+        #{messageId,jdbcType=BIGINT},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="clickState != null">
+        #{clickState,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="extraParam != null">
+      #{extraParam,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+    <!-- 批量插入消息店铺关联表 -->
+    <insert id="batchInsertMessageShopUserRef" parameterType="java.util.List">
+      insert into op_message_shop_user_ref(message_id, fk_shp_shop_id,fk_shp_user_id, click_state, insert_time,update_time, del,extra_param) values
+      <foreach collection="list" item="item" index= "index" separator =",">
+           (
+           #{item.messageId},
+           #{item.fkShpShopId},
+           #{item.fkShpUserId},
+           #{item.clickState},
+           #{item.insertTime},
+           #{item.updateTime},
+           #{item.del},
+           #{item.extraParam}
+           )
+      </foreach >
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.op.OpMessageShopUserRef">
+    update op_message_shop_user_ref
+    <set>
+      <if test="messageId != null">
+        message_id = #{messageId,jdbcType=BIGINT},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="clickState != null">
+        click_state = #{clickState,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="clickState != null">
+        extra_param = #{extraParam,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.op.OpMessageShopUserRef">
+    update op_message_shop_user_ref
+    set message_id = #{messageId,jdbcType=BIGINT},
+      fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      click_state = #{clickState,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      del = #{del,jdbcType=CHAR},
+      extra_param = #{extraParam,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <!-- 根据【用户ID】更新所有未读的【系统消息】 -->
+  <update id="updateAllUnReadSystemOpMessageByUserId" parameterType="java.lang.Integer">
+    update
+        op_message_shop_user_ref omsur
+    LEFT JOIN
+        op_message om
+    ON
+        omsur.message_id = om.id
+    set
+      omsur.click_state = 1,
+      omsur.update_time = NOW()
+    where fk_shp_user_id = #{userId,jdbcType=INTEGER}
+    and omsur.click_state = 0
+    and type = 'system'
+  </update>
+
+  <!-- 根据【用户ID】和【店铺ID】更新所有未读的【非系统消息】-->
+  <update id="updateAllUnReadOtherOpMessageByUserIdAndShopId" parameterType="java.util.Map">
+    update
+        op_message_shop_user_ref omsur
+    LEFT JOIN
+        op_message om
+    ON
+        omsur.message_id = om.id
+    set
+      omsur.click_state = 1,
+      omsur.update_time = NOW()
+    where fk_shp_user_id = #{userId,jdbcType=INTEGER}
+    and (
+        fk_shp_shop_id is null
+        or
+        fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        )
+    and omsur.click_state = 0
+    and type != 'system'
+  </update>
+
+  <!-- 根据用户ID获取消息列表 -->
+  <select id="selectUnreadCountByShopIdAndType" resultType="java.lang.Integer" parameterType="java.util.Map">
+    SELECT COUNT(1) FROM(
+      SELECT
+        message_id,fk_shp_shop_id,fk_shp_user_id
+      FROM
+        op_message_shop_user_ref
+      WHERE
+        1=1
+      AND
+        fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+      AND
+        click_state = 0
+      AND
+        del = '0'
+    )omsur
+    LEFT JOIN(
+      SELECT
+          id,
+          type
+      FROM
+          op_message
+      WHERE
+        type = #{type,jdbcType=VARCHAR}
+      AND
+        del = '0'
+    )om
+    ON
+      omsur.message_id = om.id
+    WHERE
+      om.type = #{type,jdbcType=VARCHAR}
+    <!-- 如果店铺ID不为空，并且消息类型不为【系统消息】，则根据【店铺ID】筛选-->
+    <if test="fkShpShopId != null and type!= 'system'">
+      AND fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+    </if>
+  </select>
+</mapper>

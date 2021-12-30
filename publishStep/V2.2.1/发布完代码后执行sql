@@ -1,0 +1,4 @@
+-- 发布完admin后执行
+update op_message set sub_type = 'dailyReport' where sub_type = '点击查看日报详情>';
+
+update op_message set sub_type = 'uploadProd' WHERE sub_type='releaseProd' AND CONTENT like '%新品入库%' AND title = '商品入库通知';

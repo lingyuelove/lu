@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpWechatMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpWechat">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shop_id" jdbcType="INTEGER" property="fkShopId" />
+    <result column="contact_person_name" jdbcType="VARCHAR" property="contactPersonName" />
+    <result column="contact_person_wechat" jdbcType="VARCHAR" property="contactPersonWechat" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="sort_num" jdbcType="INTEGER" property="sortNum" />
+    <result column="del" jdbcType="CHAR" property="del" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shop_id, contact_person_name, contact_person_wechat, insert_admin, update_admin, 
+    insert_time, update_time, sort_num, del
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shp_wechat
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+    <select id="selectShpWechatByShopId" resultType="com.luxuryadmin.vo.shp.VoShpWechat" parameterType="java.lang.Integer">
+      select
+        id 'id',
+        contact_person_name 'contactPersonName',
+        contact_person_wechat 'contactPersonWechat',
+        contact_responsible 'contactResponsible',
+        type 'type'
+      from
+        shp_wechat
+      where
+        del = '0' and type = '0'
+      and
+        fk_shop_id = #{fkShopId,jdbcType=INTEGER}
+      order by insert_time desc
+    </select>
+  <select id="getWechatByShow" resultType="com.luxuryadmin.vo.shp.VoShpWechat" parameterType="java.lang.Integer">
+    select
+    id 'id',
+    contact_person_name 'contactPersonName',
+    contact_person_wechat 'contactPersonWechat',
+    contact_responsible 'contactResponsible',
+    type 'type'
+    from
+    shp_wechat
+    where
+    del = '0' and type = '1'
+    and
+    fk_shop_id = #{shopId,jdbcType=INTEGER}
+
+  </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from shp_wechat
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <update id="deleteShpWechat">
+    update
+        shp_wechat
+    set
+        del = '1'
+    where
+        id = #{id,jdbcType=INTEGER}
+    and
+        fk_shop_id = #{fkShopId,jdbcType=INTEGER}
+    LIMIT 1
+  </update>
+  <insert id="insert" parameterType="com.luxuryadmin.entity.shp.ShpWechat">
+    insert into shp_wechat (id, fk_shop_id, contact_person_name, 
+      contact_person_wechat, insert_admin, update_admin, 
+      insert_time, update_time, sort_num, 
+      del)
+    values (#{id,jdbcType=INTEGER}, #{fkShopId,jdbcType=INTEGER}, #{contactPersonName,jdbcType=VARCHAR}, 
+      #{contactPersonWechat,jdbcType=VARCHAR}, #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, 
+      #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{sortNum,jdbcType=INTEGER}, 
+      #{del,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.luxuryadmin.entity.shp.ShpWechat"
+          useGeneratedKeys="true" keyProperty="id">
+    insert into shp_wechat
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShopId != null">
+        fk_shop_id,
+      </if>
+      <if test="contactPersonName != null">
+        contact_person_name,
+      </if>
+      <if test="contactPersonWechat != null">
+        contact_person_wechat,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="contactResponsible != null">
+        contact_responsible,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="sortNum != null">
+        sort_num,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShopId != null">
+        #{fkShopId,jdbcType=INTEGER},
+      </if>
+      <if test="contactPersonName != null">
+        #{contactPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPersonWechat != null">
+        #{contactPersonWechat,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="contactResponsible != null">
+        #{contactResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sortNum != null">
+        #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.shp.ShpWechat">
+    update shp_wechat
+    <set>
+      <if test="fkShopId != null">
+        fk_shop_id = #{fkShopId,jdbcType=INTEGER},
+      </if>
+      <if test="contactPersonName != null">
+        contact_person_name = #{contactPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPersonWechat != null">
+        contact_person_wechat = #{contactPersonWechat,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="contactResponsible != null">
+        contact_responsible = #{contactResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sortNum != null">
+        sort_num = #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpWechat">
+    update shp_wechat
+    set fk_shop_id = #{fkShopId,jdbcType=INTEGER},
+      contact_person_name = #{contactPersonName,jdbcType=VARCHAR},
+      contact_person_wechat = #{contactPersonWechat,jdbcType=VARCHAR},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      sort_num = #{sortNum,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

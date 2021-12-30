@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="myLevel" source="myLog.level"/>
+    <springProperty scope="context" name="myLogPath" source="myLog.path"/>
+    <!--这个名字将反应到每一条日志的开头-->
+    <property name="file.name" value="mp-api.luxuryadmin.com" />
+    <contextName>${file.name}-logging</contextName>
+    <!--设置变量，下面有用到。含义是日志保存路径-->
+    <property name="log.path" value="${myLogPath}" />
+
+    <!--输出到控制台-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 级别过滤 -->
+       <!-- <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+        <!--日志输出格式-->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--输出到文件-->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志名，用到了上面配置的路径-->
+        <file>${log.path}/${file.name}.log</file>
+        <!--根据yyyy-MM-dd所以是每天新建文件，也可以设置其它格式，如每月或每分-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/${file.name}.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--设置日志隔离级别-->
+    <root level="${myLevel}">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file" />
+    </root>
+
+    <!--设置具体包的隔离级别-->
+    <!--<logger name="cn.theUnit4.Mapper" level="debug"/>-->
+
+</configuration>

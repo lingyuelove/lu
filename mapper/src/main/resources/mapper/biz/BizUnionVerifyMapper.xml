@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizUnionVerifyMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizUnionVerify">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode" />
+
+		<result column="license_img_url" jdbcType="VARCHAR" property="licenseImgUrl" />
+
+		<result column="valid_img_url" jdbcType="VARCHAR" property="validImgUrl" />
+
+		<result column="stock_img_url" jdbcType="VARCHAR" property="stockImgUrl" />
+
+		<result column="empower_img_url" jdbcType="VARCHAR" property="empowerImgUrl" />
+
+		<result column="other_user_img_url" jdbcType="VARCHAR" property="otherUserImgUrl" />
+
+		<result column="state" jdbcType="VARCHAR" property="state" />
+
+		<result column="shop_user_type" jdbcType="VARCHAR" property="shopUserType" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+		<result column="fail_remark" jdbcType="VARCHAR" property="failRemark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		fk_pro_classify_code,
+		license_img_url,
+		valid_img_url,
+		stock_img_url,
+		empower_img_url,
+		other_user_img_url,
+		state,
+		shop_user_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fail_remark,
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizUnionVerify" keyProperty="id" useGeneratedKeys="true" >
+		insert into biz_union_verify
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id,
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id,
+			</if>
+			<if test="fkProClassifyCode!=null ">
+				fk_pro_classify_code,
+			</if>
+			<if test="licenseImgUrl!=null ">
+				license_img_url,
+			</if>
+			<if test="validImgUrl!=null ">
+				valid_img_url,
+			</if>
+			<if test="stockImgUrl!=null ">
+				stock_img_url,
+			</if>
+			<if test="empowerImgUrl!=null ">
+				empower_img_url,
+			</if>
+			<if test="otherUserImgUrl!=null ">
+				other_user_img_url,
+			</if>
+			<if test="state!=null ">
+				state,
+			</if>
+			<if test="shopUserType!=null ">
+				shop_user_type,
+			</if>
+			<if test="insertTime!=null ">
+				insert_time,
+			</if>
+			<if test="updateTime!=null ">
+				update_time,
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin,
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin,
+			</if>
+			<if test="del!=null ">
+				del,
+			</if>
+			<if test="remark!=null ">
+				remark,
+			</if>
+			<if test="failRemark!=null ">
+				fail_remark,
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null">
+				#{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseImgUrl!=null">
+				#{licenseImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="validImgUrl!=null">
+				#{validImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="stockImgUrl!=null">
+				#{stockImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="empowerImgUrl!=null">
+				#{empowerImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="otherUserImgUrl!=null">
+				#{otherUserImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="shopUserType!=null">
+				#{shopUserType,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="failRemark!=null">
+				#{failRemark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  biz_union_verify
+
+		where id = #{id}
+
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizUnionVerify" >
+		update biz_union_verify
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null ">
+				fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseImgUrl!=null ">
+				license_img_url = #{licenseImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="validImgUrl!=null ">
+				valid_img_url = #{validImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="stockImgUrl!=null ">
+				stock_img_url = #{stockImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="empowerImgUrl!=null ">
+				empower_img_url = #{empowerImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="otherUserImgUrl!=null ">
+				other_user_img_url = #{otherUserImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null ">
+				state = #{state,jdbcType=VARCHAR},
+			</if>
+			<if test="shopUserType!=null ">
+				shop_user_type = #{shopUserType,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null ">
+				del = #{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null ">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="failRemark!=null">
+				fail_remark = #{failRemark,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_classify_code,
+		license_img_url,
+		valid_img_url,
+		stock_img_url,
+		empower_img_url,
+		other_user_img_url,
+		state,
+		shop_user_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fail_remark
+		from biz_union_verify
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+	<select id="getBizUnionVerify" resultType="com.luxuryadmin.vo.biz.VoBizUnionVerifyList"
+			parameterType="com.luxuryadmin.param.biz.ParamBizUnionVerifyList">
+		SELECT
+			buv.id AS id,
+		    buv.fk_shp_shop_id AS shopId,
+			ss.NAME AS NAME,
+			ss.contact AS contact,
+			ss.number AS number,
+			sd.province AS province,
+			sd.city AS city,
+			buv.fk_pro_classify_code AS classifyCode,
+			buv.license_img_url AS licenseImgUrl,
+			buv.shop_user_type AS shopUserType,
+			buv.valid_img_url AS validImgUrl,
+			buv.stock_img_url AS stockImgUrl,
+			buv.empower_img_url AS empowerImgUrl,
+			ss.insert_time AS insertTime,
+		    buv.insert_time AS examineTime,
+			buv.state AS state,
+			buv.remark AS remark,
+		    buv.other_user_img_url AS otherUserImgUrl,
+		    buv.fail_remark AS failRemark
+		FROM
+			biz_union_verify buv
+			LEFT JOIN shp_shop ss ON buv.fk_shp_shop_id = ss.id
+			LEFT JOIN shp_detail sd ON ss.id = sd.fk_shp_shop_id
+		WHERE
+			buv.del = '0'
+		<if test="shopName!=null and shopName!=''">
+			and ss.name like CONCAT('%',#{shopName},'%')
+		</if>
+		<if test="number!=null and number!=''">
+			and ss.number like CONCAT('%',#{number},'%')
+		</if>
+		<if test="contact!=null and contact!=''">
+			and ss.contact like CONCAT('%',#{contact},'%')
+		</if>
+		<if test="fkProClassifyCode!=null and fkProClassifyCode!=''">
+			and buv.fk_pro_classify_code = #{fkProClassifyCode}
+		</if>
+		<if test="state!=null and state!=''">
+			and buv.state = #{state}
+		</if>
+		order by buv.insert_time desc
+	</select>
+	<select id="getUnionVerifyByShopId" resultType="com.luxuryadmin.vo.biz.VoUnionVerify"
+			parameterType="java.lang.Integer">
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_classify_code,
+		license_img_url,
+		valid_img_url,
+		stock_img_url,
+		empower_img_url,
+		state,
+		shop_user_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fail_remark
+		from biz_union_verify
+		where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+		order by insert_time desc
+		limit 1
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.op.OpEmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.op.OpEmployee">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="union_switch" jdbcType="VARCHAR" property="unionSwitch"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="del" jdbcType="VARCHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_user_id, type, union_switch, insert_time, update_time, insert_admin, update_admin, 
+    del, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from op_employee
+        where id = #{id,jdbcType=INTEGER} and del = 0
+    </select>
+    <select id="count" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+      select count(*)
+      from op_employee
+      where
+      fk_shp_user_id = #{shpUserId}
+      and
+      del = 0
+    </select>
+    <select id="listEmployee" resultType="com.luxuryadmin.vo.op.VoOpEmployeeList">
+        SELECT
+            op_employee.id as id,
+            op_employee.fk_shp_user_id as userId,
+            shp_user.nickname as nickname,
+            shp_user.username as username,
+            ( SELECT COUNT(*) FROM op_union_agent WHERE op_union_agent.fk_op_employee_id = op_employee.id and op_union_agent.del = 0) AS agentCount,
+            shp_user.insert_time AS insertTime,
+            op_employee.insert_time AS employeeInsertTime,
+            shp_user.number AS userNumber,
+            op_employee.union_switch as unionSwitch
+        FROM
+            op_employee
+            LEFT JOIN shp_user ON op_employee.fk_shp_user_id = shp_user.id
+        where op_employee.del = 0
+    </select>
+    <!--获取允许分享的推广人员的userId-->
+    <select id="getAllowedEmployeeShareUserId" resultType="java.lang.String">
+        SELECT ifnull(GROUP_CONCAT(fk_shp_user_id),'') FROM op_employee  WHERE union_switch = 1 and del = 0
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from op_employee
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteUnionSwitch" parameterType="java.lang.Integer">
+      update op_employee set `del` = '1' where id = #{id}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.op.OpEmployee">
+        insert into op_employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="unionSwitch != null">
+                union_switch,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="unionSwitch != null">
+                #{unionSwitch,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.op.OpEmployee">
+        update op_employee
+        <set>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="unionSwitch != null">
+                union_switch = #{unionSwitch,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

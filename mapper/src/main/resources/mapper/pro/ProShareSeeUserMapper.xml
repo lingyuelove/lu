@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProShareSeeUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProShareSeeUser">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+
+        <result column="fk_pro_share_id" jdbcType="INTEGER" property="fkProShareId"/>
+
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+
+        <result column="fk_pro_share_batch" jdbcType="VARCHAR" property="fkProShareBatch"/>
+
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+
+        <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl"/>
+
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+
+        <result column="union_id" jdbcType="VARCHAR" property="unionId"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		fk_pro_share_id,
+		fk_shp_user_id,
+		fk_pro_share_batch,
+		type,
+		nick_name,
+		phone,
+		avatar_url,
+		gender,
+		open_id,
+		union_id,
+		insert_time,
+		ip
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProShareSeeUser" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into pro_share_see_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkShpShopId!=null ">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProShareId!=null ">
+                fk_pro_share_id,
+            </if>
+            <if test="fkShpUserId!=null ">
+                fk_shp_user_id,
+            </if>
+            <if test="fkProShareBatch!=null ">
+                fk_pro_share_batch,
+            </if>
+            <if test="type!=null ">
+                type,
+            </if>
+            <if test="nickName!=null ">
+                nick_name,
+            </if>
+            <if test="phone!=null ">
+                phone,
+            </if>
+            <if test="avatarUrl!=null ">
+                avatar_url,
+            </if>
+            <if test="gender!=null ">
+                gender,
+            </if>
+            <if test="openId!=null ">
+                open_id,
+            </if>
+            <if test="unionId!=null ">
+                union_id,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="ip!=null ">
+                ip,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareId!=null">
+                #{fkProShareId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId!=null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareBatch!=null">
+                #{fkProShareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="type!=null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName!=null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone!=null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarUrl!=null">
+                #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="gender!=null">
+                #{gender,jdbcType=VARCHAR},
+            </if>
+            <if test="openId!=null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="unionId!=null">
+                #{unionId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="ip!=null">
+                #{ip,jdbcType=TIMESTAMP},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  pro_share_see_user
+
+		where id = #{id}
+
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProShareSeeUser">
+        update pro_share_see_user
+        <set>
+            <if test="fkShpShopId!=null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareId!=null">
+                fk_pro_share_id = #{fkProShareId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId!=null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareBatch!=null and fkProShareBatch != ''">
+                fk_pro_share_batch = #{fkProShareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="type!=null and fkProShareBatch != ''">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName!=null and nickName!=''">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarUrl!=null and avatarUrl!=''">
+                avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="gender!=null and gender!=''">
+                gender = #{gender,jdbcType=VARCHAR},
+            </if>
+            <if test="openId!=null and openId!=''">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="unionId!=null and unionId!=''">
+                union_id = #{unionId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="ip!=null">
+                ip = #{ip,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_share_id,
+		fk_shp_user_id,
+		fk_pro_share_batch,
+		type,
+		nick_name,
+		phone,
+		avatar_url,
+		gender,
+		open_id,
+		union_id,
+		insert_time,
+		ip
+		from pro_share_see_user
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+
+    <select resultMap="BaseResultMap" id="proShareSeeUsertest">
+		select * from pro_share_see_user
+	</select>
+    <select id="getShareSeeUserByOpenIdAndShareId" resultMap="BaseResultMap">
+		select * from pro_share_see_user where open_id =#{openId} and fk_pro_share_id =  #{shareId}
+	</select>
+    <!--获取分享用户信息列表-->
+    <select id="getShareUserList" resultType="com.luxuryadmin.vo.pro.VoShareUserList"
+            parameterType="com.luxuryadmin.param.pro.ParamShareUser">
+		SELECT
+		id,
+		nick_name userName,
+		avatar_url userImg,
+		gender sex,
+		insert_time insertTime
+		FROM
+		pro_share_see_user
+		WHERE  fk_pro_share_id = #{shareId}
+	</select>
+
+    <!-- 该微信用户是否已存在-->
+    <select id="existsWxUserByOpenId" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM pro_share_see_user WHERE TYPE = #{type} AND open_id = #{openId}
+	</select>
+
+    <!--该微信用户是否存在,根据手机号-->
+    <select id="existsWxUserReturnUserId" resultType="java.lang.Integer">
+        SELECT
+          fk_shp_user_id
+        FROM
+          pro_share_see_user
+        WHERE TYPE =#{type}
+          AND phone = #{phone}
+          AND fk_shp_user_id > 0
+        ORDER BY id ASC
+        LIMIT 1
+    </select>
+    <select id="getVisitShopAppletCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select count(*) from ( SELECT
+        seu.fk_shp_user_id
+        FROM
+        pro_share_see_user seu
+        left join pro_share ps on seu.fk_pro_share_batch =ps.share_batch
+        where ps.fk_shp_user_id =  #{userId} and date(seu.insert_time) = curdate() group by seu.open_id) count
+
+    </select>
+</mapper>

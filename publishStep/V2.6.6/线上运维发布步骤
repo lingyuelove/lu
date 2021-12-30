@@ -1,0 +1,12 @@
+一、模块添加权限配置
+仓库模块
+商品动态
+显示 dynamic:list
+删除 dynamic:delete
+/default/functionIcon/dynamic.png
+
+商品动态列表四张图片
+/default/pro/dynamic/custom.png
+/default/pro/dynamic/intransit.png
+/default/pro/dynamic/service.png
+/default/pro/dynamic/shop.png

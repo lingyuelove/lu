@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProClassifySubMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProClassifySub">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="code" jdbcType="VARCHAR" property="code" />
+
+		<result column="name" jdbcType="VARCHAR" property="name" />
+
+		<result column="description" jdbcType="VARCHAR" property="description" />
+		<result column="icon_url" jdbcType="VARCHAR" property="iconUrl" />
+
+		<result column="fk_pro_classify_id" jdbcType="INTEGER" property="fkProClassifyId" />
+		<result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="type" jdbcType="CHAR" property="type" />
+
+		<result column="state" jdbcType="INTEGER" property="state" />
+
+		<result column="sort" jdbcType="INTEGER" property="sort" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="versions" jdbcType="INTEGER" property="versions" />
+
+		<result column="del" jdbcType="CHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+
+
+
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProClassifySub" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_classify_sub
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id,
+			</if>
+			<if test="code!=null ">
+				code,
+			</if>
+			<if test="name!=null ">
+				name,
+			</if>
+			<if test="description!=null ">
+				description,
+			</if>
+			<if test="iconUrl!=null ">
+				icon_url,
+			</if>
+			<if test="fkProClassifyId!=null ">
+				fk_pro_classify_id,
+			</if>
+			<if test="fkProClassifyCode!=null ">
+				fk_pro_classify_code,
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id,
+			</if>
+			<if test="type!=null ">
+				type,
+			</if>
+			<if test="state!=null ">
+				state,
+			</if>
+			<if test="sort!=null ">
+				sort,
+			</if>
+			<if test="insertTime!=null ">
+				insert_time,
+			</if>
+			<if test="updateTime!=null ">
+				update_time,
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin,
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin,
+			</if>
+			<if test="versions!=null ">
+				versions,
+			</if>
+			<if test="del!=null ">
+				del,
+			</if>
+			<if test="remark!=null ">
+				remark,
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="code!=null">
+				#{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name!=null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="description!=null">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="iconUrl!=null">
+				#{iconUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="fkProClassifyId!=null">
+				#{fkProClassifyId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null">
+				#{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				#{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				#{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				#{versions,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_classify_sub
+
+		where id = #{id}
+
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProClassifySub" >
+		update pro_classify_sub
+		<set>
+			<if test="code!=null and code!=''">
+				code = #{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name!=null and name!=''">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="description!=null and description!=''">
+				description = #{description,jdbcType=VARCHAR},
+			</if>
+			<if test="iconUrl!=null and iconUrl!=''">
+				icon_url = #{iconUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="fkProClassifyId!=null">
+				fk_pro_classify_id = #{fkProClassifyId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null">
+				fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null and type!=''">
+				type = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				state = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="sort!=null">
+				sort = #{sort,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				versions = #{versions,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getProClassifySubById" resultType="com.luxuryadmin.vo.pro.VoProClassifySub" >
+		select
+		id,
+		code,
+		name,
+		SUBSTR(code,1,1) letter,
+		type,
+		del,
+		remark
+		from pro_classify_sub
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+
+
+	<!-- 根据一级分类id和商铺id查询二级分类，fk_shp_shop_id=-9为公用二级分类 -->
+	<select resultType="com.luxuryadmin.vo.pro.VoProClassifySub" id="listProClassifySub" >
+		select
+		id,
+		code,
+		name,
+		description,
+		SUBSTR(code,1,1) letter,
+		type,
+		fk_pro_classify_code as classifyCode
+		from pro_classify_sub
+		where  del = '0'
+		and fk_shp_shop_id in (-9,#{shopId,jdbcType=INTEGER})
+		and state = 1
+		order by  CODE ASC
+	</select>
+
+	<!-- 查询品牌分类<br/>用于公价查询系统 -->
+	<select resultType="com.luxuryadmin.vo.pro.VoProClassifySub" id="listAllProClassifySub" >
+		select
+		name,
+		description,
+		icon_url 'iconUrl',
+		SUBSTR(code,1,1) letter
+		from pro_classify_sub
+		where  del = '0'
+		and fk_shp_shop_id in (-9)
+		and state = 1
+		order by  CODE ASC
+	</select>
+
+	<!-- 分页查询二级分类 -->
+	<select  id="listProClassifySubPage"  resultType="com.luxuryadmin.vo.pro.VoProClassifySub" parameterType="com.luxuryadmin.param.pro.ParamProClassifySubQuery">
+		select
+		id,
+		code,
+		name,
+		description,
+		icon_url 'iconUrl',
+		SUBSTR(code,1,1) letter
+		from pro_classify_sub
+		where  del = '0' and fk_shp_shop_id =-9
+
+		<if test="classifyCode != null and classifyCode != ''">
+			and	fk_pro_classify_code  like  CONCAT('%',#{classifyCode,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="name != null and name != ''">
+			AND name like  CONCAT('%',#{name},'%')
+		</if>
+		order by  CODE ASC
+	</select>
+
+	<!-- 根据名称查询二级分类 -->
+	<select resultType="com.luxuryadmin.vo.pro.VoProClassifySub" id="getProClassifySubByName" >
+		select
+		id,
+		code,
+		name,
+		description
+		from pro_classify_sub
+		where del = '0' and  name=#{name,jdbcType=VARCHAR}
+		<if test="shopId != null and shopId != ''">
+			and	fk_shp_shop_id in(-9,#{shopId}) and state =1
+		</if>
+		<if test="shopId == null ">
+			and	fk_shp_shop_id =-9
+		</if>
+		limit 1
+	</select>
+	<!-- 查询用户自增的所有品牌 -->
+	<select resultMap="BaseResultMap" id="getClassifySubListByName" >
+		select
+		id,
+		code,
+		name,
+		description,
+		icon_url,
+		fk_pro_classify_id,
+		fk_pro_classify_code,
+		fk_shp_shop_id,
+		type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		del,
+		remark
+		from pro_classify_sub
+		where del = '0' and  name=#{name,jdbcType=VARCHAR}
+		and	fk_shp_shop_id != -9
+
+	</select>
+	<!-- 分页查询二级分类 后台 -->
+	<select  id="getClassifySubPageForAdmin"  resultType="com.luxuryadmin.vo.pro.VoProClassifySubForAdmin" parameterType="com.luxuryadmin.param.pro.ParamProClassifySubQuery">
+		select
+		id,
+		icon_url 'iconUrl',
+		state,
+		fk_pro_classify_code as classifyCode,
+		name
+		from pro_classify_sub
+		where  del = '0'
+
+		<if test="classifyCode != null and classifyCode != ''">
+			and	fk_pro_classify_code = #{classifyCode,jdbcType=VARCHAR}
+		</if>
+		<if test="name != null and name != ''">
+			AND name like  CONCAT('%',#{name},'%')
+		</if>
+		order by id desc
+	</select>
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		code,
+		name,
+		description,
+		icon_url,
+		fk_pro_classify_id,
+		fk_pro_classify_code,
+		fk_shp_shop_id,
+		type,
+		state,
+		sort,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		del,
+		remark
+		from pro_classify_sub
+		where id = #{id,jdbcType=INTEGER} and del = '0'
+
+	</select>
+</mapper>

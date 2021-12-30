@@ -1,0 +1,24 @@
+发布步骤:
+step01 执行[V2.5.4-zs.sql]文件
+
+step02 维修保养添加查看数据权限 uPermServiceProfit
+       后台添加查看维修保养数据汇总权限 pro:check:uPermServiceProfit
+       店铺模块的销售分析改为数据分析 并添加版本控制
+       后台添加回收分析权限权限 sale:recycle:all
+       后台添加资产分析权限权限 sale:money:all
+step03 把回收分析的七个类型的图标放入阿里云当中
+ 图标路径
+  //箱包
+  http://file-test.luxuryadmin.com/default/classifyImg/bag.png
+  //服饰
+  http://file-test.luxuryadmin.com/default/classifyImg/clothes.png
+ //珠宝
+  http://file-test.luxuryadmin.com/default/classifyImg/jewellery.png
+ //配饰
+  http://file-test.luxuryadmin.com/default/classifyImg/ornament.png
+ //其他
+ http://file-test.luxuryadmin.com/default/classifyImg/other.png
+ //鞋靴
+  http://file-test.luxuryadmin.com/default/classifyImg/shoes.png
+ //腕表
+  http://file-test.luxuryadmin.com/default/classifyImg/surface.png

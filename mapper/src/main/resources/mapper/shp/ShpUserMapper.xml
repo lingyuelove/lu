@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpUserMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="number" jdbcType="INTEGER" property="number"/>
+        <result column="default_login" jdbcType="VARCHAR" property="defaultLogin"/>
+        <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_op_channel_id" jdbcType="INTEGER" property="fkOpChannelId"/>
+        <result column="bind_we_chat" jdbcType="INTEGER" property="bindWeChat"/>
+        <result column="bind_apple" jdbcType="INTEGER" property="bindWeChat"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="jg_push_reg_id" jdbcType="VARCHAR" property="jgPushRegId"/>
+        <result column="app_version" jdbcType="VARCHAR" property="appVersion"/>
+    </resultMap>
+
+
+    <!--基础SQL-->
+    <sql id="Base_Column_List">
+        id, username, password, nickname, phone, type, state, number,default_login,head_img_url,
+        fk_shp_shop_id, fk_op_channel_id, insert_time, update_time, insert_admin, update_admin,
+        versions, del, remark,jg_push_reg_id,app_version,bind_we_chat,bind_apple
+    </sql>
+
+    <!--根据id查找整个对象-->
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--根据id查找整个对象-->
+    <select id="getTempForUser" resultType="com.luxuryadmin.vo.temp.TempForUser">
+        SELECT username as userName,nickname as nickName,number as number,insert_time as insertTime FROM shp_user WHERE fk_shp_shop_id <![CDATA[<]]> 1
+    </select>
+
+    <!--查找所有实体-->
+    <select id="listObject" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user
+    </select>
+
+    <!--根据用户名查找用户店铺登录用户-使用接口封装VO类,登录接口调用-->
+    <select id="getVOShpUserSaltByUsername" parameterType="java.lang.String"
+            resultType="com.luxuryadmin.vo.shp.VoShpUserSalt">
+        SELECT
+          shpu.`id` AS userId,
+          shpu.`fk_shp_shop_id` AS shopId,
+          (SELECT
+            shop.number
+          FROM
+            shp_shop shop
+          WHERE shop.id = shpu.`fk_shp_shop_id`) 'shopNumber',
+          (SELECT
+            shop.name
+          FROM
+            shp_shop shop
+          WHERE shop.id = shpu.`fk_shp_shop_id`) 'shopName',
+          shpu.`number` 'userNumber',
+          shpu.`username`,
+          shpu.`password`,
+          shpu.`type`,
+          shpu.`state`,
+          salt.`salt`,
+          shpu.`default_login` 'defaultLogin'
+        FROM
+          shp_user shpu
+          LEFT JOIN sys_salt salt
+            ON shpu.`id` = salt.`user_id`
+        WHERE shpu.`username` = #{username}
+    </select>
+
+    <!--根据用户名查找是否存在此用户-->
+    <select id="existsShpUserByUsername" resultType="int">
+        select count(id) from shp_user shpu where shpu.username=#{username}
+    </select>
+
+    <!--根据用户编码查找是否存在此用户-->
+    <select id="getShpUserIdByNumber" resultType="java.lang.Integer">
+        select id from shp_user shpu where shpu.number=#{number}
+    </select>
+
+    <!--根据用户名获取用户id-->
+    <select id="getShpUserIdByUsername" resultType="java.lang.Integer">
+        select id from shp_user shpu where shpu.username=#{username}
+    </select>
+
+
+    <!--根据用户id获取用户密码-->
+    <select id="getShpUserPasswordById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select shpu.password from shp_user shpu where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="getShpUserBaseByUserIdAndShopId" resultType="com.luxuryadmin.vo.shp.VoUserShopBase">
+
+        SELECT shpu.number,shpu.`nickname`,shpu.`username`,
+         shpu.`phone`,shpRef.type, shpu.head_img_url 'headImgUrl',
+        shop.name 'shopName',shop.`address` 'shopAddress' ,shop.`number` 'shopNumber'
+        FROM shp_user shpu
+        LEFT JOIN shp_user_shop_ref shpRef  ON shpRef.`fk_shp_user_id` = shpu.`id`
+        LEFT JOIN shp_shop shop ON shpRef.`fk_shp_shop_id` = shop.`id`
+        WHERE shpu.id = #{userId}
+        AND shop.id = #{shopId}
+        AND shpRef.state = 1
+        AND shpRef.del = '0'
+        AND shpu.del = '0'
+        AND shop.del = '0'
+
+    </select>
+
+    <!--获取用户的基础信息,用于个人中心展示;-->
+    <select id="getShpUserBaseInfoByUserId" resultType="com.luxuryadmin.vo.shp.VoUserShopBase">
+        SELECT
+          shpu.number 'userNumber',
+          shpu.`nickname`,
+          shpu.`username`,
+          shpu.`phone`,
+          shpu.`bind_we_chat` 'bindWeChat',
+          shpu.`bind_apple` 'bindApple',
+          shpu.head_img_url 'userHeadImgUrl',
+          shop.`name` 'shopName',
+          shop.`number` 'shopNumber',
+          shop.head_img_url 'shopHeadImgUrl',
+          shop.`mini_program_cover_img_url` 'miniProgramCoverImgUrl',
+          shop.member_state 'memberState',
+          IFNULL((SELECT
+            uShopR.`name`
+          FROM
+            shp_user_shop_ref uShopR
+          WHERE uShopR.fk_shp_shop_id = shop.`id`
+            AND uShopR.fk_shp_user_id = #{userId}),shpu.`nickname`) 'userShopName'
+        FROM
+          shp_user shpu
+          left join
+          shp_shop shop
+          on shpu.`fk_shp_shop_id` = shop.`id`
+        WHERE shpu.id = #{userId} AND shpu.`state` = 1 AND shpu.`del` = '0'
+
+    </select>
+
+    <!--根据用户名获取用户昵称-->
+    <select id="geVoEmployeeByUsername" parameterType="com.luxuryadmin.vo.shp.VoShpUser"
+            resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        select shpu.id 'userId', shpu.nickname, shpu.state from shp_user shpu where shpu.username=#{username}
+    </select>
+    <!-- 条件查询用户列表 -->
+    <select id="listShpUser" parameterType="com.luxuryadmin.param.shp.ParamShpUser"
+            resultType="com.luxuryadmin.vo.shp.VoShpUser">
+        select
+        su.id as id,
+        su.phone as phone,
+        su.nickname as nickname,
+        su.state as state,
+        su.insert_time as insertTime,
+        (SELECT
+        sut.login_ip
+        FROM
+        shp_user_token sut
+        WHERE sut.`fk_shp_user_id` = su.id
+        order by sut.insert_time
+        limit 1) 'loginIp',
+        oc.channel_name as channelName,
+        su.number as `number`,
+        concat(shop.`name`, '/', shop.`number`) 'shopNumber',
+        concat(
+        subSu.`nickname`,
+        '/',
+        subSu.`number`
+        ) 'inviteUserNumber'
+        from
+        shp_user su
+        LEFT JOIN op_channel oc
+        on su.fk_op_channel_id = oc.id
+        left join shp_shop shop
+        on su.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_user_invite sui
+        on su.id = sui.`fk_be_invite_user_id`
+        left join shp_user subSu
+        on subSu.`id` = sui.`fk_invite_user_id`
+        where 1=1
+        <if test="number != null">
+            and su.`number` = #{number}
+        </if>
+        <if test="phone != null">
+            and su.phone = #{phone}
+        </if>
+        <if test="nickname != null">
+            and su.nickname like CONCAT('%',#{nickname},'%')
+        </if>
+        <if test="channelId != null">
+            and su.fk_op_channel_id = #{channelId}
+        </if>
+        <if test="inviteUserId != null">
+            and subSu.number= #{inviteUserId}
+        </if>
+        <if test="insertTimeStart != null">
+            and su.insert_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} >= su.insert_time
+        </if>
+        order by su.insert_time desc
+    </select>
+    <!-- 条件查询员工列表 -->
+    <select id="listShpUserRel" parameterType="com.luxuryadmin.param.shp.ParamShpUser"
+            resultType="com.luxuryadmin.vo.shp.VoShpUser">
+        SELECT
+        su.number AS number,
+        su.username AS username,
+        su.phone AS phone,
+        ref.name AS nickname,
+        ref.state AS state,
+        ref.fk_shp_user_type_id AS TYPE,
+        ref.insert_time AS insertTime,
+        ref.update_time AS updateTime,
+        sud.id AS detailId,
+        su2.nickname AS updateAdminNickname,
+        shop.`name` AS shopName,
+        shop.id AS shopId,
+        shop.number AS shopNumber,
+        sut.`name` AS roleName
+        FROM
+        shp_user_shop_ref ref
+        LEFT JOIN shp_user su
+        ON ref.`fk_shp_user_id` = su.`id`
+        LEFT JOIN shp_user_detail sud
+        ON su.`id` = sud.`fk_shp_user_id`
+        LEFT JOIN shp_user su2
+        ON ref.`update_admin` = su2.`id`
+        LEFT JOIN shp_shop shop
+        ON ref.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_user_type sut
+        ON ref.`fk_shp_user_type_id` = sut.`id`
+        WHERE ref.`del` = '0'
+        <if test="username != null">
+            and su.username = #{username}
+        </if>
+        <if test="nickname != null">
+            and ref.name like CONCAT('%',#{nickname},'%')
+        </if>
+        <if test="state != null">
+            and ref.state = #{state}
+        </if>
+        <!-- 不等于空，表示根据是否【实名认证】查询-->
+        <if test="detailFlag != null">
+            <!-- 查询已上传实名认证的 -->
+            <if test="detailFlag == '1' || detailFlag == 1">
+                and (sud.id is not null and sud.id != '')
+            </if>
+            <!-- 查询未上传实名认证的 -->
+            <if test="detailFlag == '0' || detailFlag == 0">
+                and (sud.id is null or sud.id = '')
+            </if>
+        </if>
+        <if test="insertTimeStart != null">
+            and ref.insert_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} >= ref.insert_time
+        </if>
+        <if test="shopNumber != null">
+            and shop.number = #{shopNumber}
+        </if>
+        <if test="shopName != null">
+            and shop.`name` like CONCAT('%',#{shopName},'%')
+        </if>
+        order by ref.insert_time desc
+    </select>
+
+    <!-- 查询所有有效的用户ID -->
+    <select id="selectAllValidUserId" resultType="java.lang.Integer">
+        select id from shp_user where `state` = 1 AND `del` = '0'
+    </select>
+
+    <select id="selectUserIdListByUsernameList" resultType="java.lang.Integer" parameterType="java.util.List">
+        select id from shp_user where `state` = 1 AND `del` = '0' AND username IN(
+        <foreach collection="list" item="item" index="index" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+    <!--根据用户id获取用户昵称-->
+    <select id="getNicknameByUserId" resultType="java.lang.String">
+        SELECT nickname FROM shp_user WHERE id = #{userId}
+    </select>
+
+    <!--根据用户id或者用户名(已解密的用户名)-->
+    <select id="getUsernameByUserId" resultType="java.lang.String">
+        SELECT username FROM shp_user WHERE id =#{userId}
+    </select>
+
+    <!--获取员工的基本信息(用于薪资明细)-->
+    <select id="getEmployeeForSalary" resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        SELECT
+          us.username,
+          IF(
+            uShopR.`name` = '',
+            us.`nickname`,
+            uShopR.`name`
+          ) 'nickname',
+          us.head_img_url 'headImageUrl',
+          uShopR.insert_time 'joinWorkTime',
+          sutype.name 'userTypeName'
+        FROM
+          shp_user_shop_ref uShopR
+          LEFT JOIN shp_user us
+            ON uShopR.`fk_shp_user_id` = us.`id`
+          LEFT JOIN shp_user_type sutype
+            ON uShopR.`fk_shp_user_type_id` = sutype.`id`
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+          AND uShopR.`fk_shp_user_id` = #{userId}
+        ORDER BY uShopR.state DESC
+        LIMIT 1
+    </select>
+
+    <!-- 获取所有用户编码和用户id-->
+    <select id="listUserNumber" resultType="com.luxuryadmin.entity.shp.ShpUser">
+        select id,number from shp_user where number &lt; 1000000
+    </select>
+
+    <!-- 根据统计日期统计注册人数 -->
+    <select id="countRegPersonNumByCountDate" resultType="java.lang.Integer">
+        select count(1) from shp_user where DATE(insert_time) = DATE(#{countDate})
+    </select>
+
+    <!-- 根据shopId统计注册人数 -->
+    <select id="countRegPersonNumByShopId" resultType="java.lang.Integer">
+        select count(1) from shp_user where fk_shp_shop_id = #{shopId}
+    </select>
+
+    <!-- 根据shopId统计在职人数 -->
+    <select id="countValidRegPersonNumByShopId" resultType="java.lang.Integer">
+        select count(1) from shp_user where fk_shp_shop_id = #{shopId} and `state` = 1 AND `del` = '0'
+    </select>
+
+    <!--获取用户信息,用于登录,包含username,state;-->
+    <select id="getShpUserForLogin" resultType="com.luxuryadmin.vo.shp.VoShpUser">
+        SELECT
+          shpu.`id` AS userId,
+          shpu.`fk_shp_shop_id` AS shopId,
+          shpu.`username`,
+          shpu.`type`,
+          shpu.`state`
+        FROM
+          shp_user  shpu
+        WHERE shpu.`username` = #{username}
+    </select>
+
+    <!--根据渠道id,获取该渠道下的所有用户id-->
+    <select id="listUserIdByOpChannelId" resultType="java.lang.Integer">
+        select id from shp_user where fk_op_channel_id = #{channelId}
+    </select>
+
+    <!-- 根据用户手机号获取用户信息-->
+    <select id="getUserInfoByUsername" resultType="com.luxuryadmin.vo.shp.VoShpUser"
+            parameterType="java.lang.String">
+        SELECT
+          id,
+          nickname,
+          username,
+          insert_time 'insertTime'
+        FROM
+          shp_user
+        WHERE username = #{username}
+    </select>
+    <select id="getUserByPhone" resultType="com.luxuryadmin.entity.shp.ShpUser"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user where phone = #{phone} and del = 0 and state = 1
+    </select>
+    <select id="getUserInfoById" resultType="com.luxuryadmin.vo.shp.VoShpUser"
+            parameterType="java.lang.Integer">
+        select
+        su.id as id,
+        su.phone as phone,
+        su.nickname as nickname,
+        su.state as state,
+        su.insert_time as insertTime,
+        su.`number` 'inviteUserNumber'
+        from
+        shp_user su
+        where su.id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="getCountByUsername" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT
+            COUNT(*)
+        FROM
+            shp_user
+            LEFT JOIN shp_shop ON shp_user.id = shp_shop.fk_shp_user_id
+        WHERE
+            shp_shop.is_member = 'yes'
+            AND shp_user.phone = #{username}
+    </select>
+    <select id="listVipPhone" resultType="java.lang.String"
+            parameterType="java.util.List">
+        SELECT
+            shp_user.phone
+        FROM
+            shp_user
+            LEFT JOIN shp_shop ON shp_user.id = shp_shop.fk_shp_user_id
+        WHERE
+            shp_shop.is_member = 'yes'
+            AND shp_user.phone IN
+            <foreach collection="usernames" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        GROUP BY
+            shp_user.phone
+
+    </select>
+
+    <!--新增实体-->
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpUser" useGeneratedKeys="true" keyProperty="id">
+        insert into shp_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="nickname != null">
+                nickname,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="number != null">
+                number,
+            </if>
+            <if test="defaultLogin != null">
+                default_login,
+            </if>
+            <if test="headImgUrl != null">
+                head_img_url,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkOpChannelId != null">
+                fk_op_channel_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="jgPushRegId != null">
+                jg_push_reg_id,
+            </if>
+            <if test="appVersion != null">
+                app_version,
+            </if>
+            <if test="bindWeChat != null">
+                bind_we_chat,
+            </if>
+            <if test="bindApple != null">
+                bind_apple,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+            <if test="defaultLogin != null">
+                #{defaultLogin,jdbcType=VARCHAR},
+            </if>
+            <if test="headImgUrl != null">
+                #{headImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOpChannelId != null">
+                #{fkOpChannelId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="jgPushRegId != null">
+                #{jgPushRegId,jdbcType=VARCHAR},
+            </if>
+            <if test="appVersion != null">
+                #{appVersion,jdbcType=VARCHAR},
+            </if>
+            <if test="bindWeChat != null">
+                #{bindWeChat,jdbcType=INTEGER},
+            </if>
+            <if test="bindApple != null">
+                #{bindApple,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!--更新实体-->
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpUser">
+        update shp_user
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="number != null">
+                number = #{number,jdbcType=INTEGER},
+            </if>
+            <if test="defaultLogin != null">
+                default_login = #{defaultLogin,jdbcType=VARCHAR},
+            </if>
+            <if test="headImgUrl != null">
+                head_img_url = #{headImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOpChannelId != null">
+                fk_op_channel_id = #{fkOpChannelId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="jgPushRegId != null">
+                jg_push_reg_id = #{jgPushRegId,jdbcType=VARCHAR},
+            </if>
+            <if test="appVersion != null">
+                app_version = #{appVersion,jdbcType=VARCHAR},
+            </if>
+            <if test="bindWeChat != null">
+                bind_we_chat = #{bindWeChat,jdbcType=INTEGER},
+            </if>
+            <if test="bindApple != null">
+                bind_apple = #{bindApple,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

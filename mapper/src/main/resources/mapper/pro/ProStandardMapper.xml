@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProStandardMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProStandard">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="watch_core_type" jdbcType="VARCHAR" property="watchCoreType" />
+
+		<result column="watchcase" jdbcType="VARCHAR" property="watchcase" />
+
+		<result column="watchcase_size" jdbcType="VARCHAR" property="watchcaseSize" />
+
+		<result column="material" jdbcType="VARCHAR" property="material" />
+
+		<result column="object_size" jdbcType="VARCHAR" property="objectSize" />
+
+		<result column="clothes_size" jdbcType="VARCHAR" property="clothesSize" />
+
+		<result column="public_price" jdbcType="VARCHAR" property="publicPrice" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		watch_core_type,
+		watchcase,
+		watchcase_size,
+		material,
+		object_size,
+		clothes_size,
+		public_price,
+		insert_time,
+		update_time,
+		update_admin,
+		del,
+		remark
+	</sql>
+	<select id="getByProductId" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		watch_core_type,
+		watchcase,
+		watchcase_size,
+		material,
+		object_size,
+		clothes_size,
+		public_price,
+		insert_time,
+		update_time,
+		update_admin,
+		del,
+		remark
+		from pro_standard
+		where fk_pro_product_id = #{productId,jdbcType=INTEGER}
+
+	</select>
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProStandard" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_standard
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkProProductId!=null ">
+				fk_pro_product_id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="watchCoreType!=null ">
+				watch_core_type, 
+			</if>
+			<if test="watchcase!=null ">
+				watchcase, 
+			</if>
+			<if test="watchcaseSize!=null ">
+				watchcase_size, 
+			</if>
+			<if test="material!=null ">
+				material, 
+			</if>
+			<if test="objectSize!=null ">
+				object_size, 
+			</if>
+			<if test="clothesSize!=null ">
+				clothes_size, 
+			</if>
+			<if test="publicPrice!=null ">
+				public_price, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			 <if test="insertAdmin != null">
+				 insert_admin,
+			 </if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="del!=null ">
+				del, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				#{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="watchCoreType!=null">
+				#{watchCoreType,jdbcType=VARCHAR},
+			</if>
+			<if test="watchcase!=null">
+				#{watchcase,jdbcType=VARCHAR},
+			</if>
+			<if test="watchcaseSize!=null">
+				#{watchcaseSize,jdbcType=VARCHAR},
+			</if>
+			<if test="material!=null">
+				#{material,jdbcType=VARCHAR},
+			</if>
+			<if test="objectSize!=null">
+				#{objectSize,jdbcType=VARCHAR},
+			</if>
+			<if test="clothesSize!=null">
+				#{clothesSize,jdbcType=VARCHAR},
+			</if>
+			<if test="publicPrice!=null">
+				#{publicPrice,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin != null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_standard 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProStandard" >
+		update pro_standard
+		<set>
+			<if test="fkProProductId!=null">
+				fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="watchCoreType!=null">
+				watch_core_type = #{watchCoreType,jdbcType=VARCHAR},
+			 </if>
+			<if test="watchcase!=null ">
+				watchcase = #{watchcase,jdbcType=VARCHAR},
+			 </if>
+			<if test="watchcaseSize!=null ">
+				watchcase_size = #{watchcaseSize,jdbcType=VARCHAR},
+			 </if>
+			<if test="material!=null ">
+				material = #{material,jdbcType=VARCHAR},
+			 </if>
+			<if test="objectSize!=null">
+				object_size = #{objectSize,jdbcType=VARCHAR},
+			 </if>
+			<if test="clothesSize!=null ">
+				clothes_size = #{clothesSize,jdbcType=VARCHAR},
+			 </if>
+			<if test="publicPrice!=null">
+				public_price = #{publicPrice,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin != null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			 </if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		watch_core_type,
+		watchcase,
+		watchcase_size,
+		material,
+		object_size,
+		clothes_size,
+		public_price,
+		insert_time,
+		update_time,
+		update_admin,
+		del,
+		remark
+		from pro_standard
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+	<select id="selectAll" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		watch_core_type,
+		watchcase,
+		watchcase_size,
+		material,
+		object_size,
+		clothes_size,
+		public_price,
+		insert_time,
+		update_time,
+		update_admin,
+		del,
+		remark
+		from pro_standard
+		<where>
+		<if test="id!=null "> and pro_standard.id = #{id,jdbcType=INTEGER}</if>
+		<if test="fkProProductId!=null "> and pro_standard.fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER}</if>
+		<if test="fkShpShopId!=null "> and pro_standard.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}</if>
+		<if test="watchCoreType!=null and watchCoreType!=''"> and pro_standard.watch_core_type = #{watchCoreType,jdbcType=VARCHAR}</if>
+		<if test="watchcase!=null and watchcase!=''"> and pro_standard.watchcase = #{watchcase,jdbcType=VARCHAR}</if>
+		<if test="watchcaseSize!=null and watchcaseSize!=''"> and pro_standard.watchcase_size = #{watchcaseSize,jdbcType=VARCHAR}</if>
+		<if test="material!=null and material!=''"> and pro_standard.material = #{material,jdbcType=VARCHAR}</if>
+		<if test="objectSize!=null and objectSize!=''"> and pro_standard.object_size = #{objectSize,jdbcType=VARCHAR}</if>
+		<if test="clothesSize!=null and clothesSize!=''"> and pro_standard.clothes_size = #{clothesSize,jdbcType=VARCHAR}</if>
+		<if test="publicPrice!=null "> and pro_standard.public_price = #{publicPrice,jdbcType=INTEGER}</if>
+		<if test="insertTime!=null "> and pro_standard.insert_time = #{insertTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateTime!=null "> and pro_standard.update_time = #{updateTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateAdmin!=null "> and pro_standard.update_admin = #{updateAdmin,jdbcType=INTEGER}</if>
+		<if test="del!=null and del!=''"> and pro_standard.del = #{del,jdbcType=VARCHAR}</if>
+		<if test="remark!=null and remark!=''"> and pro_standard.remark = #{remark,jdbcType=VARCHAR}</if>
+		</where>
+		<choose>
+          <when test="orderByString!=null and orderByString!=''">
+              ${orderByString}
+          </when>
+          <otherwise>
+              order by id desc
+          </otherwise>
+      </choose>
+
+	</select>
+
+	<select id="selectByCondition" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		watch_core_type,
+		watchcase,
+		watchcase_size,
+		material,
+		object_size,
+		clothes_size,
+		public_price,
+		insert_time,
+		update_time,
+		update_admin,
+		del,
+		remark
+		from pro_standard
+		<where>
+		<if test="id!=null "> and pro_standard.id = #{id,jdbcType=INTEGER}</if>
+		<if test="fkProProductId!=null "> and pro_standard.fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER}</if>
+		<if test="fkShpShopId!=null "> and pro_standard.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}</if>
+		<if test="watchCoreType!=null and watchCoreType!=''"> and pro_standard.watch_core_type = #{watchCoreType,jdbcType=VARCHAR}</if>
+		<if test="watchcase!=null and watchcase!=''"> and pro_standard.watchcase = #{watchcase,jdbcType=VARCHAR}</if>
+		<if test="watchcaseSize!=null and watchcaseSize!=''"> and pro_standard.watchcase_size = #{watchcaseSize,jdbcType=VARCHAR}</if>
+		<if test="material!=null and material!=''"> and pro_standard.material = #{material,jdbcType=VARCHAR}</if>
+		<if test="objectSize!=null and objectSize!=''"> and pro_standard.object_size = #{objectSize,jdbcType=VARCHAR}</if>
+		<if test="clothesSize!=null and clothesSize!=''"> and pro_standard.clothes_size = #{clothesSize,jdbcType=VARCHAR}</if>
+		<if test="publicPrice!=null "> and pro_standard.public_price = #{publicPrice,jdbcType=INTEGER}</if>
+		<if test="insertTime!=null "> and pro_standard.insert_time = #{insertTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateTime!=null "> and pro_standard.update_time = #{updateTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateAdmin!=null "> and pro_standard.update_admin = #{updateAdmin,jdbcType=INTEGER}</if>
+		<if test="del!=null and del!=''"> and pro_standard.del = #{del,jdbcType=VARCHAR}</if>
+		<if test="remark!=null and remark!=''"> and pro_standard.remark = #{remark,jdbcType=VARCHAR}</if>
+		</where>
+		<choose>
+          <when test="orderByString!=null and orderByString!=''">
+              ${orderByString}
+          </when>
+          <otherwise>
+              order by id desc
+          </otherwise>
+      </choose>
+
+	</select>
+
+	<select resultMap="BaseResultMap" id="proStandardtest" >
+		select * from pro_standard
+	</select>
+
+
+</mapper>

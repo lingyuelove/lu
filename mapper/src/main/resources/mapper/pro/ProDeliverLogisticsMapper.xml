@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProDeliverLogisticsMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProDeliverLogistics">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="logistics_state" jdbcType="INTEGER" property="logisticsState" />
+
+		<result column="logistics_number" jdbcType="VARCHAR" property="logisticsNumber" />
+
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+
+		<result column="context" jdbcType="LONGVARCHAR" property="context" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		logistics_state,
+		logistics_number,
+		phone,
+		context,
+		insert_time
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProDeliverLogistics" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_deliver_logistics
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="logisticsState!=null ">
+				logistics_state,
+			</if>
+			<if test="logisticsNumber!=null ">
+				logistics_number, 
+			</if>
+			 <if test="phone!=null ">
+				 phone,
+			 </if>
+			<if test="context!=null ">
+				context, 
+			</if>
+			 <if test="insertTime!=null ">
+				 insert_time,
+			 </if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="logisticsState!=null">
+				#{logisticsState,jdbcType=INTEGER},
+			</if>
+			<if test="logisticsNumber!=null">
+				#{logisticsNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="phone!=null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="context!=null">
+				#{context,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_deliver_logistics 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProDeliverLogistics" >
+		update pro_deliver_logistics
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="logisticsState!=null">
+				logistics_state = #{logisticsState,jdbcType=INTEGER},
+			</if>
+			<if test="logisticsNumber!=null and logisticsNumber!=''">
+				logistics_number = #{logisticsNumber,jdbcType=VARCHAR},
+			 </if>
+			<if test="phone!=null and phone!=''">
+				phone = #{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="context!=null and context!=''">
+				context = #{context,jdbcType=LONGVARCHAR},
+			 </if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		logistics_state,
+		logistics_number,
+		phone,
+		context,
+		insert_time
+		from pro_deliver_logistics
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+	<select id="getDeliverLogistByLogisticsNumber" resultType="com.luxuryadmin.entity.pro.ProDeliverLogistics"
+			parameterType="java.lang.String">
+		select
+		id,
+		insert_time as insertTime,
+		fk_shp_shop_id as fkShpShopId,
+		logistics_state as logisticsState,
+		logistics_number as logisticsNumber,
+		phone,
+		insert_time,
+		context
+		from pro_deliver_logistics
+		where logistics_number = #{logistics_number,jdbcType=VARCHAR}
+	</select>
+	<select id="listDeliverLogisticsByShopId" resultType="com.luxuryadmin.entity.pro.ProDeliverLogistics">
+		select
+		id,
+		insert_time as insertTime,
+		fk_shp_shop_id as fkShpShopId,
+		logistics_state as logisticsState,
+		logistics_number as logisticsNumber,
+		phone,
+		insert_time,
+		context
+		from pro_deliver_logistics
+		where logistics_state &lt; 50
+		<if test="shopId!=null">
+			and   fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+		</if>
+
+	</select>
+    <select id="getDeliverByOrderNumber" resultType="com.luxuryadmin.vo.pro.VoDeliver">
+		select
+		pd.deliver_type as expressName,
+		pd.state as state,
+		dl.id,
+		dl.insert_time as insertTime,
+		dl.fk_shp_shop_id as fkShpShopId,
+		dl.logistics_state as logisticsState,
+		dl.logistics_number as logisticsNumber,
+		dl.phone,
+		dl.insert_time,
+		dl.context
+		from  pro_deliver pd left join pro_deliver_logistics dl on dl.logistics_number =pd.logistics_number
+		left join ord_order oo on pd.fk_ord_order_id = oo.id
+		where oo.`number` = #{number}  AND oo.`fk_shp_shop_id` = #{shopId}
+	</select>
+
+
+</mapper>

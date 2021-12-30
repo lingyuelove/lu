@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.stat.StatProdSaleClassifyMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.stat.StatProdSaleClassify">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pro_classify_code" jdbcType="VARCHAR" property="proClassifyCode" />
+    <result column="pro_classify_name" jdbcType="VARCHAR" property="proClassifyName" />
+    <result column="total_sale_num" jdbcType="INTEGER" property="totalSaleNum" />
+    <result column="total_sale_amount" jdbcType="DECIMAL" property="totalSaleAmount" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, pro_classify_code, pro_classify_name, total_sale_num, total_sale_amount, insert_time, 
+    update_time
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from stat_prod_sale_classify
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据classifyCode查询销售分类数据 -->
+  <select id="selectStatProdSaleByClassifyCode"
+          resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from stat_prod_sale_classify
+    where pro_classify_code = #{proClassifyCode,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 查询所有销售分类数据 -->
+  <select id="selectProdSellClassifyList" resultType="com.luxuryadmin.vo.stat.VoStateProdSellClassify">
+        SELECT
+            pro_classify_name as 'name',
+            ${showField} as 'value'
+        FROM
+            stat_prod_sale_classify
+  </select>
+
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from stat_prod_sale_classify
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.stat.StatProdSaleClassify">
+    insert into stat_prod_sale_classify
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="proClassifyCode != null">
+        pro_classify_code,
+      </if>
+      <if test="proClassifyName != null">
+        pro_classify_name,
+      </if>
+      <if test="totalSaleNum != null">
+        total_sale_num,
+      </if>
+      <if test="totalSaleAmount != null">
+        total_sale_amount,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="proClassifyCode != null">
+        #{proClassifyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="proClassifyName != null">
+        #{proClassifyName,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSaleNum != null">
+        #{totalSaleNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleAmount != null">
+        #{totalSaleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.stat.StatProdSaleClassify">
+    update stat_prod_sale_classify
+    <set>
+      <if test="proClassifyCode != null">
+        pro_classify_code = #{proClassifyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="proClassifyName != null">
+        pro_classify_name = #{proClassifyName,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSaleNum != null">
+        total_sale_num = #{totalSaleNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalSaleAmount != null">
+        total_sale_amount = #{totalSaleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProTempMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProTemp">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="price_type" jdbcType="VARCHAR" property="priceType"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, state, name, price_type, insert_time, update_time, insert_admin, update_admin,
+    sort, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_temp
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="getVoTempForOrg" parameterType="java.lang.Integer" resultType="com.luxuryadmin.vo.pro.VoTempForOrg">
+        select
+        pt.id
+        , pt.name as tempName
+        , ss.number as shopNumber
+        , ss.name as shopName
+        , ss.contact as shopContact
+        from pro_temp pt
+        left join shp_shop ss on pt.fk_shp_shop_id =ss.id
+        where pt.id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--获取店铺临时仓-->
+    <select id="listVoProTemp" resultType="com.luxuryadmin.vo.pro.VoProTemp">
+        SELECT
+            pt.id 'tempId',
+            pt.`name`,
+            pt.insert_time 'insertTime',
+            su.nickname 'insertUser'
+        FROM
+            pro_temp pt
+            LEFT JOIN shp_user su ON pt.insert_admin = su.id
+        WHERE
+            pt.state = '10' and pt.fk_shp_shop_id = #{shopId}
+        order by pt.insert_time desc
+  </select>
+
+    <!--获取临时仓的商品总数-->
+    <select id="countTempProductTotalNum" resultType="com.luxuryadmin.vo.pro.VoProTemp">
+        select
+        ptp.`fk_pro_temp_id` 'tempId',
+        SUM(IFNULL(ptp.`num`,pro.total_num) ) 'proTotalNum'
+        from
+        pro_temp_product ptp
+        left join pro_product pro
+        on ptp.`fk_pro_product_id` = pro.`id`
+        where ptp.`fk_pro_temp_id` in (${tempIds})
+        and ptp.`fk_shp_shop_id`= #{shopId} and pro.fk_pro_state_code >0
+        group by ptp.`fk_pro_temp_id`
+    </select>
+
+    <!--获取临时仓的售罄商品总数-->
+    <select id="countTempProductSaleOutNum" resultType="com.luxuryadmin.vo.pro.VoProTemp">
+        select
+        ptp.`fk_pro_temp_id` 'tempId',
+        sum(pro.`sale_num`) 'saleNum'
+        from
+        pro_temp_product ptp
+        left join pro_product pro
+        on ptp.`fk_pro_product_id` = pro.`id`
+        where ptp.`fk_pro_temp_id` in (${tempIds})
+        and ptp.`fk_shp_shop_id`= #{shopId} AND pro.fk_pro_state_code > 0
+        group by ptp.`fk_pro_temp_id`
+    </select>
+
+    <!--获取商品所在临时仓的名称-->
+    <select id="getTempName" resultType="java.lang.String">
+        SELECT
+          REPLACE(GROUP_CONCAT(pt.`name`), ',', ';')
+        FROM
+          pro_temp_product ptp
+          LEFT JOIN pro_temp pt
+            ON ptp.`fk_pro_temp_id` = pt.`id`
+        WHERE ptp.`fk_pro_product_id` =#{proId}  AND ptp.`fk_shp_shop_id` = #{shopId}
+    </select>
+
+    <!--获取商品所在临时仓-->
+    <select id="getTempForPro" resultType="com.luxuryadmin.vo.pro.VoTempForPro">
+        SELECT
+        pt.id as tempId,
+        pt.name as tempName
+        FROM
+        pro_temp_product ptp
+        LEFT JOIN pro_temp pt
+        ON ptp.`fk_pro_temp_id` = pt.`id`
+        WHERE ptp.`fk_pro_product_id` =#{proId}  AND ptp.`fk_shp_shop_id` = #{shopId}
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_temp
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <!--删除临时仓-->
+    <delete id="deleteProTempByShopId">
+       delete from pro_temp where fk_shp_shop_id = #{shopId} and id = #{proTempId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProTemp">
+        insert into pro_temp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="priceType != null">
+                price_type,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="priceType != null">
+                #{priceType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProTemp">
+        update pro_temp
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="priceType != null">
+                price_type = #{priceType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

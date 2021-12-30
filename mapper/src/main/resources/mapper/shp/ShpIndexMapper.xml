@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpIndexMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpIndex">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="fk_shp_perm_index_id" jdbcType="INTEGER" property="fkShpPermIndexId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, parent_id, name, fk_shp_perm_index_id, type, sort, insert_time, update_time, insert_admin,
+    update_admin, versions, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_index
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--同一个父级下是否已经存在该权限;-->
+    <select id="existsShpIndex" resultType="java.lang.Integer">
+        SELECT COUNT(shpIdx.`id`) FROM shp_index shpIdx
+        WHERE
+         shpIdx.`name` = #{name}
+    </select>
+
+    <!--code是否存在,h5除外;-->
+    <select id="existsShpIndexCode" resultType="java.lang.Integer">
+        SELECT COUNT(shpIdx.`id`) FROM shp_index shpIdx
+        WHERE
+        shpIdx.`code` = #{code}
+        and shpIdx.`code` != 'h5'
+    </select>
+
+    <!--是否已存在权限标识符-->
+    <select id="existsShpIndexPerms" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM shp_perm_index WHERE permission = #{permission}
+    </select>
+
+    <!--获取app首页的功能列表-->
+    <select id="listAppIndexFunction" resultType="com.luxuryadmin.vo.shp.VoShpIndex">
+        SELECT
+        subIdx.`parent_id` 'parentId',
+        parentIdx.`name` 'parentName',
+        subIdx.`name`,
+        permIdx.`code`,
+        permIdx.`id` 'permId',
+        permIdx.`http_url` 'httpUrl',
+        permIdx.`icon_url` 'iconUrl',
+        permIdx.`new_state` 'newState',
+        permIdx.`cost_state` 'costState',
+        permIdx.`is_private` 'isPrivate',
+        permIdx.`only_shop_id` 'onlyShopId'
+        FROM
+        shp_index subIdx
+        LEFT JOIN shp_index parentIdx
+        ON subIdx.`parent_id` = parentIdx.`id`
+        LEFT JOIN shp_perm_index permIdx
+        ON subIdx.`fk_shp_perm_index_id` = permIdx.`id`
+        WHERE subIdx.`type` = 1
+        <choose>
+            <when test="platform == 'ios'">
+                and #{appVersion} >= permIdx.ios_version
+            </when>
+            <when test="platform == 'android'">
+                and #{appVersion} >= permIdx.android_version
+            </when>
+        </choose>
+        GROUP BY permIdx.`code`
+        ORDER BY
+        parentIdx.`sort` ASC,
+        parentIdx.`id` ASC,
+        subIdx.`sort` ASC,
+        subIdx.`id` ASC
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+      delete from shp_index
+      where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <!--多个id删除-->
+    <delete id="batchDelete" parameterType="java.lang.Integer">
+      delete from shp_index
+      where id in (${ids})
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpIndex" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into shp_index
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="fkShpPermIndexId != null">
+                fk_shp_perm_index_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpPermIndexId != null">
+                #{fkShpPermIndexId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpIndex">
+        update shp_index
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpPermIndexId != null">
+                fk_shp_perm_index_id = #{fkShpPermIndexId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--获取用户在该店铺拥有的全部权限-->
+    <select id="listAllPermByShopIdUserId" resultType="com.luxuryadmin.vo.shp.VoShpIndex">
+        SELECT
+        shpPerm.`id` 'permId',
+        subIdx.`name`,
+        shpPerm.`code`,
+        shpPerm.`http_url` 'httpUrl',
+        shpPerm.`icon_url` 'iconUrl',
+        shpPerm.`only_shop_id` 'onlyShopId',
+        subIdx.`parent_id` 'parentId',
+        parentIdx.`name` 'parentName',
+        shpPerm.`new_state` 'newState',
+        shpPerm.`cost_state` 'costState'
+        FROM
+        shp_perm_index shpPerm
+        LEFT JOIN shp_perm_user_ref permUser
+        ON shpPerm.`id` = permUser.`fk_shp_perm_index_id` OR shpPerm.only_shop_id = - 2
+        LEFT JOIN shp_index subIdx ON shpPerm.`id` = subIdx.`fk_shp_perm_index_id`
+        LEFT JOIN shp_index parentIdx ON subIdx.`parent_id` = parentIdx.`id`
+        WHERE
+        permUser.`fk_shp_shop_id` = #{shopId}
+        AND permUser.`fk_shp_user_id` = #{userId}
+        AND subIdx.`id` != ''
+        <choose>
+            <when test="platform == 'ios'">
+                and #{appVersion} >= shpPerm.ios_version
+            </when>
+            <when test="platform == 'android'">
+                and #{appVersion} >= shpPerm.android_version
+            </when>
+        </choose>
+        GROUP BY shpPerm.`code`
+        ORDER BY
+        parentIdx.`sort` ASC,
+        parentIdx.`id` ASC,
+        subIdx.`sort` ASC,
+        subIdx.`id` ASC
+    </select>
+
+    <!--获取所有功能点-->
+    <select id="listAllShpIndex" resultType="com.luxuryadmin.vo.shp.VoShpIndex">
+        SELECT
+          shpIdx.id,
+          shpIdx.parent_id 'parentId',
+          shpIdx.NAME,
+          shpIdx.fk_shp_perm_index_id 'permId',
+          shpIdx.type,
+          shpIdx.sort,
+          IFNULL(shpPermIdx.`name`, '无') 'permRefName'
+        FROM
+          shp_index shpIdx
+          LEFT JOIN shp_perm_index shpPermIdx
+            ON shpIdx.`fk_shp_perm_index_id` = shpPermIdx.`id`
+        ORDER BY shpIdx.type ASC,
+          shpIdx.sort ASC,
+          shpIdx.parent_id ASC,
+          shpIdx.id ASC
+    </select>
+
+</mapper>

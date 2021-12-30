@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProShareSeeUserAgencyMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProShareSeeUserAgency">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_pro_share_id" jdbcType="INTEGER" property="fkProShareId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="fk_pro_share_batch" jdbcType="VARCHAR" property="fkProShareBatch"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl"/>
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="union_id" jdbcType="VARCHAR" property="unionId"/>
+        <result column="already_send_money" jdbcType="INTEGER" property="alreadySendMoney"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_pro_share_id, fk_shp_user_id, fk_pro_share_batch, state, type, 
+    nick_name, phone, avatar_url, gender, open_id, union_id, already_send_money, insert_time, 
+    update_time, update_admin
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_share_see_user_agency
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--该微信用户是否已存在-->
+    <select id="existsWxUserByOpenId" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM pro_share_see_user_agency WHERE TYPE = #{type} AND open_id = #{openId}
+  </select>
+
+    <!--获取访问小程序用户-->
+    <select id="listVoProShareSeeUserAgency" resultType="com.luxuryadmin.vo.pro.VoProShareSeeUserAgency">
+      SELECT
+        ifnull( shop.`name`,'') 'shopName',
+        if(agn.`state`='1','已发放','未发放') 'state',
+        agn.`nick_name` 'nickName',
+        agn.`phone`,
+        agn.`avatar_url` 'avatarUrl',
+        agn.`already_send_money` 'alreadySendMoney',
+        agn.`insert_time` 'insertTime',
+        su.nickname 'shareUser',
+        ifnull(shop.pay_start_time,'') 'payTime'
+      FROM
+        pro_share_see_user_agency agn
+        LEFT JOIN shp_shop shop
+          ON agn.`fk_shp_shop_id` = shop.`id`
+          left join shp_user su
+          on su.id = agn.fk_shp_user_id
+      WHERE agn.type = 1
+        AND agn.fk_shp_user_id = #{userId}
+        order by agn.id desc
+  </select>
+    <!--该微信用户是否已存在-->
+    <select id="existsWxUserByPhone" resultType="java.lang.Integer">
+         SELECT COUNT(*) FROM pro_share_see_user_agency WHERE TYPE = #{type} AND phone = #{phone}
+    </select>
+
+    <!--根据手机号 获取 实体-->
+    <select id="getObjectByPhone" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_share_see_user_agency
+        where type = #{type} and phone = #{phone}
+    </select>
+    <select id="getNewVisitAppletCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select count(*)from pro_share_see_user_agency
+        where fk_shp_user_id = #{userId} and date(insert_time) = curdate()
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_share_see_user_agency
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProShareSeeUserAgency">
+        insert into pro_share_see_user_agency
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProShareId != null">
+                fk_pro_share_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="fkProShareBatch != null">
+                fk_pro_share_batch,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="nickName != null">
+                nick_name,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="avatarUrl != null">
+                avatar_url,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+            <if test="openId != null">
+                open_id,
+            </if>
+            <if test="unionId != null">
+                union_id,
+            </if>
+            <if test="alreadySendMoney != null">
+                already_send_money,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareId != null">
+                #{fkProShareId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareBatch != null">
+                #{fkProShareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarUrl != null">
+                #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                #{gender,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="unionId != null">
+                #{unionId,jdbcType=VARCHAR},
+            </if>
+            <if test="alreadySendMoney != null">
+                #{alreadySendMoney,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProShareSeeUserAgency">
+        update pro_share_see_user_agency
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareId != null">
+                fk_pro_share_id = #{fkProShareId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProShareBatch != null">
+                fk_pro_share_batch = #{fkProShareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarUrl != null">
+                avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                gender = #{gender,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="unionId != null">
+                union_id = #{unionId,jdbcType=VARCHAR},
+            </if>
+            <if test="alreadySendMoney != null">
+                already_send_money = #{alreadySendMoney,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

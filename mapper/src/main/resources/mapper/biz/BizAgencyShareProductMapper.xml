@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizAgencyShareProductMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizAgencyShareProduct">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_pro_product_biz_id" jdbcType="VARCHAR" property="fkProProductBizId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="agency_price" jdbcType="DECIMAL" property="agencyPrice"/>
+        <result column="sale_price" jdbcType="DECIMAL" property="salePrice"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_pro_product_biz_id, fk_shp_user_id, name, description, agency_price, 
+    sale_price, insert_time, update_time, insert_admin, update_admin, versions, del, 
+    remark
+  </sql>
+
+    <!--根据相关条件获取分享产品-->
+    <select id="getBizAgencyShareProduct" resultType="com.luxuryadmin.entity.biz.BizAgencyShareProduct">
+        select
+        <include refid="Base_Column_List"/>
+        from biz_agency_share_product
+        where fk_shp_shop_id = #{shopId}
+        and fk_pro_product_biz_id = #{proBizId}
+        and fk_shp_user_id = #{userId}
+    </select>
+
+    <!--新增-->
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizAgencyShareProduct">
+        insert into biz_agency_share_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProProductBizId != null">
+                fk_pro_product_biz_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="agencyPrice != null">
+                agency_price,
+            </if>
+            <if test="salePrice != null">
+                sale_price,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductBizId != null">
+                #{fkProProductBizId,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="agencyPrice != null">
+                #{agencyPrice,jdbcType=DEFAULT},
+            </if>
+            <if test="salePrice != null">
+                #{salePrice,jdbcType=DEFAULT},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!--更新byId-->
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizAgencyShareProduct">
+        update biz_agency_share_product
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductBizId != null">
+                fk_pro_product_biz_id = #{fkProProductBizId,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="agencyPrice != null">
+                agency_price = #{agencyPrice,jdbcType=DEFAULT},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DEFAULT},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--更新BizAgencyShareProduct By shopId,proBizId,userId-->
+    <update id="updateBizAgencyShareProduct">
+        update biz_agency_share_product
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DEFAULT},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where fk_shp_shop_id = #{fkShpShopId}
+        and fk_pro_product_biz_id = #{fkProProductBizId}
+        and fk_shp_user_id = #{fkShpUserId}
+    </update>
+</mapper>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.sys.SysVersionMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.sys.SysVersion">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="update_url" jdbcType="VARCHAR" property="updateUrl" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="fk_op_platform_id" jdbcType="INTEGER" property="fkOpPlatformId" />
+    <result column="forced_update" jdbcType="CHAR" property="forcedUpdate" />
+    <result column="file_size" jdbcType="VARCHAR" property="fileSize" />
+    <result column="app_version" jdbcType="VARCHAR" property="appVersion" />
+    <result column="show_dialog" jdbcType="CHAR" property="showDialog" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, update_url, content, fk_op_platform_id, forced_update, file_size, app_version, 
+    show_dialog, insert_time, update_time, insert_admin, update_admin, versions, del, 
+    remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_version
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectSysVersionList" resultType="com.luxuryadmin.vo.sys.VoSysVersion" parameterType="com.luxuryadmin.param.sys.ParamSysVersion">
+    select
+        sv.id as id,
+        sv.app_version as appVersion,
+        sv.fk_op_platform_id as fkOpPlatformId,
+        op.type as platformName,
+        sv.forced_update as forcedUpdate,
+        sv.content as content,
+        sv.update_url as updateUrl,
+        sv.insert_time as insertTime,
+        sv.update_time as updateTime,
+        su.nickname as updateAdmin
+    from
+      sys_version sv
+    left join
+      op_platform op
+    ON
+      sv.fk_op_platform_id = op.id
+    left join
+      sys_user su
+    ON
+      sv.insert_admin = su.id
+    where 1 = 1
+    AND sv.del = '0'
+    <if test="fkOpPlatformId != null">
+      AND fk_op_platform_id = #{fkOpPlatformId,jdbcType=INTEGER}
+    </if>
+    ORDER BY sv.insert_time DESC
+  </select>
+    <select id="selectSysVersionByPlatform" resultType="com.luxuryadmin.vo.sys.VoSysVersion" parameterType="java.util.Map">
+    select
+        sv.id as id,
+        sv.app_version as appVersion,
+        sv.fk_op_platform_id as fkOpPlatformId,
+        op.type as platformName,
+        sv.forced_update as forcedUpdate,
+        sv.content as content,
+        sv.update_url as updateUrl,
+        sv.insert_time as insertTime,
+        sv.update_time as updateTime
+    from
+      sys_version sv
+    left join
+      op_platform op
+    ON
+      sv.fk_op_platform_id = op.id
+    where
+        1 = 1
+    AND
+        sv.del = '0'
+    AND
+        op.type = #{platform,jdbcType=VARCHAR}
+    ORDER BY sv.insert_time DESC
+    LIMIT 1
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Long">
+    delete from sys_version
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="saveObjectAll" parameterType="com.luxuryadmin.entity.sys.SysVersion">
+    insert into sys_version (id, update_url, content, 
+      fk_op_platform_id, forced_update, file_size, 
+      app_version, show_dialog, insert_time, 
+      update_time, insert_admin, update_admin, 
+      versions, del, remark)
+    values (#{id,jdbcType=BIGINT}, #{updateUrl,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{fkOpPlatformId,jdbcType=INTEGER}, #{forcedUpdate,jdbcType=CHAR}, #{fileSize,jdbcType=VARCHAR}, 
+      #{appVersion,jdbcType=VARCHAR}, #{showDialog,jdbcType=CHAR}, #{insertTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, 
+      #{versions,jdbcType=INTEGER}, #{del,jdbcType=CHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.sys.SysVersion">
+    insert into sys_version
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="updateUrl != null">
+        update_url,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="fkOpPlatformId != null">
+        fk_op_platform_id,
+      </if>
+      <if test="forcedUpdate != null">
+        forced_update,
+      </if>
+      <if test="fileSize != null">
+        file_size,
+      </if>
+      <if test="appVersion != null">
+        app_version,
+      </if>
+      <if test="showDialog != null">
+        show_dialog,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="updateUrl != null">
+        #{updateUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="fkOpPlatformId != null">
+        #{fkOpPlatformId,jdbcType=INTEGER},
+      </if>
+      <if test="forcedUpdate != null">
+        #{forcedUpdate,jdbcType=CHAR},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null">
+        #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="showDialog != null">
+        #{showDialog,jdbcType=CHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.sys.SysVersion">
+    update sys_version
+    <set>
+      <if test="updateUrl != null">
+        update_url = #{updateUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="fkOpPlatformId != null">
+        fk_op_platform_id = #{fkOpPlatformId,jdbcType=INTEGER},
+      </if>
+      <if test="forcedUpdate != null">
+        forced_update = #{forcedUpdate,jdbcType=CHAR},
+      </if>
+      <if test="fileSize != null">
+        file_size = #{fileSize,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null">
+        app_version = #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="showDialog != null">
+        show_dialog = #{showDialog,jdbcType=CHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.sys.SysVersion">
+    update sys_version
+    set update_url = #{updateUrl,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      fk_op_platform_id = #{fkOpPlatformId,jdbcType=INTEGER},
+      forced_update = #{forcedUpdate,jdbcType=CHAR},
+      file_size = #{fileSize,jdbcType=VARCHAR},
+      app_version = #{appVersion,jdbcType=VARCHAR},
+      show_dialog = #{showDialog,jdbcType=CHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      versions = #{versions,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

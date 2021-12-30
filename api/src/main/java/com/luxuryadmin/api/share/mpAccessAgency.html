@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据汇总</title>
+</head>
+<script src="https://file.luxuryadmin.com/js/jquery-3.1.1.min.js"></script>
+<style type="text/css">
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    td{
+        padding: 5px;
+    }
+
+    table{
+        border: 1px solid;
+    }
+
+
+</style>
+<body>
+
+<form style="text-align: left;margin-top: 50px;margin-left: 50px;margin-right: 20px;">
+
+    <table border="1" style="display: none; text-align:center;margin-top: 50px"
+           id="showMpAccess">
+    </table>
+
+</form>
+</body>
+<script type="text/javascript">
+   var domain = "http://127.0.0.1:8080";
+   //var domain = "https://m.luxuryadmin.com";
+
+
+   function getUrlParam(name) {
+       var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+       var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+       if (r != null) return unescape(r[2]); return null; //返回参数值
+   }
+
+
+   $(document).ready(function () {
+        var flagId = getUrlParam("flagId");
+        queryData();
+        //console.log();
+        function queryData() {
+            var urlParam = "?appVersion=2.3&flagId=" + flagId;
+            var ajaxRul = $.ajax({url: domain + "/shop/share/loadMpAccessAgency" + urlParam, async: false});
+            var ajaxJson = JSON.parse(ajaxRul.responseText);
+            if (ajaxJson.code !== 'ok') {
+                alert(ajaxJson.msg);
+                return false;
+            }
+            var registerUserAndShop = $("#showMpAccess");
+            //注册数量
+            var data = ajaxJson.data.objList;
+           console.log(data);
+            if (data.length > 0) {
+                var td = "<tr><td>序号</td><td >头像</td><td>昵称</td><td>分享人</td>" +
+                    "<td>首次访问小程序时间</td><td>店铺名称</td><td>店铺付费时间</td><td>佣金</td><td>佣金发放</td></tr>";
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    td += "<tr style='padding: 10px;'><td>" + (i+1) + "</td><td><img src='" + obj.avatarUrl + "' style='width: 48px;' /></td><td>" + obj.nickName+ "</td>" +
+                        "<td>" + obj.shareUser + "</td><td>" + obj.insertTime + "</td><td>" + obj.shopName+ "</td>" +
+                        "<td>" + obj.payTime + "</td><td>" + obj.alreadySendMoney + "</td><td>" + obj.state+ "</td></tr>"
+                }
+                registerUserAndShop.empty();
+                registerUserAndShop.append(td);
+                registerUserAndShop.show();
+            }
+        }
+    });
+
+</script>
+</html>

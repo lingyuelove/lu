@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizLeaguerConfigMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizLeaguerConfig">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="limit_leaguer_num" jdbcType="INTEGER" property="limitLeaguerNum" />
+    <result column="have_leaguer_num" jdbcType="INTEGER" property="haveLeaguerNum" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="is_can_see_sale_price" jdbcType="TINYINT" property="isCanSeeSalePrice"/>
+    <result column="is_can_see_trade_price" jdbcType="TINYINT" property="isCanSeeTradePrice"/>
+    <result column="only_show_top_leaguer" jdbcType="VARCHAR" property="onlyShowTopLeaguer"/>
+    <result column="recommend" jdbcType="VARCHAR" property="recommend"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, shop_name, fk_shp_shop_id, limit_leaguer_num, have_leaguer_num, insert_time, update_time,
+    insert_admin, update_admin, versions, del, remark, is_can_see_sale_price,is_can_see_trade_price,
+    only_show_top_leaguer,recommend
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from biz_leaguer_config
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectBizLeaguerConfigByShopId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from biz_leaguer_config
+    where fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+    and del = '0'
+    LIMIT 1
+  </select>
+  <select id="getRecommendShopProductCount" resultType="Integer">
+    select
+    count(*)
+    from pro_product pp
+    left join biz_leaguer la ON pp.fk_shp_shop_id = la.fk_be_inviter_shop_id
+    where la.fk_inviter_shop_id = #{shopId} and la.state ="20"  AND pp.fk_pro_state_code BETWEEN 20 AND 29
+    AND pp.id NOT IN
+    (SELECT
+    fk_pro_product_id lk
+    FROM
+    pro_lock_record lk
+    WHERE lk.fk_shp_shop_id IN (la.fk_be_inviter_shop_id)
+    AND lk.`state` = 0)
+  </select>
+  <select id="getRecommendShopCount" resultType="Integer">
+    select
+    count(*)
+    from biz_leaguer la left join shp_shop sp on la.fk_be_inviter_shop_id =sp.id
+    where la.fk_inviter_shop_id = #{shopId} and la.state ="20" and sp.fk_shp_state_code >0
+
+  </select>
+  <select id="getLeaguerShop" resultType="com.luxuryadmin.vo.biz.VoBizLeaguerShop">
+    select
+    lc.fk_shp_shop_id as shopId,
+    lc.have_leaguer_num as leaguerShopCount,
+    ss.number as shopNumber,
+    ss.name as leaguerShopName,
+    shpDet.`city` 'address',
+    ss.cover_img_url as coverImgUrl,
+    ss.head_img_url as headImgUrl
+    from biz_leaguer_config lc left join shp_shop ss on lc.fk_shp_shop_id = ss.id
+    LEFT JOIN shp_detail shpDet
+    ON ss.`id` = shpDet.`fk_shp_shop_id`
+    where lc.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+    and lc.del = '0'
+    LIMIT 1
+  </select>
+
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from biz_leaguer_config
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteLeaguerConfigByShop" parameterType="java.lang.Integer">
+    delete from biz_leaguer_config
+    where fk_shp_shop_id = #{shopId}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerConfig" useGeneratedKeys="true" keyProperty="id">
+    insert into biz_leaguer_config
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="shopName != null">
+        shop_name,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="limitLeaguerNum != null">
+        limit_leaguer_num,
+      </if>
+      <if test="haveLeaguerNum != null">
+        have_leaguer_num,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="isCanSeeSalePrice != null">
+        is_can_see_sale_price,
+      </if>
+      <if test="isCanSeeTradePrice != null">
+        is_can_see_trade_price,
+      </if>
+      <if test="onlyShowTopLeaguer != null">
+        only_show_top_leaguer,
+      </if>
+      <if test="recommend != null">
+        recommend,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="shopName != null">
+        #{shopName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="limitLeaguerNum != null">
+        #{limitLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="haveLeaguerNum != null">
+        #{haveLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isCanSeeSalePrice != null">
+        #{isCanSeeSalePrice,jdbcType=TINYINT},
+      </if>
+      <if test="isCanSeeTradePrice != null">
+        #{isCanSeeTradePrice,jdbcType=TINYINT},
+      </if>
+      <if test="onlyShowTopLeaguer != null">
+        #{onlyShowTopLeaguer,jdbcType=VARCHAR},
+      </if>
+      <if test="recommend != null">
+        #{recommend,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguerConfig">
+    update biz_leaguer_config
+    <set>
+      <if test="shopName != null">
+        shop_name = #{shopName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="limitLeaguerNum != null">
+        limit_leaguer_num = #{limitLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="haveLeaguerNum != null">
+        have_leaguer_num = #{haveLeaguerNum,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isCanSeeSalePrice != null">
+        is_can_see_sale_price = #{isCanSeeSalePrice,jdbcType=TINYINT},
+      </if>
+      <if test="isCanSeeTradePrice != null">
+        is_can_see_trade_price = #{isCanSeeTradePrice,jdbcType=TINYINT},
+      </if>
+      <if test="onlyShowTopLeaguer != null">
+        only_show_top_leaguer = #{onlyShowTopLeaguer,jdbcType=VARCHAR},
+      </if>
+      <if test="recommend != null">
+        recommend = #{recommend,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

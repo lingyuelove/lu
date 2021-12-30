@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.biz.BizLeaguerMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.biz.BizLeaguer">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_inviter_shop_id" jdbcType="INTEGER" property="fkInviterShopId"/>
+        <result column="fk_be_inviter_shop_id" jdbcType="INTEGER" property="fkBeInviterShopId"/>
+        <result column="note" jdbcType="VARCHAR" property="note"/>
+        <result column="visible" jdbcType="CHAR" property="visible"/>
+        <result column="top" jdbcType="CHAR" property="top"/>
+        <result column="label" jdbcType="VARCHAR" property="label"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="mark" jdbcType="VARCHAR" property="mark"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="become_friend_time" jdbcType="TIMESTAMP" property="becomeFriendTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="is_can_see_sale_price" jdbcType="TINYINT" property="isCanSeeSalePrice"/>
+        <result column="is_can_see_trade_price" jdbcType="TINYINT" property="isCanSeeTradePrice"/>
+        <result column="is_want_see_leaguer_prod" jdbcType="TINYINT" property="isWantSeeLeaguerProd"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_inviter_shop_id, fk_be_inviter_shop_id, note, visible, top, label,
+        state, mark, insert_time, become_friend_time, update_time, insert_admin, update_admin,
+        versions, del, remark, is_can_see_sale_price,is_can_see_trade_price,is_want_see_leaguer_prod
+    </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from biz_leaguer
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--精确查找店铺;根据店长手机号或者店铺编号-->
+    <select id="searchShop" resultType="com.luxuryadmin.vo.biz.VoBizLeaguer">
+        SELECT
+        shop.id 'shopId',
+        shop.number 'shopNumber',
+        shop.NAME 'shopName',
+        shop.contact 'phone',
+        shop.head_img_url 'headImgUrl',
+        CONCAT(det.`province`, det.`city`) 'address',
+        (SELECT
+        su.nickname
+        FROM
+        shp_user su
+        WHERE su.id = shop.fk_shp_user_id) 'shopkeeperNickname' ,
+        leag.`visible`,
+        leag.`note`,
+        leag.`top`
+        FROM
+        shp_shop shop
+        LEFT JOIN shp_detail det
+        ON shop.`id` = det.`fk_shp_shop_id`
+        LEFT JOIN biz_leaguer leag
+        ON shop.`id` = fk_be_inviter_shop_id
+        AND leag.fk_inviter_shop_id = #{shopId}
+        AND leag.state = 20
+        WHERE shop.number = #{shopNumber} or shop.contact = #{shopNumber}
+        AND shop.fk_shp_state_code >= 10
+    </select>
+
+    <!--查找友商店铺的基本信息-->
+    <select id="getLeaguerShop" resultType="com.luxuryadmin.vo.biz.VoBizLeaguer">
+        SELECT
+        shop.id 'shopId',
+        shop.NAME 'shopName',
+        shop.contact 'phone',
+        shop.head_img_url 'headImgUrl',
+        shop.cover_img_url 'coverImgUrl',
+        CONCAT(det.`province`, det.`city`) 'address',
+        (SELECT
+        ss.number
+        FROM
+        shp_shop ss
+        WHERE  ss.`id` = #{leaguerShopId})'leaguerShopNumber',
+        (SELECT
+        lea.note
+        FROM
+        biz_leaguer lea
+        WHERE lea.`fk_inviter_shop_id` = #{myShopId}
+        AND lea.`fk_be_inviter_shop_id` = #{leaguerShopId})'note'
+        FROM
+        shp_shop shop
+        LEFT JOIN shp_detail det
+        ON shop.`id` = det.`fk_shp_shop_id`
+        WHERE shop.`id` = #{leaguerShopId}
+        AND shop.fk_shp_state_code >= 10
+    </select>
+    <!--查看此友商是否是好友友商是否-->
+    <select id="getLeaguerFriendState" resultType="String">
+        SELECT
+        lea.id
+        FROM
+        biz_leaguer lea
+        WHERE lea.`fk_inviter_shop_id` = #{myShopId}
+        AND lea.`fk_be_inviter_shop_id` = #{leaguerShopId}
+    </select>
+    <!--获取对该友商不可见的其它友商; visible='0'-->
+    <select id="listBizLeaguerNoVisible" resultType="java.lang.Integer">
+        SELECT
+        lea.`fk_inviter_shop_id` 'leaguerShopId'
+        FROM
+        biz_leaguer lea
+        WHERE lea.`fk_be_inviter_shop_id` = #{shopId}
+        AND lea.`state` = '20'
+        and lea.visible = '0'
+        ORDER BY lea.`insert_time` DESC
+    </select>
+
+    <!--友商通讯录路; 查找该店铺的友商成员; BizLeaguer.state='20';-->
+    <select id="listBizLeaguerByShopId" resultType="com.luxuryadmin.vo.biz.VoBizLeaguer">
+        SELECT
+        shop.id 'shopId',
+        shop.number 'shopNumber',
+        shop.name 'shopName',
+        shop.head_img_url 'headImgUrl',
+        leag.`id` 'leaguerId',
+        leag.`top` 'top',
+        leag.`note` 'note'
+        FROM
+        shp_shop shop
+        LEFT JOIN biz_leaguer leag
+        ON shop.`id` = fk_be_inviter_shop_id
+        WHERE shop.fk_shp_state_code >= 10
+        AND leag.fk_inviter_shop_id = #{shopId}
+        AND leag.state = 20
+        order by leag.`insert_time` desc
+    </select>
+
+    <!--查找友商记录;状态等于20-->
+    <select id="getBizLeaguerByShopIdAndLeaguerShopId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        biz_leaguer
+        WHERE fk_inviter_shop_id = #{shopId}
+        AND fk_be_inviter_shop_id = #{leaguerShopId}
+        AND state = 20
+    </select>
+    <!--查找友商记录;状态等于10-->
+    <select id="getLeaguerDetailForState" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        biz_leaguer
+        WHERE fk_inviter_shop_id = #{myShopId}
+        AND fk_be_inviter_shop_id = #{leaguerShopId}
+        AND state = 10
+    </select>
+    <!--获取友商的店铺id-->
+    <select id="listBizLeaguerShopIdByShopId" resultType="java.lang.Integer">
+        SELECT
+        lea.`fk_be_inviter_shop_id` 'leaguerShopId'
+        FROM
+        biz_leaguer lea
+        WHERE lea.`fk_inviter_shop_id` = #{shopId}
+        AND lea.`state` = '20'
+        <if test="isTop == 1">
+            AND lea.top = '1'
+        </if>
+        ORDER BY lea.`insert_time` DESC
+    </select>
+
+    <!-- 获取友商店铺的详细信息-->
+    <select id="getSpecificLeaguerDetail" resultType="com.luxuryadmin.vo.biz.VoBizLeaguer">
+        SELECT
+        shop.id 'shopId',
+        shop.number 'shopNumber',
+        shop.name 'shopName',
+        shop.contact 'phone',
+        shop.head_img_url 'headImgUrl',
+        CONCAT(det.`province`, det.`city`) 'address',
+        (SELECT
+        su.nickname
+        FROM
+        shp_user su
+        WHERE su.id = shop.fk_shp_user_id) 'shopkeeperNickname' ,
+        leag.`id` 'leaguerId',
+        leag.`top` 'top',
+        leag.`label` 'label',
+        leag.`note` 'note',
+        leag.`visible` 'visible',
+        leag.`is_can_see_sale_price` 'isCanSeeSalePrice',
+        leag.`is_can_see_trade_price` 'isCanSeeTradePrice',
+        leag.`is_want_see_leaguer_prod` 'isWantSeeLeaguerProd'
+        FROM
+        shp_shop shop
+        LEFT JOIN shp_detail det
+        ON shop.`id` = det.`fk_shp_shop_id`
+        LEFT JOIN biz_leaguer leag
+        ON shop.`id` = fk_be_inviter_shop_id
+        WHERE shop.fk_shp_state_code >= 10
+        AND leag.fk_inviter_shop_id = #{myShopId}
+        AND leag.fk_be_inviter_shop_id = #{leaguerShopId}
+        AND leag.state = 20
+        order by leag.`insert_time` desc
+    </select>
+
+    <select id="listBizLeaguerNoWantSee" resultType="java.lang.Integer">
+        SELECT
+        lea.`fk_be_inviter_shop_id` 'leaguerShopId'
+        FROM
+        biz_leaguer lea
+        WHERE lea.`fk_inviter_shop_id` = #{shopId}
+        AND lea.`state` = '20'
+        and lea.is_want_see_leaguer_prod = '0'
+        ORDER BY lea.`insert_time` DESC
+    </select>
+
+    <!-- 根据shopId查询友商数量 -->
+    <select id="countLeaguerNumByShopId" resultType="java.lang.Integer">
+        select count(1) from biz_leaguer where `fk_inviter_shop_id` = #{shopId}
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from biz_leaguer
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteBizLeaguer">
+        delete from biz_leaguer
+        where fk_inviter_shop_id = #{shopId} and fk_be_inviter_shop_id = #{leaguerShopId}
+    </delete>
+    <delete id="deleteLeaguerForShop">
+        delete from biz_leaguer
+        where fk_inviter_shop_id = #{shopId} or fk_be_inviter_shop_id = #{shopId}
+    </delete>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguer">
+        insert into biz_leaguer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkInviterShopId != null">
+                fk_inviter_shop_id,
+            </if>
+            <if test="fkBeInviterShopId != null">
+                fk_be_inviter_shop_id,
+            </if>
+            <if test="note != null">
+                note,
+            </if>
+            <if test="visible != null">
+                visible,
+            </if>
+            <if test="top != null">
+                top,
+            </if>
+            <if test="label != null">
+                label,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="mark != null">
+                mark,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="becomeFriendTime != null">
+                become_friend_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="isCanSeeSalePrice != null">
+                is_can_see_sale_price,
+            </if>
+            <if test="isCanSeeTradePrice != null">
+                is_can_see_trade_price,
+            </if>
+            <if test="isWantSeeLeaguerProd != null">
+                is_want_see_leaguer_prod,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkInviterShopId != null">
+                #{fkInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviterShopId != null">
+                #{fkBeInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="visible != null">
+                #{visible,jdbcType=CHAR},
+            </if>
+            <if test="top != null">
+                #{top,jdbcType=CHAR},
+            </if>
+            <if test="label != null">
+                #{label,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="mark != null">
+                #{mark,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="becomeFriendTime != null">
+                #{becomeFriendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="isCanSeeSalePrice != null">
+                #{isCanSeeSalePrice,jdbcType=TINYINT},
+            </if>
+            <if test="isCanSeeTradePrice != null">
+                #{isCanSeeTradePrice,jdbcType=TINYINT},
+            </if>
+            <if test="isWantSeeLeaguerProd != null">
+                #{isWantSeeLeaguerProd,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+
+    <sql id="updateCondition">
+        <set>
+            <if test="fkInviterShopId != null">
+                fk_inviter_shop_id = #{fkInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeInviterShopId != null">
+                fk_be_inviter_shop_id = #{fkBeInviterShopId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                note = #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="visible != null">
+                visible = #{visible,jdbcType=CHAR},
+            </if>
+            <if test="top != null">
+                top = #{top,jdbcType=CHAR},
+            </if>
+            <if test="label != null">
+                label = #{label,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="mark != null">
+                mark = #{mark,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="becomeFriendTime != null">
+                become_friend_time = #{becomeFriendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="isCanSeeSalePrice != null">
+                is_can_see_sale_price = #{isCanSeeSalePrice,jdbcType=TINYINT},
+            </if>
+            <if test="isCanSeeTradePrice != null">
+                is_can_see_trade_price = #{isCanSeeTradePrice,jdbcType=TINYINT},
+            </if>
+            <if test="isWantSeeLeaguerProd != null">
+                is_want_see_leaguer_prod = #{isWantSeeLeaguerProd,jdbcType=TINYINT},
+            </if>
+        </set>
+    </sql>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.biz.BizLeaguer">
+        update biz_leaguer
+        <include refid="updateCondition"/>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <!--是否允许友商查看店铺商品-->
+    <update id="modifyVisible">
+        update biz_leaguer
+        set
+        visible = #{visible,jdbcType=CHAR},
+        top = #{top,jdbcType=CHAR},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+        is_can_see_sale_price = #{isCanSeeSalePrice,jdbcType=TINYINT},
+        is_can_see_trade_price = #{isCanSeeTradePrice,jdbcType=TINYINT},
+        is_want_see_leaguer_prod = #{isWantSeeLeaguerProd,jdbcType=TINYINT}
+        where id = #{id}
+        and fk_inviter_shop_id = #{fkInviterShopId}
+        and fk_be_inviter_shop_id = #{fkBeInviterShopId}
+    </update>
+
+    <!--修改友商备注-->
+    <update id="updateLeaguerNote">
+        update biz_leaguer
+        set
+        note = #{note},
+        update_time = now()
+        where id = #{leaguerId}
+        and fk_inviter_shop_id = #{shopId}
+        and fk_be_inviter_shop_id = #{leaguerShopId}
+    </update>
+
+    <!-- 修改店铺【友商总权限】时，修改对应所有的友商【权限】 -->
+    <update id="updateAllBizLeaguerRecord">
+        update
+        biz_leaguer
+        set
+        update_time = NOW()
+        <if test="isUpdateSalePrice==1">
+            ,is_can_see_sale_price = #{isCanSeeSalePrice,jdbcType=INTEGER}
+        </if>
+        <if test="isUpdateTradePrice==1">
+            ,is_can_see_trade_price = #{isCanSeeTradePrice,jdbcType=INTEGER}
+        </if>
+        where
+        fk_inviter_shop_id = #{shopId}
+    </update>
+</mapper>

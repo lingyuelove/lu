@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.op.DaEFenQiKaMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.op.DaEFenQiKa">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="机构" jdbcType="VARCHAR" property="机构"/>
+        <result column="机构名称" jdbcType="VARCHAR" property="机构名称"/>
+        <result column="卡号" jdbcType="VARCHAR" property="卡号"/>
+        <result column="姓名" jdbcType="VARCHAR" property="姓名"/>
+        <result column="卡种类" jdbcType="VARCHAR" property="卡种类"/>
+        <result column="证件号码" jdbcType="VARCHAR" property="证件号码"/>
+        <result column="开卡日期" jdbcType="VARCHAR" property="开卡日期"/>
+        <result column="逾期类型" jdbcType="VARCHAR" property="逾期类型"/>
+        <result column="账单日" jdbcType="VARCHAR" property="账单日"/>
+        <result column="推广人编号" jdbcType="VARCHAR" property="推广人编号"/>
+        <result column="推广人姓名" jdbcType="VARCHAR" property="推广人姓名"/>
+        <result column="联系电话" jdbcType="VARCHAR" property="联系电话"/>
+        <result column="省份" jdbcType="VARCHAR" property="省份"/>
+        <result column="城市" jdbcType="VARCHAR" property="城市"/>
+        <result column="运营商" jdbcType="VARCHAR" property="运营商"/>
+        <result column="授信额度" jdbcType="DOUBLE" property="授信额度"/>
+        <result column="透支余额" jdbcType="DOUBLE" property="透支余额"/>
+        <result column="透支本金" jdbcType="DOUBLE" property="透支本金"/>
+        <result column="利息余额" jdbcType="DOUBLE" property="利息余额"/>
+        <result column="费用余额" jdbcType="DOUBLE" property="费用余额"/>
+        <result column="分期付款原始本金" jdbcType="DOUBLE" property="分期付款原始本金"/>
+        <result column="分期付款待摊本金" jdbcType="DOUBLE" property="分期付款待摊本金"/>
+        <result column="分期付款原始费用" jdbcType="DOUBLE" property="分期付款原始费用"/>
+        <result column="分期付款待摊费用" jdbcType="DOUBLE" property="分期付款待摊费用"/>
+        <result column="未还款额" jdbcType="DOUBLE" property="未还款额"/>
+        <result column="专案代码" jdbcType="VARCHAR" property="专案代码"/>
+        <result column="分期总额" jdbcType="VARCHAR" property="分期总额"/>
+        <result column="年日均" jdbcType="VARCHAR" property="年日均"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, 机构, 机构名称, 卡号, 姓名, 卡种类, 证件号码, 开卡日期, 逾期类型, 账单日, 推广人编号, 推广人姓名, 联系电话, 授信额度, 透支余额, 
+    透支本金, 利息余额, 费用余额, 分期付款原始本金, 分期付款待摊本金, 分期付款原始费用, 分期付款待摊费用, 未还款额, 专案代码, 分期总额, 年日均, 
+    insert_time, update_time, update_admin, remark
+  </sql>
+
+
+    <select id="getCellphoneLocation" resultType="com.luxuryadmin.entity.op.DaEFenQiKa">
+       select id,联系电话,省份,城市,运营商
+       from daefenqika
+       where 省份='' and  remark='手机格式错误'
+       limit #{offset}, #{pageSize}
+    </select>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.op.DaEFenQiKa">
+        insert into daefenqika
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="机构 != null">
+                机构,
+            </if>
+            <if test="机构名称 != null">
+                机构名称,
+            </if>
+            <if test="卡号 != null">
+                卡号,
+            </if>
+            <if test="姓名 != null">
+                姓名,
+            </if>
+            <if test="卡种类 != null">
+                卡种类,
+            </if>
+            <if test="证件号码 != null">
+                证件号码,
+            </if>
+            <if test="开卡日期 != null">
+                开卡日期,
+            </if>
+            <if test="逾期类型 != null">
+                逾期类型,
+            </if>
+            <if test="账单日 != null">
+                账单日,
+            </if>
+            <if test="推广人编号 != null">
+                推广人编号,
+            </if>
+            <if test="推广人姓名 != null">
+                推广人姓名,
+            </if>
+            <if test="联系电话 != null">
+                联系电话,
+            </if>
+            <if test="授信额度 != null">
+                授信额度,
+            </if>
+            <if test="透支余额 != null">
+                透支余额,
+            </if>
+            <if test="透支本金 != null">
+                透支本金,
+            </if>
+            <if test="利息余额 != null">
+                利息余额,
+            </if>
+            <if test="费用余额 != null">
+                费用余额,
+            </if>
+            <if test="分期付款原始本金 != null">
+                分期付款原始本金,
+            </if>
+            <if test="分期付款待摊本金 != null">
+                分期付款待摊本金,
+            </if>
+            <if test="分期付款原始费用 != null">
+                分期付款原始费用,
+            </if>
+            <if test="分期付款待摊费用 != null">
+                分期付款待摊费用,
+            </if>
+            <if test="未还款额 != null">
+                未还款额,
+            </if>
+            <if test="专案代码 != null">
+                专案代码,
+            </if>
+            <if test="分期总额 != null">
+                分期总额,
+            </if>
+            <if test="年日均 != null">
+                年日均,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="机构 != null">
+                #{机构,jdbcType=VARCHAR},
+            </if>
+            <if test="机构名称 != null">
+                #{机构名称,jdbcType=VARCHAR},
+            </if>
+            <if test="卡号 != null">
+                #{卡号,jdbcType=VARCHAR},
+            </if>
+            <if test="姓名 != null">
+                #{姓名,jdbcType=VARCHAR},
+            </if>
+            <if test="卡种类 != null">
+                #{卡种类,jdbcType=VARCHAR},
+            </if>
+            <if test="证件号码 != null">
+                #{证件号码,jdbcType=VARCHAR},
+            </if>
+            <if test="开卡日期 != null">
+                #{开卡日期,jdbcType=VARCHAR},
+            </if>
+            <if test="逾期类型 != null">
+                #{逾期类型,jdbcType=VARCHAR},
+            </if>
+            <if test="账单日 != null">
+                #{账单日,jdbcType=VARCHAR},
+            </if>
+            <if test="推广人编号 != null">
+                #{推广人编号,jdbcType=VARCHAR},
+            </if>
+            <if test="推广人姓名 != null">
+                #{推广人姓名,jdbcType=VARCHAR},
+            </if>
+            <if test="联系电话 != null">
+                #{联系电话,jdbcType=VARCHAR},
+            </if>
+            <if test="授信额度 != null">
+                #{授信额度,jdbcType=DOUBLE},
+            </if>
+            <if test="透支余额 != null">
+                #{透支余额,jdbcType=DOUBLE},
+            </if>
+            <if test="透支本金 != null">
+                #{透支本金,jdbcType=DOUBLE},
+            </if>
+            <if test="利息余额 != null">
+                #{利息余额,jdbcType=DOUBLE},
+            </if>
+            <if test="费用余额 != null">
+                #{费用余额,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款原始本金 != null">
+                #{分期付款原始本金,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款待摊本金 != null">
+                #{分期付款待摊本金,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款原始费用 != null">
+                #{分期付款原始费用,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款待摊费用 != null">
+                #{分期付款待摊费用,jdbcType=DOUBLE},
+            </if>
+            <if test="未还款额 != null">
+                #{未还款额,jdbcType=DOUBLE},
+            </if>
+            <if test="专案代码 != null">
+                #{专案代码,jdbcType=VARCHAR},
+            </if>
+            <if test="分期总额 != null">
+                #{分期总额,jdbcType=VARCHAR},
+            </if>
+            <if test="年日均 != null">
+                #{年日均,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <!-- MySQL下批量保存，可以foreach遍历 mysql支持values(),(),()语法 -->
+    <insert id="saveBatch" parameterType="java.util.List">
+        insert into daefenqika (机构, 机构名称,
+        卡号, 姓名, 卡种类, 证件号码,
+        开卡日期, 逾期类型, 账单日, 推广人编号,
+        推广人姓名, 联系电话, 授信额度, 透支余额,
+        透支本金, 利息余额, 费用余额, 分期付款原始本金,
+        分期付款待摊本金, 分期付款原始费用, 分期付款待摊费用,
+        未还款额, 专案代码, 分期总额, 年日均,
+        insert_time, update_time, update_admin,
+        remark)
+        values
+        <foreach collection="list" item="daEFenQiKa" separator=",">
+            (#{daEFenQiKa.机构,jdbcType=VARCHAR}, #{daEFenQiKa.机构名称,jdbcType=VARCHAR},
+            #{daEFenQiKa.卡号,jdbcType=VARCHAR}, #{daEFenQiKa.姓名,jdbcType=VARCHAR}, #{daEFenQiKa.卡种类,jdbcType=VARCHAR},
+            #{daEFenQiKa.证件号码,jdbcType=VARCHAR},
+            #{daEFenQiKa.开卡日期,jdbcType=VARCHAR}, #{daEFenQiKa.逾期类型,jdbcType=VARCHAR},
+            #{daEFenQiKa.账单日,jdbcType=VARCHAR}, #{daEFenQiKa.推广人编号,jdbcType=VARCHAR},
+            #{daEFenQiKa.推广人姓名,jdbcType=VARCHAR}, #{daEFenQiKa.联系电话,jdbcType=VARCHAR},
+            #{daEFenQiKa.授信额度,jdbcType=DOUBLE}, #{daEFenQiKa.透支余额,jdbcType=DOUBLE},
+            #{daEFenQiKa.透支本金,jdbcType=DOUBLE}, #{daEFenQiKa.利息余额,jdbcType=DOUBLE}, #{daEFenQiKa.费用余额,jdbcType=DOUBLE},
+            #{daEFenQiKa.分期付款原始本金,jdbcType=DOUBLE},
+            #{daEFenQiKa.分期付款待摊本金,jdbcType=DOUBLE}, #{daEFenQiKa.分期付款原始费用,jdbcType=DOUBLE},
+            #{daEFenQiKa.分期付款待摊费用,jdbcType=DOUBLE},
+            #{daEFenQiKa.未还款额,jdbcType=DOUBLE}, #{daEFenQiKa.专案代码,jdbcType=VARCHAR},
+            #{daEFenQiKa.分期总额,jdbcType=VARCHAR}, #{daEFenQiKa.年日均,jdbcType=VARCHAR},
+            #{daEFenQiKa.insertTime,jdbcType=TIMESTAMP}, #{daEFenQiKa.updateTime,jdbcType=TIMESTAMP},
+            #{daEFenQiKa.updateAdmin,jdbcType=INTEGER},
+            #{daEFenQiKa.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.op.DaEFenQiKa">
+        update daefenqika
+        <set>
+            <if test="机构 != null">
+                机构 = #{机构,jdbcType=VARCHAR},
+            </if>
+            <if test="机构名称 != null">
+                机构名称 = #{机构名称,jdbcType=VARCHAR},
+            </if>
+            <if test="卡号 != null">
+                卡号 = #{卡号,jdbcType=VARCHAR},
+            </if>
+            <if test="姓名 != null">
+                姓名 = #{姓名,jdbcType=VARCHAR},
+            </if>
+            <if test="卡种类 != null">
+                卡种类 = #{卡种类,jdbcType=VARCHAR},
+            </if>
+            <if test="证件号码 != null">
+                证件号码 = #{证件号码,jdbcType=VARCHAR},
+            </if>
+            <if test="开卡日期 != null">
+                开卡日期 = #{开卡日期,jdbcType=VARCHAR},
+            </if>
+            <if test="逾期类型 != null">
+                逾期类型 = #{逾期类型,jdbcType=VARCHAR},
+            </if>
+            <if test="账单日 != null">
+                账单日 = #{账单日,jdbcType=VARCHAR},
+            </if>
+            <if test="推广人编号 != null">
+                推广人编号 = #{推广人编号,jdbcType=VARCHAR},
+            </if>
+            <if test="推广人姓名 != null">
+                推广人姓名 = #{推广人姓名,jdbcType=VARCHAR},
+            </if>
+            <if test="联系电话 != null">
+                联系电话 = #{联系电话,jdbcType=VARCHAR},
+            </if>
+            <if test="省份 != null">
+                省份 = #{省份,jdbcType=VARCHAR},
+            </if>
+            <if test="城市 != null">
+                城市 = #{城市,jdbcType=VARCHAR},
+            </if>
+            <if test="运营商 != null">
+                运营商 = #{运营商,jdbcType=VARCHAR},
+            </if>
+            <if test="授信额度 != null">
+                授信额度 = #{授信额度,jdbcType=DOUBLE},
+            </if>
+            <if test="透支余额 != null">
+                透支余额 = #{透支余额,jdbcType=DOUBLE},
+            </if>
+            <if test="透支本金 != null">
+                透支本金 = #{透支本金,jdbcType=DOUBLE},
+            </if>
+            <if test="利息余额 != null">
+                利息余额 = #{利息余额,jdbcType=DOUBLE},
+            </if>
+            <if test="费用余额 != null">
+                费用余额 = #{费用余额,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款原始本金 != null">
+                分期付款原始本金 = #{分期付款原始本金,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款待摊本金 != null">
+                分期付款待摊本金 = #{分期付款待摊本金,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款原始费用 != null">
+                分期付款原始费用 = #{分期付款原始费用,jdbcType=DOUBLE},
+            </if>
+            <if test="分期付款待摊费用 != null">
+                分期付款待摊费用 = #{分期付款待摊费用,jdbcType=DOUBLE},
+            </if>
+            <if test="未还款额 != null">
+                未还款额 = #{未还款额,jdbcType=DOUBLE},
+            </if>
+            <if test="专案代码 != null">
+                专案代码 = #{专案代码,jdbcType=VARCHAR},
+            </if>
+            <if test="分期总额 != null">
+                分期总额 = #{分期总额,jdbcType=VARCHAR},
+            </if>
+            <if test="年日均 != null">
+                年日均 = #{年日均,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateDaEFenQiKaList" parameterType="java.util.List">
+        UPDATE daefenqika
+        SET
+        联系电话 = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.联系电话}
+        </foreach>
+        END,
+        省份 = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.省份}
+        </foreach>
+        END,
+        城市 = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.城市}
+        </foreach>
+        END,
+        运营商 = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.运营商}
+        </foreach>
+        END,
+        remark = CASE id
+        <foreach collection="list" item="item" index="index" open="" separator="" close="">
+            WHEN #{item.id} THEN #{item.remark}
+        </foreach>
+        END,
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+</mapper>

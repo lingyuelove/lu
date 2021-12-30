@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpOperateLogMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpOperateLog">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="shop_name" jdbcType="VARCHAR" property="shopName"/>
+        <result column="operate_user_id" jdbcType="INTEGER" property="operateUserId"/>
+        <result column="operate_user_shop_name" jdbcType="VARCHAR" property="operateUserShopName"/>
+        <result column="module_name" jdbcType="VARCHAR" property="moduleName"/>
+        <result column="operate_type_name" jdbcType="VARCHAR" property="operateTypeName"/>
+        <result column="operate_content" jdbcType="VARCHAR" property="operateContent"/>
+        <result column="operate_date" jdbcType="VARCHAR" property="operateDate"/>
+        <result column="operate_time" jdbcType="TIMESTAMP" property="operateTime"/>
+        <result column="request_domain" jdbcType="VARCHAR" property="requestDomain"/>
+        <result column="request_uri" jdbcType="VARCHAR" property="requestUri"/>
+        <result column="request_param" jdbcType="VARCHAR" property="requestParam"/>
+        <result column="request_ip" jdbcType="VARCHAR" property="requestIp"/>
+        <result column="request_method" jdbcType="VARCHAR" property="requestMethod"/>
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+        <result column="fk_ord_order_id" jdbcType="INTEGER" property="fkOrdOrderId"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_shp_shop_id, shop_name, operate_user_id, operate_user_shop_name, module_name,
+        operate_type_name, operate_content, operate_date, operate_time, request_domain, request_uri,
+        request_param, request_ip, request_method, fk_pro_product_id, fk_ord_order_id, insert_time,
+        update_time
+    </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_operate_log
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!-- 分页查询操作日志 -->
+    <select id="selectShpOperateLogList" resultType="com.luxuryadmin.vo.shp.VoShpOperateLogRecord"
+            parameterType="com.luxuryadmin.param.shp.ParamShpOperateLogQuery">
+        select
+        sol.id,
+        (SELECT
+        uShopR.`name`
+        FROM
+        shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = sol.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = sol.`operate_user_id`) 'operateUserName',
+        sol.operate_time as 'operateTime',
+        sol.module_name as 'operateModule',
+        CONCAT(sol.operate_type_name,":",sol.operate_content) 'operateContent'
+        from
+        shp_operate_log sol
+        <if test="bizId != null">
+            left join pro_product pp on sol.fk_pro_product_id = pp.id
+        </if>
+
+        where
+        1=1
+        <if test="fkShpShopId != null">
+            and sol.fk_shp_shop_id = #{fkShpShopId}
+        </if>
+        <if test="operateUserId != null">
+            and sol.operate_user_id = #{operateUserId}
+        </if>
+        <if test="bizId != null">
+            and pp.biz_id = #{bizId}
+        </if>
+        <if test="module != null">
+            and sol.module_name = #{module}
+        </if>
+        <if test="searchContentKey != null">
+            and (sol.operate_type_name like CONCAT('%',#{searchContentKey},'%') OR sol.operate_content like
+            CONCAT('%',#{searchContentKey},'%'))
+        </if>
+        <if test="operateTimeStart != null">
+            and sol.operate_date >= #{operateTimeStart}
+        </if>
+        <if test="operateTimeEnd != null">
+            and #{operateTimeEnd} >= sol.operate_date
+        </if>
+        order by sol.insert_time desc,sol.id desc
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from shp_operate_log
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--删除店铺操作日志-->
+    <delete id="deleteShpOperateLogByShopId">
+        delete from shp_operate_log
+        where fk_shp_shop_id = #{shopId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpOperateLog" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into shp_operate_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="shopName != null">
+                shop_name,
+            </if>
+            <if test="operateUserId != null">
+                operate_user_id,
+            </if>
+            <if test="operateUserShopName != null">
+                operate_user_shop_name,
+            </if>
+            <if test="moduleName != null">
+                module_name,
+            </if>
+            <if test="operateTypeName != null">
+                operate_type_name,
+            </if>
+            <if test="operateContent != null">
+                operate_content,
+            </if>
+            <if test="operateDate != null">
+                operate_date,
+            </if>
+            <if test="operateTime != null">
+                operate_time,
+            </if>
+            <if test="requestDomain != null">
+                request_domain,
+            </if>
+            <if test="requestUri != null">
+                request_uri,
+            </if>
+            <if test="requestParam != null">
+                request_param,
+            </if>
+            <if test="requestIp != null">
+                request_ip,
+            </if>
+            <if test="requestMethod != null">
+                request_method,
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id,
+            </if>
+            <if test="fkOrdOrderId != null">
+                fk_ord_order_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="shopName != null">
+                #{shopName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateUserId != null">
+                #{operateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="operateUserShopName != null">
+                #{operateUserShopName,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleName != null">
+                #{moduleName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTypeName != null">
+                #{operateTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateContent != null">
+                #{operateContent,jdbcType=VARCHAR},
+            </if>
+            <if test="operateDate != null">
+                #{operateDate,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="requestDomain != null">
+                #{requestDomain,jdbcType=VARCHAR},
+            </if>
+            <if test="requestUri != null">
+                #{requestUri,jdbcType=VARCHAR},
+            </if>
+            <if test="requestParam != null">
+                #{requestParam,jdbcType=VARCHAR},
+            </if>
+            <if test="requestIp != null">
+                #{requestIp,jdbcType=VARCHAR},
+            </if>
+            <if test="requestMethod != null">
+                #{requestMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProProductId != null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdOrderId != null">
+                #{fkOrdOrderId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpOperateLog">
+        update shp_operate_log
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="shopName != null">
+                shop_name = #{shopName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateUserId != null">
+                operate_user_id = #{operateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="operateUserShopName != null">
+                operate_user_shop_name = #{operateUserShopName,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleName != null">
+                module_name = #{moduleName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTypeName != null">
+                operate_type_name = #{operateTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="operateContent != null">
+                operate_content = #{operateContent,jdbcType=VARCHAR},
+            </if>
+            <if test="operateDate != null">
+                operate_date = #{operateDate,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                operate_time = #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="requestDomain != null">
+                request_domain = #{requestDomain,jdbcType=VARCHAR},
+            </if>
+            <if test="requestUri != null">
+                request_uri = #{requestUri,jdbcType=VARCHAR},
+            </if>
+            <if test="requestParam != null">
+                request_param = #{requestParam,jdbcType=VARCHAR},
+            </if>
+            <if test="requestIp != null">
+                request_ip = #{requestIp,jdbcType=VARCHAR},
+            </if>
+            <if test="requestMethod != null">
+                request_method = #{requestMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdOrderId != null">
+                fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpOperateLog">
+        update shp_operate_log
+        set fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+        shop_name = #{shopName,jdbcType=VARCHAR},
+        operate_user_id = #{operateUserId,jdbcType=INTEGER},
+        operate_user_shop_name = #{operateUserShopName,jdbcType=VARCHAR},
+        module_name = #{moduleName,jdbcType=VARCHAR},
+        operate_type_name = #{operateTypeName,jdbcType=VARCHAR},
+        operate_content = #{operateContent,jdbcType=VARCHAR},
+        operate_date = #{operateDate,jdbcType=VARCHAR},
+        operate_time = #{operateTime,jdbcType=TIMESTAMP},
+        request_domain = #{requestDomain,jdbcType=VARCHAR},
+        request_uri = #{requestUri,jdbcType=VARCHAR},
+        request_param = #{requestParam,jdbcType=VARCHAR},
+        request_ip = #{requestIp,jdbcType=VARCHAR},
+        request_method = #{requestMethod,jdbcType=VARCHAR},
+        fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+        fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

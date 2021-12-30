@@ -1,0 +1,7 @@
+1.线上发布项目之后;在timedTask的机器上,内网执行以下命令:
+#先执行测试命令;
+# curl http://127.0.0.1:9080/timedTask/hello
+#再执行初始化店铺薪资命令
+# curl http://127.0.0.1:9080/timedTask/startFinSalaryRunnable
+
+执行完命令之后, 执行sql语句

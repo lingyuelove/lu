@@ -1,0 +1,2785 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProProductMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProProduct">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="biz_id" jdbcType="VARCHAR" property="bizId"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_pro_state_code" jdbcType="INTEGER" property="fkProStateCode"/>
+        <result column="fk_pro_attribute_code" jdbcType="VARCHAR" property="fkProAttributeCode"/>
+        <result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode"/>
+        <result column="fk_pro_classify_sub_name" jdbcType="VARCHAR" property="fkProClassifySubName"/>
+        <result column="fk_pro_sub_series_name" jdbcType="VARCHAR" property="fkProSubSeriesName"/>
+        <result column="fk_pro_series_model_name" jdbcType="VARCHAR" property="fkProSeriesModelName"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="quality" jdbcType="VARCHAR" property="quality"/>
+        <result column="target_user" jdbcType="VARCHAR" property="targetUser"/>
+        <result column="tag" jdbcType="VARCHAR" property="tag"/>
+        <result column="total_num" jdbcType="INTEGER" property="totalNum"/>
+        <result column="sale_num" jdbcType="INTEGER" property="saleNum"/>
+        <result column="hot" jdbcType="CHAR" property="hot"/>
+        <result column="share" jdbcType="VARCHAR" property="share"/>
+        <result column="init_price" jdbcType="DECIMAL" property="initPrice"/>
+        <result column="trade_price" jdbcType="DECIMAL" property="tradePrice"/>
+        <result column="agency_price" jdbcType="DECIMAL" property="agencyPrice"/>
+        <result column="sale_price" jdbcType="DECIMAL" property="salePrice"/>
+        <result column="finish_price" jdbcType="DECIMAL" property="finishPrice"/>
+        <result column="small_img" jdbcType="VARCHAR" property="smallImg"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="release_time" jdbcType="TIMESTAMP" property="releaseTime"/>
+        <result column="lock_time" jdbcType="TIMESTAMP" property="lockTime"/>
+        <result column="lock_user_id" jdbcType="INTEGER" property="lockUserId"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="save_end_time" jdbcType="TIMESTAMP" property="saveEndTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="union_state" jdbcType="VARCHAR" property="unionState"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="recycle_admin" jdbcType="INTEGER" property="recycleAdmin"/>
+        <result column="fk_shp_retrieve_user_id" jdbcType="INTEGER" property="fkShpRetrieveUserId"/>
+        <result column="convey_state" jdbcType="VARCHAR" property="conveyState"/>
+        <result column="fk_pro_convey_id" jdbcType="INTEGER" property="fkProConveyId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_shp_shop_id, fk_pro_state_code, fk_pro_attribute_code, fk_pro_classify_code,
+        fk_pro_classify_sub_name,fk_pro_sub_series_name,fk_pro_series_model_name, name, description,quality, target_user, tag, total_num, sale_num, hot, share,
+        init_price 'init_price' , trade_price 'trade_price', agency_price 'agency_price',public_price,
+        sale_price 'sale_price', finish_price 'finish_price', small_img, biz_id, insert_time, update_time,
+        release_time, lock_time, lock_user_id, finish_time, save_end_time, insert_admin, update_admin,
+        versions, del, remark,recycle_admin,fk_shp_retrieve_user_id,union_state,convey_state,fk_pro_convey_id
+    </sql>
+
+    <!--对外显示的列; pro_product 别名 pro-->
+    <sql id="vo_base_column_list">
+        pro.id 'proId',
+        pro.fk_shp_shop_id 'shopId' ,pro.biz_id 'bizId',pro.name 'name',pro.description,pro.tag,
+        pro.hot,pro.fk_pro_state_code 'stateUs',pro.fk_pro_attribute_code 'attributeUs',pro.fk_pro_classify_sub_name 'classifySub',
+        (SELECT attr.name
+        FROM pro_attribute attr
+        WHERE
+        attr.fk_shp_shop_id = pro.fk_shp_shop_id AND attr.code=pro.fk_pro_attribute_code
+        ) 'attributeCn',
+        pro.fk_pro_classify_code 'classifyUs',
+        (SELECT cla.name
+        FROM pro_classify cla
+        WHERE cla.fk_shp_shop_id = pro.fk_shp_shop_id AND cla.code = pro.fk_pro_classify_code
+        ) 'classifyCn',
+        (SELECT cb. description FROM pro_classify_sub cb WHERE cb.name=pro.fk_pro_classify_sub_name
+        and cb.fk_shp_shop_id in(-9,pro.fk_shp_shop_id) and  cb.del = '0' and cb.state = 1
+        ) 'classifySubName',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.lock_user_id
+        )'lockedUser',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.recycle_admin
+        )'recycleName',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.fk_shp_retrieve_user_id
+        )'retrieveUserName',
+        pro.retrieve_time 'retrieveTime',
+        pro.total_num 'totalNum',
+        pro.sale_num 'saleNum',
+        pro.share 'shareState',
+        pro.init_price 'initPrice',pro.trade_price 'tradePrice',
+        pro.agency_price 'agencyPrice',pro.sale_price 'salePrice',pro.finish_price 'finishPrice',
+        pro.small_img 'smallImg',pro.insert_time 'insertTime' ,pro.update_time 'updateTime' ,
+        pro.release_time 'releaseTime' ,pro.lock_time 'lockTime' ,pro.finish_time 'finishTime' ,
+        pro.save_end_time 'saveEndTime' ,
+        pro.delete_remark 'deleteRemark' ,pro.update_admin 'updateUserId',pro.fk_shp_retrieve_user_id 'retrieveUserId',
+        pro.retrieve_remark 'retrieveRemark',
+        pro.fk_pro_sub_series_name 'subSeriesName',pro.fk_pro_series_model_name 'seriesModelName',
+        pro.remark,pro.target_user 'targetUser',pro.quality,pro.convey_state 'conveyState',pro.fk_pro_convey_id 'conveyId'
+    </sql>
+    <!--商品详情显示的列; pro_detail 别名 det-->
+    <sql id="vo_detail_column_list">
+        det.accessory, det.source, det.customer_name,det.customer_phone,det.customer_remark,
+        det.repair_card 'repairCard',
+        det.repair_card_time 'repairCardTime',det.unique_code 'uniqueCode',
+        det.card_code_img 'cardCodeImg',det.product_img 'productImg',
+        det.customer_name 'customerName',det.customer_phone 'customerPhone',
+        det.customer_remark 'customerRemark',
+        det.video_url 'videoUrl',
+        det.remark_img_url 'remarkImgUrl',
+        IFNULL((SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.update_admin),'无') 'updateUser',
+        IFNULL((SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.insert_admin),'无')'uploadUser',
+        det.customer_info 'customerInfo',
+        det.auto_number 'autoNumber'
+    </sql>
+
+    <delete id="deleteProProductByShopId">
+        delete from pro_product where fk_shp_shop_id = #{shopId}
+    </delete>
+
+    <delete id="deleteProProductByIds">
+        delete from pro_product where id in(${ids})
+    </delete>
+
+    <!--根据商品id查找商品-->
+    <select id="getObjectById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_product
+        where id = #{id}
+    </select>
+
+    <!--根据商品id查找商品-->
+    <select id="getProProductByShopIdBizId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_product
+        where del = '0' and biz_id = #{bizId} and fk_shp_shop_id = #{shopId} and fk_pro_state_code != -90
+    </select>
+    <!--根据商品id查找商品-->
+    <select id="getProProductForDeleteByShopIdBizId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_product
+        where del = '0' and biz_id = #{bizId} and fk_shp_shop_id = #{shopId}
+    </select>
+
+    <!-- stateCode查询条件 -->
+    <sql id="StateCodeQueryCondition">
+        <choose>
+            <when test="stateCode == 'notRelease'">
+                AND pro.fk_pro_state_code BETWEEN 10 AND 19
+            </when>
+            <when test="stateCode == 'onRelease'">
+                AND pro.fk_pro_state_code BETWEEN 20 AND 39
+            </when>
+            <when test="stateCode == 'onSale'">
+                AND pro.fk_pro_state_code BETWEEN 20 AND 29
+            </when>
+            <when test="stateCode == 'onLock'">
+                AND pro.fk_pro_state_code BETWEEN 30 AND 39
+            </when>
+            <when test="stateCode == 'saleOut'">
+                AND pro.fk_pro_state_code BETWEEN 40 AND 49
+            </when>
+            <when test="stateCode == 'store'">
+                AND pro.fk_pro_state_code BETWEEN 10 AND 39
+            </when>
+            <when test="stateCode == 'all'">
+                AND pro.fk_pro_state_code >=0
+            </when>
+            <when test="stateCode == 'notExpire'">
+                AND pro.fk_pro_state_code = 12
+            </when>
+            <when test="stateCode == 'expire'">
+                AND pro.fk_pro_state_code = 13
+            </when>
+            <when test="stateCode == 'redeem'">
+                AND pro.fk_pro_state_code = 44
+            </when>
+            <otherwise>
+                AND pro.fk_pro_state_code = #{stateCode}
+            </otherwise>
+        </choose>
+    </sql>
+
+    <!--ParamProductQuery参数的查询条件;针对ProProduct实体查询-->
+    <sql id="ParamProductQueryCondition">
+        <include refid="StateCodeQueryCondition"/>
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description,pro.remark,det.unique_code) REGEXP #{proName}
+            OR CONCAT(det.unique_code,pro.remark,pro.description,pro.name) REGEXP #{proName}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            <if test="customerUser != null and customerUser!=''">
+                OR (det.customer_info like CONCAT('%',#{customerUser},'%') and ( pro.fk_pro_attribute_code = '20' or
+                pro.fk_pro_attribute_code = '30') )
+            </if>
+            OR REPLACE(REPLACE(CONCAT(pro.name,pro.description,pro.remark,det.unique_code),'.',''),'-','') REGEXP
+            #{proName}
+            OR REPLACE(REPLACE(CONCAT(det.unique_code,pro.remark,pro.description,pro.name),'.',''),'-','') REGEXP
+            #{proName}
+            )
+        </if>
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code like #{classifyCode}
+        </if>
+        <if test="attributeCode != null and attributeCode != ''">
+            AND pro.fk_pro_attribute_code IN (${attributeCode})
+        </if>
+        <if test="targetUser != null and targetUser != ''">
+            AND pro.target_user IN (${targetUser})
+        </if>
+        <if test="classifySub != null and classifySub != ''">
+            AND pro.fk_pro_classify_sub_name IN (${classifySub})
+        </if>
+        <if test="quality != null and quality != ''">
+            AND pro.quality IN (${quality})
+        </if>
+        <if test="repairCard != null and repairCard != ''">
+            AND (SELECT repair_card FROM pro_detail WHERE fk_pro_product_id = pro.id)=#{repairCard}
+        </if>
+        <if test="uploadStDateTime != null and uploadStDateTime != ''">
+            AND pro.insert_time &gt;= #{uploadStDateTime}
+        </if>
+        <if test="uploadEtDateTime != null and uploadEtDateTime != ''">
+            AND pro.insert_time &lt;= #{uploadEtDateTime}
+        </if>
+        <if test="recycleUserId != null and recycleUserId!=''">
+            AND pro.`recycle_admin` IN (${recycleUserId})
+        </if>
+        <if test="uploadUserId != null and uploadUserId != ''">
+            AND pro.insert_admin = #{uploadUserId}
+        </if>
+        <if test="retrieveStTime != null and retrieveStTime != ''">
+            AND pro.retrieve_time &gt;= #{retrieveStTime}
+        </if>
+        <if test="retrieveEnTime != null and retrieveEnTime != ''">
+            AND pro.retrieve_time &lt;= #{retrieveEnTime}
+        </if>
+        <if test="retrieveUserId != null and retrieveUserId != ''">
+            AND pro.fk_shp_retrieve_user_id IN (${retrieveUserId})
+        </if>
+        <choose>
+            <when test="priceType == 'initPrice'">
+                <if test="priceMin != null">
+                    AND pro.init_price &gt;= #{priceMin}
+                </if>
+                <if test="priceMax != null">
+                    AND pro.init_price &lt;= #{priceMax}
+                </if>
+            </when>
+            <otherwise>
+                <if test="priceMin != null">
+                    AND pro.sale_price &gt;= #{priceMin}
+                </if>
+                <if test="priceMax != null">
+                    AND pro.sale_price &lt;= #{priceMax}
+                </if>
+            </otherwise>
+        </choose>
+    </sql>
+
+
+    <!--根据ParamProductQuery来获取商品列表;多个模糊查找用REGEXP; 多个具体值用IN-->
+    <select id="listProProductByVoProductQueryParam"
+            parameterType="com.luxuryadmin.param.pro.ParamProductQuery"
+            resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        <include refid="vo_base_column_list"/>,
+        det.repair_card_time 'repairCardTime',
+        img.update_time 'recentDownloadTime',
+        det.unique_code 'uniqueCode',
+        <!-- 此字段判断是否是寄卖转移商品 id指寄卖传商品id-->
+        <if test="conveyId != null and conveyId != ''">
+            (select pcp.id from pro_convey_product pcp where pcp.fk_pro_product_id = pro.id and pcp.fk_pro_convey_id = #{conveyId}) 'id',
+           pro.total_num - ifnull( (SELECT sum( lock_num ) FROM pro_lock_record  WHERE pro.id = fk_pro_product_id AND state = 0 ),0) 'conveyNum',
+        </if>
+
+        det.auto_number 'autoNumber'
+        FROM
+        pro_product pro
+        LEFT JOIN
+        pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        LEFT JOIN pro_download_img img
+        ON pro.biz_id = img.fk_pro_product_biz_id and img.fk_shp_user_id = #{userId}
+        WHERE
+        pro.del = 0
+        <if test="shopId != 10684">
+            AND pro.fk_shp_shop_id = #{shopId}
+        </if>
+        <if test="conveyState != null and conveyState == 'convey'">
+            AND pro.convey_state= #{conveyState}
+        </if>
+        <if test="conveyState != null and conveyState != 'convey'">
+            AND pro.convey_state != 'convey'
+        </if>
+        <!-- 此字段判断是否是寄卖转移商品 -->
+        <if test="conveyId != null and conveyId != ''">
+            AND pro.total_num > ifnull((
+            SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0)  and pro.convey_state = 'warehouse'
+        </if>
+        <include refid="ParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="notDown == 'notDown'">
+                img.update_time asc ,pro.insert_time desc
+            </when>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--根据ParamProductQuery来获取商品列表;多个模糊查找用REGEXP; 多个具体值用IN-->
+    <select id="listProProductByVoProductQueryParamExcelExport"
+            parameterType="com.luxuryadmin.param.pro.ParamProductQuery"
+            resultType="com.luxuryadmin.excel.ExVoProduct">
+        SELECT
+        pro.name 'name',
+        pro.description 'description',
+        pro.hot,pro.fk_pro_state_code 'state',
+        pro.fk_pro_attribute_code 'attribute',
+        pro.fk_pro_classify_code 'classify',
+        pro.total_num 'totalNum',
+        pro.init_price 'initPrice',pro.trade_price 'tradePrice',
+        pro.agency_price 'agencyPrice',pro.sale_price 'salePrice',
+        pro.small_img 'smallImg',
+        det.repair_card 'repairCard',
+        pro.insert_time 'insertTime' ,
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.recycle_admin
+        )'recycleUser',
+        det.unique_code 'uniqueCode',
+        det.auto_number 'autoNumber',
+        IFNULL((SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pro.insert_admin),'无')'uploadUser',
+        pro.remark 'remark'
+        FROM
+        pro_product pro
+        LEFT JOIN
+        pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        LEFT JOIN pro_download_img img
+        ON pro.biz_id = img.fk_pro_product_biz_id and img.fk_shp_user_id = #{userId}
+        WHERE
+        pro.del = 0
+        <if test="shopId != 10684">
+            AND pro.fk_shp_shop_id = #{shopId}
+        </if>
+        <include refid="ParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="notDown == 'notDown'">
+                img.update_time asc ,pro.insert_time asc
+            </when>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--根据业务id;获取商品详情;-->
+    <select id="getProductDetailByShopIdBizId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        <include refid="vo_base_column_list"/>,
+        <include refid="vo_detail_column_list"/>
+        FROM pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.biz_id = #{bizId}
+        <if test="shopId != 10684">
+            AND pro.fk_shp_shop_id = #{shopId}
+        </if>
+        and pro.del = 0
+    </select>
+
+    <!--统计仓库今天上传的总数; 已删除和质押商品 不计入其中-->
+    <select id="countTodayUpload" resultType="java.lang.Integer">
+        SELECT
+        ifnull(sum(pro.total_num),0) 'todayUpload'
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.del = 0
+        AND pro.fk_shp_shop_id = #{shopId}
+        AND pro.insert_time &gt;= '${todayDate} 00:00:00'
+        AND pro.insert_time &lt;= '${todayDate} 23:59:59'
+        <include refid="ParamProductQueryCondition"/>
+    </select>
+
+    <!--统计仓库今天上架的总数; 已删除和质押商品 不计入其中-->
+    <select id="countTodayOnRelease" resultType="java.lang.Integer">
+        SELECT
+        COUNT(0) 'todayOnRelease'
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.del = 0
+        AND pro.fk_shp_shop_id = #{shopId}
+        AND pro.release_time &gt;= '${todayDate} 00:00:00'
+        AND pro.release_time &lt;= '${todayDate} 23:59:59'
+        <include refid="ParamProductQueryCondition"/>
+    </select>
+
+    <!--统计 质押商品 今日到期的总数;-->
+    <select id="countTodayExpire" resultType="java.lang.Integer">
+        SELECT
+        COUNT(0) 'todayExpire'
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.del = 0
+        AND pro.fk_shp_shop_id = #{shopId}
+        AND pro.save_end_time &gt;= '${todayDate} 00:00:00'
+        AND pro.save_end_time &lt;= '${todayDate} 23:59:59'
+        <include refid="ParamProductQueryCondition"/>
+    </select>
+
+    <!--统计仓库的剩余库存和总成本;已删除和已售出和质押商品 不计入其中-->
+    <select id="countLeftNumAndInitPrice" resultType="java.util.Map">
+        SELECT
+        IFNULL(SUM(pro.total_num), 0)'totalNum',
+        IFNULL(SUM(pro.total_num * pro.init_price),0)'totalPrice'
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.del = 0 AND pro.fk_shp_shop_id = #{shopId}
+        <include refid="ParamProductQueryCondition"/>
+    </select>
+
+    <!--统计仓库-各分类商品-剩余库存和总成本;-->
+    <select id="countClassifyNumAndPrice" resultType="com.luxuryadmin.vo.pro.VoProClassifyForAnalysis">
+        select
+        (SELECT
+        cla.name
+        FROM
+        pro_classify cla
+        WHERE cla.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND cla.code = pro.fk_pro_classify_code) 'classifyName',
+        IFNULL(SUM(pro.total_num), 0) 'num',
+        IFNULL(SUM(pro.total_num * pro.init_price), 0) 'totalPrice'
+        from
+        pro_product pro
+        where  pro.del = 0 and pro.fk_shp_shop_id = #{shopId}
+        AND pro.fk_pro_state_code BETWEEN 10 AND 39
+        AND pro.fk_pro_attribute_code IN (${attributeCode})
+        group by pro.fk_pro_classify_code order by totalPrice desc
+    </select>
+
+    <!--统计仓库-各属性商品-剩余库存和总成本;不包含质押成本 2020-05-13 22:00:47 临时改成只获取自有商品-->
+    <select id="countAttributeNumAndPrice" resultType="com.luxuryadmin.vo.pro.VoProClassifyForAnalysis">
+        select
+        (SELECT
+        attr.name
+        FROM
+        pro_attribute attr
+        WHERE attr.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND attr.code = pro.fk_pro_attribute_code) 'attributeName',
+        IFNULL(SUM(pro.total_num), 0) 'num',
+        IFNULL(SUM(pro.total_num * pro.init_price), 0) 'totalPrice'
+        from
+        pro_product pro
+        where pro.del = 0 and pro.fk_shp_shop_id = #{shopId}
+        AND pro.fk_pro_state_code BETWEEN 10 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        group by pro.fk_pro_attribute_code order by totalPrice desc
+    </select>
+
+    <!--分享产品的基础列-->
+    <sql id="baseShareProductColumns">
+        pro.fk_shp_shop_id 'shopId',
+        pro.biz_id 'bizId',pro.name 'name',pro.description,
+        pro.small_img 'smallImg',
+        pro.update_time 'updateTime' ,pro.release_time 'releaseTime',
+        pro.remark
+    </sql>
+
+    <!--友商商品基础列-->
+    <sql id="bizLeaguerColumns">
+        <include refid="baseShareProductColumns"/>,
+        pro.trade_price 'tradePrice'
+    </sql>
+
+    <!--根据友商的shopId,获取【友商】的商品-->
+    <select id="listBizLeaguerProduct" resultType="com.luxuryadmin.vo.pro.VoLeaguerProduct">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        pro.`biz_id` 'bizId',
+        pro.`small_img` 'smallImg',
+        pro.`target_user` 'targetUser',
+        pro.`name`,
+        pro.`trade_price` 'tradePrice',
+        pro.`sale_price` 'salePrice',
+        shop.`name` 'shopName',
+        shop.`contact` 'phone',
+        shpDet.`city` 'address',
+        pro.`total_Num` 'totalNum',
+        DATE_FORMAT(pro.update_time, '%Y-%m-%d') as releaseTime
+        FROM
+        pro_product pro
+        LEFT JOIN shp_shop shop
+        ON pro.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_detail shpDet
+        ON shop.`id` = shpDet.`fk_shp_shop_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` IN (${shopIds})
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id IN (${shopIds})
+        AND lk.`state` = 0)
+        <if test="param.proName != null and param.proName!=''">
+            AND (CONCAT(pro.name,pro.description) REGEXP #{param.proName} OR CONCAT(pro.description,pro.name) REGEXP
+            #{param.proName})
+        </if>
+        <if test="param.classifyCode != null and param.classifyCode!=''">
+            AND pro.fk_pro_classify_code like #{param.classifyCode}
+        </if>
+        <if test="param.targetUser != null and param.targetUser != ''">
+            AND pro.target_user IN (${param.targetUser})
+        </if>
+        <if test="param.classifySub != null and param.classifySub != ''">
+            AND pro.fk_pro_classify_sub_name IN (${param.classifySub})
+        </if>
+        <if test="param.priceMin != null">
+            AND pro.trade_price &gt;= #{param.priceMin}
+        </if>
+        <if test="param.priceMax != null">
+            AND pro.trade_price &lt;= #{param.priceMax}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="param.sortKeyDb != null &amp;&amp; param.sortKeyDb != ''">
+                ${param.sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!--获取商家联盟商品集合显示-->
+    <select id="getUnionForAppList" parameterType="com.luxuryadmin.param.biz.ParamLeaguerProductQuery"
+            resultType="com.luxuryadmin.vo.pro.VoLeaguerProduct">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        pro.`biz_id` 'bizId',
+        pro.`small_img` 'smallImg',
+        pro.`target_user` 'targetUser',
+        pro.`name`,
+        pro.`trade_price` 'tradePrice',
+        pro.`sale_price` 'salePrice',
+        shop.`name` 'shopName',
+        shop.`contact` 'phone',
+        shpDet.`city` 'address',
+        pro.`total_Num` 'totalNum',
+        DATE_FORMAT(pro.update_time, '%Y-%m-%d') as releaseTime
+        FROM
+        pro_product pro
+        LEFT JOIN biz_shop_union bsu
+        ON pro.`fk_shp_shop_id` = bsu.`fk_shp_shop_id`
+        LEFT JOIN shp_shop shop
+        ON pro.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_detail shpDet
+        ON bsu.`fk_shp_shop_id` = shpDet.`fk_shp_shop_id`
+        WHERE bsu.type = '20' and bsu.state = 10
+        AND pro.trade_price BETWEEN ${showMinPrice} AND ${showMaxPrice}
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id = pro.fk_shp_shop_id and lk.state = 0)
+        <include refid="ParamProductUnionForApp"/>
+
+        ORDER BY
+        <choose>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--
+  直接查询商家联盟的所有商品;
+    针对排序做了性能优化, 故不使用mysql分页, 使用java的业务逻辑分页;
+    调用此方法, 不需要结合分页控件进行分页;
+    -->
+    <select id="listUnionProductNoPage" resultType="com.luxuryadmin.vo.pro.VoLeaguerProduct">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        pro.`biz_id` 'bizId',
+        pro.`small_img` 'smallImg',
+        pro.`target_user` 'targetUser',
+        pro.`name`,
+        pro.`trade_price` 'tradePrice',
+        pro.`sale_price` 'salePrice',
+        shop.`name` 'shopName',
+        shop.`contact` 'phone',
+        shpDet.`city` 'address',
+        pro.`total_Num` 'totalNum',
+        DATE_FORMAT(pro.update_time, '%Y-%m-%d') AS releaseTime,
+        DATE_FORMAT(pro.update_time, '%Y-%m-%d') AS showTime,
+        bsu.id 'bsuId'
+        FROM
+        pro_product pro
+        LEFT JOIN biz_shop_union bsu
+        ON pro.`fk_shp_shop_id` = bsu.`fk_shp_shop_id`
+        AND bsu.type = '20'
+        AND bsu.state = 10
+        LEFT JOIN shp_shop shop
+        ON bsu.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_detail shpDet
+        ON bsu.`fk_shp_shop_id` = shpDet.`fk_shp_shop_id`
+        LEFT JOIN pro_lock_record lk
+        ON lk.`fk_pro_product_id` = pro.`id`
+        AND lk.`state` = 0
+        WHERE pro.trade_price BETWEEN 10000
+        AND 500000000
+        AND pro.fk_pro_state_code BETWEEN 20
+        AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.union_state = '1'
+        AND lk.`id` IS NULL
+        AND pro.update_time >= #{showTimeSt}
+        <include refid="ParamProductUnionForApp"/>
+
+        ORDER BY
+        <choose>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.id DESC
+            </otherwise>
+        </choose>
+        limit ${pageNum}
+    </select>
+
+    <!--获取商家联盟商品集合搜索查询条件-->
+    <sql id="ParamProductUnionForApp">
+        and pro.del = '0'
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description) REGEXP #{proName}
+            OR CONCAT(pro.description,pro.name) REGEXP #{proName}
+            OR REPLACE(REPLACE(CONCAT(pro.name,pro.description),'.',''),'-','') REGEXP #{proName}
+            OR REPLACE(REPLACE(CONCAT(pro.description,pro.name),'.',''),'-','') REGEXP #{proName}
+            )
+        </if>
+        <if test="classifySub != null and classifySub != ''">
+            AND pro.fk_pro_classify_sub_name IN (${classifySub})
+        </if>
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code like #{classifyCode}
+        </if>
+        <if test="targetUser != null and targetUser != ''">
+            AND pro.target_user IN (${targetUser})
+        </if>
+        <choose>
+            <when test="priceType == 'salePrice'">
+                <if test="priceMin != null">
+                    AND pro.sale_price &gt;= #{priceMin}
+                </if>
+                <if test="priceMax != null">
+                    AND pro.sale_price &lt;= #{priceMax}
+                </if>
+            </when>
+            <otherwise>
+                <if test="priceMin != null">
+                    AND pro.trade_price &gt;= #{priceMin}
+                </if>
+                <if test="priceMax != null">
+                    AND pro.trade_price &lt;= #{priceMax}
+                </if>
+            </otherwise>
+        </choose>
+    </sql>
+    <!--统计商家联盟的总商品件数和总价格 总价格 库存*销售价-->
+    <select id="getUnionForAppByStatistics" resultType="java.util.Map">
+        SELECT
+        IFNULL(SUM(pro.total_num), 0) 'totalNum',
+        IFNULL(SUM(pro.total_num * pro.trade_price),0) 'totalPrice'
+        FROM
+        pro_product pro
+        LEFT JOIN biz_shop_union bsu
+        ON pro.`fk_shp_shop_id` = bsu.`fk_shp_shop_id`
+        left join shp_shop shop
+        on pro.`fk_shp_shop_id` = shop.id
+        WHERE pro.del = '0' and bsu.type = '20' and bsu.state = 10
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.trade_price BETWEEN ${showMinPrice} AND ${showMaxPrice}
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.union_state = '1'
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id = pro.fk_shp_shop_id and lk.state = 0)
+        <if test="unionState != null and unionState != ''">
+            AND pro.union_state = #{unionState}
+        </if>
+        <if test="shopNumber != null and shopNumber != ''">
+            AND shop.number = #{shopNumber}
+        </if>
+
+    </select>
+    <!--获取商家联盟商品集合显示后台-->
+    <select id="getProductLoadForUnionList" parameterType="com.luxuryadmin.param.pro.ParamProProduct"
+            resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        det.`auto_number` 'autoNumber',
+        pro.`small_img` 'smallImg',
+        pro.`name`,
+        pro.`trade_price` 'tradePrice',
+        pro.`sale_price` 'salePrice',
+        pro.`fk_pro_attribute_code` 'attributeUs',
+        pro.`total_Num` 'totalNum',
+        pro.union_state 'unionState',
+        shop.name 'shopName',
+        shop.number 'shopNumber',
+        DATE_FORMAT(pro.insert_time, '%Y-%m-%d') as showTime
+        FROM
+        pro_product pro
+        left join
+        pro_detail det
+        on pro.id = det.fk_pro_product_id
+        left join shp_shop shop
+        on pro.`fk_shp_shop_id` = shop.id
+        LEFT JOIN biz_shop_union bsu
+        ON pro.`fk_shp_shop_id` = bsu.`fk_shp_shop_id`
+
+        WHERE
+        <include refid="ParamProductLoadForUnionList"/>
+
+        ORDER BY
+        pro.insert_time DESC
+
+    </select>
+    <!-- <select id="getProductUnionForAdmin" parameterType="com.luxuryadmin.param.pro.ParamProProduct" resultType="Integer">
+         SELECT
+         IFNULL(SUM(pro.total_num), 0)
+         FROM
+         pro_product pro
+         LEFT JOIN biz_shop_union bsu
+         ON pro.`fk_shp_shop_id` = bsu.`fk_shp_shop_id`
+         WHERE
+         <include refid="ParamProductLoadForUnionList"/>
+         ORDER BY
+         pro.insert_time DESC
+     </select>-->
+    <sql id="ParamProductLoadForUnionList">
+        bsu.type = '20' and bsu.state = 10 and pro.del = '0'
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.trade_price BETWEEN ${showMinPrice} AND ${showMaxPrice}
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.update_time >= #{showTimeSt}
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id = pro.fk_shp_shop_id and lk.state = 0)
+        <if test="name != null and name!=''">
+            AND (CONCAT(pro.name,pro.description) REGEXP #{name} OR CONCAT(pro.description,pro.name) REGEXP
+            #{name})
+        </if>
+        <if test="attributeCode != null and attributeCode!=''">
+            AND pro.fk_pro_attribute_code like #{attributeCode}
+        </if>
+        <if test="id != null and id!=''">
+            AND pro.biz_id like #{id}
+        </if>
+        <if test="insertTimeStart != null and insertTimeStart != ''">
+            AND pro.insert_time &gt;= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null and insertTimeEnd != ''">
+            AND pro.insert_time &lt;= #{insertTimeEnd}
+        </if>
+        <if test="unionState != null and unionState != ''">
+            AND pro.union_state = #{unionState}
+        </if>
+        <if test="shopNumber != null and shopNumber != ''">
+            AND shop.number = #{shopNumber}
+        </if>
+    </sql>
+    <!--根据友商的shopId,获取(具体)友商的商品-->
+    <select id="listSpecificBizLeaguerProduct" resultType="com.luxuryadmin.vo.pro.VoLeaguerProduct">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        pro.`biz_id` 'bizId',
+        pro.`small_img` 'smallImg',
+        pro.`target_user` 'targetUser',
+        pro.`name`,
+        pro.sale_price 'salePrice',
+        pro.`trade_price` 'tradePrice',
+        pro.`total_Num` 'totalNum',
+        shop.name 'shopName',
+        shpDet.`city` 'address',
+        DATE_FORMAT(pro.update_time, '%Y-%m-%d') as releaseTime
+        FROM
+        pro_product pro
+        LEFT JOIN shp_shop shop
+        ON pro.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN shp_detail shpDet
+        ON shop.`id` = shpDet.`fk_shp_shop_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` IN (${param.leaguerShopId})
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id IN (${param.leaguerShopId})
+        AND lk.`state` = 0)
+        <if test="param.proName != null and param.proName!=''">
+            AND (CONCAT(pro.name,pro.description) REGEXP #{param.proName} OR CONCAT(pro.description,pro.name) REGEXP
+            #{param.proName})
+        </if>
+        <if test="param.classifyCode != null and param.classifyCode!=''">
+            AND pro.fk_pro_classify_code like #{param.classifyCode}
+        </if>
+        <if test="param.targetUser != null and param.targetUser != ''">
+            AND pro.target_user IN (${param.targetUser})
+        </if>
+        <if test="param.priceMin != null">
+            AND pro.trade_price &gt;= #{param.priceMin}
+        </if>
+        <if test="param.priceMax != null">
+            AND pro.trade_price &lt;= #{param.priceMax}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="param.sortKeyDb != null &amp;&amp; param.sortKeyDb != ''">
+                ${param.sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--获取友商商品详情-->
+    <select id="getBizLeaguerProductDetailByBizId" resultType="com.luxuryadmin.vo.pro.VoLeaguerProduct">
+        SELECT
+        pro.`fk_shp_shop_id` 'shopId',
+        pro.`id` 'proId',
+        pro.`biz_id` 'bizId',
+        pro.`name`,
+        pro.`trade_price` 'tradePrice',
+        pro.sale_price 'salePrice',
+        pro.`description`,
+        pro.`target_user` 'targetUser',
+        proDet.`accessory`,
+        proDet.`product_img` 'productImg',
+        proDet.`video_url` 'videoUrl',
+        shop.`name` 'shopName',
+        shop.`number` 'shopNumber',
+        shop.`contact` 'phone'
+        FROM
+        pro_product pro
+        LEFT JOIN shp_shop shop
+        ON pro.`fk_shp_shop_id` = shop.`id`
+        LEFT JOIN pro_detail proDet
+        ON pro.`id` = proDet.`fk_pro_product_id`
+        WHERE pro.del = '0' and pro.`fk_pro_state_code` >= 10
+        AND pro.`biz_id` = #{bizId}
+        AND pro.share != 10
+    </select>
+
+
+    <!--根据分享商品的业务id;获取【分享】商品详情-->
+    <select id="getShareProductDetailByShopIdBizId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.id 'proId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.name 'name',
+        pro.description 'description',
+        pro.tag,
+        pro.quality,
+        pro.target_user 'targetUser',
+        pro.trade_price 'tradePrice',
+        pro.agency_price 'agencyPrice',
+        pro.sale_price 'salePrice',
+        pro.init_price 'initPrice',
+        pro.insert_time 'insertTime',
+        pro.fk_pro_attribute_code 'attributeUs',
+        pro.fk_pro_state_code 'stateUs',
+        det.accessory,
+        det.product_img 'productImg',
+        det.video_url 'videoUrl'
+        FROM pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE pro.del = '0' and pro.biz_id = #{bizId}
+        <if test="shopId != null">
+            AND pro.fk_shp_shop_id = #{shopId}
+        </if>
+        limit 1
+    </select>
+
+    <!--根据业务逻辑查找,是否存在该产品-->
+    <select id="existsProductByBizId" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM pro_product WHERE del = '0' and fk_shp_shop_id = #{shopId} AND biz_id = #{bizId}
+    </select>
+
+
+    <!--查询分享出去的商品列表-->
+    <select id="listShareProductByProId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.id 'proId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.biz_id 'bizId',
+        pro.small_img 'smallImg',
+        pro. NAME,
+        pro.target_user 'targetUser',
+        pro.quality,
+        pro.init_price 'initPrice',
+        pro.trade_price 'tradePrice',
+        pro.agency_price 'agencyPrice',
+        pro.sale_price 'salePrice',
+        pro.fk_pro_attribute_code 'attributeUs',
+        pro.fk_pro_state_code 'stateUs'
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE
+        pro.del = '0'
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id IN (${shopId})
+        AND lk.`state` = 0)
+        <if test="proIds != 'all'">
+            and pro.id in (${proIds})
+        </if>
+        <if test="classifyCodes != null">
+            and pro.fk_pro_classify_code in (${classifyCodes})
+        </if>
+        <if test="shopId != null &amp;&amp; shopId != ''">
+            and pro.fk_shp_shop_id = #{shopId}
+        </if>
+        and pro.fk_pro_attribute_code IN ('10', '20', '40')
+        <include refid="ParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--条件查询商品 一般商品 质押商品 left join sys_enum se on se.code = pp.fk_pro_classify_code -->
+    <select id="listShpUserRel" parameterType="com.luxuryadmin.param.pro.ParamProProduct"
+            resultType="com.luxuryadmin.vo.pro.VoProduct">
+        SELECT
+        pp.id AS id,
+        det.auto_number AS bizId,
+        pp.name AS NAME,
+        pp.total_Num AS totalNum,
+        pp.sale_Num AS saleNum,
+        pp.init_Price AS initPrice,
+        pp.small_Img AS smallImg,
+        pp.trade_Price AS tradePrice,
+        pp.agency_Price AS agencyPrice,
+        pp.sale_Price AS salePrice,
+        pp.insert_time AS insertTime,
+        pa.name AS attributeName,
+        ss.name AS shopName,
+        se.name AS stateName,
+        su.nickname AS insertAdmin,
+        pp.release_time AS releaseTime,
+        pp.finish_time AS finishTime,
+        pp.save_end_time AS saveEndTime,
+        pp.fk_pro_state_code AS fkProStateCode,
+        pp.fk_shp_shop_id AS fkShpShopId,
+        ss.number AS shopNumber
+        FROM
+        pro_product pp
+        left join pro_detail det
+        ON pp.id = det.fk_pro_product_id
+        LEFT JOIN shp_shop ss
+        ON pp.`fk_shp_shop_id` = ss.`id`
+        LEFT JOIN shp_user su
+        ON su.`id` = pp.`insert_admin`
+        LEFT JOIN pro_attribute pa
+        ON pa.`code` = pp.fk_pro_attribute_code
+        AND pa.fk_shp_shop_id = pp.fk_shp_shop_id
+        LEFT JOIN sys_enum se
+        ON se.code = pp.fk_pro_state_code
+        AND se.type = 'pro_state'
+        LEFT JOIN pro_classify pc
+        ON pc.`code` = pp.fk_pro_classify_code
+        AND pc.fk_shp_shop_id = pp.fk_shp_shop_id
+        where pp.del = 0
+        <if test="id != null">
+            and pp.id=#{id}
+        </if>
+        <if test="name != null">
+            AND (
+            CONCAT(pp.name,pp.description,pp.remark) REGEXP #{name}
+            OR CONCAT(pp.remark,pp.description,pp.name) REGEXP #{name}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.unique_code = #{uniqueCode}
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            )
+        </if>
+        <if test="shopNumber != null">
+            and ss.number=#{shopNumber}
+        </if>
+        <if test="shopName != null">
+            and ss.name like CONCAT('%',#{shopName},'%')
+        </if>
+        <if test="attributeCode != null">
+            and pp.fk_pro_attribute_code=#{attributeCode}
+        </if>
+        <if test="attributeCode == null">
+            and pp.fk_pro_attribute_code in ('10','20','40')
+        </if>
+        <if test="classifyCode != null">
+            and pp.fk_pro_classify_code=#{classifyCode}
+        </if>
+        <if test="stateCode == '0' or stateCode == 0">
+            and pp.fk_pro_state_code between 10 and 19
+        </if>
+        <if test="stateCode == '1' or stateCode == 1">
+            and pp.fk_pro_state_code between 20 and 39
+        </if>
+        <if test="stateCode == '2' or stateCode == 2">
+            and pp.fk_pro_state_code between 40 and 49
+        </if>
+        <if test="stateCode == '12' or stateCode == 12">
+            and pp.fk_pro_state_code = 12
+        </if>
+        <if test="stateCode == '13' or stateCode == 13">
+            and pp.fk_pro_state_code = 13
+        </if>
+        <if test="stateCode == '44' or stateCode == 44">
+            and pp.fk_pro_state_code = 44
+        </if>
+        <if test="stateCode == '99' or stateCode == 99">
+            and pp.fk_pro_state_code in (12,13,44)
+        </if>
+        <if test="stateCode == '' or stateCode == null">
+            and pp.fk_pro_state_code between 10 and 49
+        </if>
+        <if test="insertTimeStart != null">
+            and pp.insert_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} >= pp.insert_time
+        </if>
+        <if test="releaseTimeStart != null">
+            and pp.release_time >= #{releaseTimeStart}
+        </if>
+        <if test="releaseTimeEnd != null">
+            and #{releaseTimeEnd} >= pp.release_time
+        </if>
+        <if test="finishTimeStart != null">
+            and pp.save_end_time >= #{finishTimeStart}
+        </if>
+        <if test="finishTimeEnd != null">
+            and #{finishTimeEnd} >= pp.save_end_time
+        </if>
+        <if test="stateCode == null">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '0' or stateCode == 0">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '1' or stateCode == 1">
+            order by pp.release_time desc
+        </if>
+        <if test="stateCode == '2' or stateCode == 2">
+            order by pp.finish_time desc
+        </if>
+        <if test="stateCode == '12' or stateCode == 12">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '13' or stateCode == 13">
+            order by pp.release_time desc
+        </if>
+        <if test="stateCode == '44' or stateCode == 44">
+            order by pp.finish_time desc
+        </if>
+        <if test="stateCode == '99' or stateCode == 99">
+            order by pp.insert_time desc
+        </if>
+    </select>
+
+
+    <!--用于优化count的查询;-->
+    <select id="listShpUserRel_COUNT" resultType="java.lang.Long">
+        SELECT
+        count(*)
+        FROM
+        pro_product pp
+        left join pro_detail det
+        ON pp.id = det.fk_pro_product_id
+        LEFT JOIN shp_shop ss
+        ON pp.`fk_shp_shop_id` = ss.`id`
+        where pp.del = 0
+        <if test="id != null">
+            and pp.id=#{id}
+        </if>
+        <if test="name != null">
+            AND (
+            CONCAT(pp.name,pp.description,pp.remark) REGEXP #{name}
+            OR CONCAT(pp.remark,pp.description,pp.name) REGEXP #{name}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.unique_code = #{uniqueCode}
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            )
+        </if>
+        <if test="shopNumber != null">
+            and ss.number=#{shopNumber}
+        </if>
+        <if test="shopName != null">
+            and ss.name like CONCAT('%',#{shopName},'%')
+        </if>
+        <if test="attributeCode != null">
+            and pp.fk_pro_attribute_code=#{attributeCode}
+        </if>
+        <if test="attributeCode == null">
+            and pp.fk_pro_attribute_code in ('10','20','40')
+        </if>
+        <if test="classifyCode != null">
+            and pp.fk_pro_classify_code=#{classifyCode}
+        </if>
+        <if test="stateCode == '0' or stateCode == 0">
+            and pp.fk_pro_state_code between 10 and 19
+        </if>
+        <if test="stateCode == '1' or stateCode == 1">
+            and pp.fk_pro_state_code between 20 and 39
+        </if>
+        <if test="stateCode == '2' or stateCode == 2">
+            and pp.fk_pro_state_code between 40 and 49
+        </if>
+        <if test="stateCode == '12' or stateCode == 12">
+            and pp.fk_pro_state_code = 12
+        </if>
+        <if test="stateCode == '13' or stateCode == 13">
+            and pp.fk_pro_state_code = 13
+        </if>
+        <if test="stateCode == '44' or stateCode == 44">
+            and pp.fk_pro_state_code = 44
+        </if>
+        <if test="stateCode == '99' or stateCode == 99">
+            and pp.fk_pro_state_code in (12,13,44)
+        </if>
+        <if test="stateCode == '' or stateCode == null">
+            and pp.fk_pro_state_code between 10 and 49
+        </if>
+        <if test="insertTimeStart != null">
+            and pp.insert_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} >= pp.insert_time
+        </if>
+        <if test="releaseTimeStart != null">
+            and pp.release_time >= #{releaseTimeStart}
+        </if>
+        <if test="releaseTimeEnd != null">
+            and #{releaseTimeEnd} >= pp.release_time
+        </if>
+        <if test="finishTimeStart != null">
+            and pp.save_end_time >= #{finishTimeStart}
+        </if>
+        <if test="finishTimeEnd != null">
+            and #{finishTimeEnd} >= pp.save_end_time
+        </if>
+        <if test="stateCode == null">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '0' or stateCode == 0">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '1' or stateCode == 1">
+            order by pp.release_time desc
+        </if>
+        <if test="stateCode == '2' or stateCode == 2">
+            order by pp.finish_time desc
+        </if>
+        <if test="stateCode == '12' or stateCode == 12">
+            order by pp.insert_time desc
+        </if>
+        <if test="stateCode == '13' or stateCode == 13">
+            order by pp.release_time desc
+        </if>
+        <if test="stateCode == '44' or stateCode == 44">
+            order by pp.finish_time desc
+        </if>
+        <if test="stateCode == '99' or stateCode == 99">
+            order by pp.insert_time desc
+        </if>
+    </select>
+
+
+    <select id="getProProductInfo" parameterType="java.lang.Integer" resultType="com.luxuryadmin.vo.pro.VoProduct">
+
+SELECT
+  pp.id AS id,
+  pp.biz_id AS bizId,
+  pp.name AS NAME,
+  se.name AS stateName,
+  pd.product_img AS productImg,
+  pp.total_num AS totalNum,
+  pp.sale_num AS saleNum,
+  pp.trade_price AS tradePrice,
+  pp.init_price AS initPrice,
+  pp.agency_price AS agencyPrice,
+  pp.sale_price AS salePrice,
+  pp.description AS description,
+  pa.`name` AS attributeName,
+  pd.source AS source,
+  pp.tag AS tag,
+  pd.unique_code AS uniqueCode,
+  pp.quality AS quality,
+  pp.target_user AS targetUser,
+  pd.card_code_img AS cardCodeImg,
+  pp.remark AS remark,
+  pp.update_time AS updateTime,
+  IFNULL(shopRef.name, pp.`insert_admin`) AS insertAdmin,
+  IFNULL(
+    shopRef2.name,
+    pp.`update_admin`
+  ) AS updateAdmin,
+  GROUP_CONCAT(pac.name) AS accessoryName,
+  pp.save_end_time AS saveEndTime,
+  pp.fk_pro_state_code AS fkProStateCode,
+  pp.finish_time AS finishTime,
+  pd.customer_name AS customerName,
+  pp.insert_time AS insertTime,
+  pp.small_img AS smallImg
+FROM
+  pro_detail pd,
+  pro_accessory pac,
+  pro_product pp
+  LEFT JOIN sys_enum se
+    ON se.code = pp.fk_pro_state_code
+    AND se.type = 'pro_state'
+    AND se.state = '1'
+  LEFT JOIN pro_attribute pa
+    ON pa.code = pp.fk_pro_attribute_code
+    AND pa.fk_shp_shop_id = pp.fk_shp_shop_id
+  LEFT JOIN shp_user_shop_ref shopRef
+    ON shopRef.`fk_shp_user_id` = pp.insert_admin
+    AND shopRef.`fk_shp_shop_id` = pp.`fk_shp_shop_id`
+  LEFT JOIN shp_user_shop_ref shopRef2
+    ON shopRef2.`fk_shp_user_id` = pp.update_admin
+    AND shopRef2.`fk_shp_shop_id` = pp.`fk_shp_shop_id`
+WHERE pp.del = 0
+  AND pp.id = pd.fk_pro_product_id
+  AND pp.fk_shp_shop_id = pd.fk_shp_shop_id
+  AND pp.fk_shp_shop_id = pac.fk_shp_shop_id
+  AND pp.id = #{id}
+    </select>
+
+    <select id="listProdNameByBizIdList" resultType="com.luxuryadmin.vo.pro.VoProductSimple">
+        SELECT
+        name 'prodName',
+        biz_id 'bizId'
+        FROM pro_product
+        WHERE del = 0 and biz_id
+        IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <!--友商模块专用-->
+    <select id="selectOnSaleProductNumByShopId" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        pro_product pro
+        WHERE
+        pro.del = '0'
+        AND
+        pro.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.share != 10
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        AND lk.`state` = 0)
+    </select>
+
+    <!--后台管理系统专用-->
+    <select id="countOnSaleProductNumByShopIdByAdmin" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        pro_product pro
+        WHERE
+        pro.del = '0'
+        AND
+        pro.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        AND pro.fk_pro_state_code BETWEEN 20 AND 39
+        AND pro.fk_pro_attribute_code != 30
+        AND pro.id NOT IN
+        (SELECT
+        fk_pro_product_id lk
+        FROM
+        pro_lock_record lk
+        WHERE lk.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        AND lk.`state` = 0)
+    </select>
+    <select id="selectShopIdByBizId" resultType="java.lang.Integer">
+        SELECT
+        fk_shp_shop_id
+        FROM
+        pro_product
+        WHERE
+        del = '0'
+        AND
+        biz_id = #{bizId,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 分组商品种类查询资产横批统计 -->
+    <select id="countProductAnalyzeDetail" resultType="com.luxuryadmin.vo.pro.VoProductAnalyzeDetail">
+        SELECT
+        CASE fk_pro_classify_code
+        WHEN 'WB' THEN '腕表'
+        WHEN 'XB' THEN '箱包'
+        WHEN 'ZB' THEN '珠宝'
+        WHEN 'XX' THEN '鞋靴'
+        WHEN 'PS' THEN '配饰'
+        WHEN 'QT' THEN '其它'
+        ELSE '无' END 'prodTypeName',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 10 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 10 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataSelf',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 20 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 20 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataConsignment',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 40 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 40 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataOther',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code IN (10,20,40) THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code IN (10,20,40) THEN pro.init_price * total_num ELSE 0 END),
+        0)/100,0)
+        )'countDataAll'
+        FROM
+        pro_product pro
+        WHERE pro.del = '0' and
+        pro.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        AND pro.fk_pro_state_code BETWEEN 10 AND 39
+        AND pro.fk_pro_attribute_code IN (10,20,40)
+        AND pro.fk_pro_classify_code != ''
+        GROUP BY
+        pro.fk_pro_classify_code
+    </select>
+
+    <!-- 查询所有商品类型资产横批统计 -->
+    <select id="countProductAnalyzeDetailAllClassify" resultType="com.luxuryadmin.vo.pro.VoProductAnalyzeDetail">
+        SELECT
+        '合计' AS 'prodTypeName',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 10 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 10 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataSelf',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 20 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 20 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataConsignment',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 40 THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code = 40 THEN pro.init_price * total_num ELSE 0 END), 0)/100,0)
+        )'countDataOther',
+        CONCAT(
+        IFNULL(SUM(CASE WHEN fk_pro_attribute_code IN (10,20,40) THEN pro.total_num ELSE 0 END), 0),'/￥',
+        Format(IFNULL(SUM(CASE WHEN fk_pro_attribute_code IN (10,20,40) THEN pro.init_price * total_num ELSE 0 END),
+        0)/100,0)
+        )'countDataAll'
+        FROM
+        pro_product pro
+        WHERE  pro.del = '0' and
+        pro.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        AND pro.fk_pro_state_code BETWEEN 10 AND 39
+        AND pro.fk_pro_attribute_code IN (10,20,40)
+        AND pro.fk_pro_classify_code != ''
+    </select>
+
+    <select id="listAllShopProProduct" resultType="com.luxuryadmin.entity.pro.ProProduct">
+        SELECT id,name,description FROM pro_product ORDER BY id ASC
+    </select>
+
+
+    <!--获取临时仓里面的商品-->
+    <select id="listVoProductLoadByShopIdAndTempId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.id 'proId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.biz_id 'bizId',
+        ifnull(pt.name, pro.name) 'name',
+        ifnull(pt.description, pro.description) 'description',
+        pro.tag,
+        pro.hot,
+        pro.fk_pro_state_code 'stateUs',
+        pro.fk_pro_attribute_code 'attributeUs',
+        (SELECT
+        attr.name
+        FROM
+        pro_attribute attr
+        WHERE attr.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND attr.code = pro.fk_pro_attribute_code) 'attributeCn',
+        pro.fk_pro_classify_code 'classifyUs',
+        (SELECT
+        cla.name
+        FROM
+        pro_classify cla
+        WHERE cla.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND cla.code = pro.fk_pro_classify_code) 'classifyCn',
+        pro.init_price 'initPrice',
+        ifnull(pt.trade_price, pro.trade_price) 'tradePrice',
+        ifnull( pt.agency_price, pro.agency_price ) 'agencyPrice',
+        ifnull( pt.sale_price, pro.sale_price) 'salePrice',
+        ifnull( pt.num, pro.total_num) 'totalNum',
+        pro.small_img 'smallImg',
+        pro.insert_time 'insertTime',
+        pro.update_time 'updateTime',
+        pro.remark,
+        pro.target_user 'targetUser'
+        FROM
+        pro_temp_product pt
+        LEFT JOIN pro_product pro
+        ON pt.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` = #{shopId} AND pt.`fk_pro_temp_id` = #{proTempId}
+        <include refid="ParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="notDown == 'notDown'">
+                img.recentDownloadTime ASC,pro.insert_time DESC
+            </when>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+        ,pro.id desc
+    </select>
+
+
+    <!--获取临时仓里面的商品2.5.2-->
+    <select id="listVoProductLoadByPriceByPrice" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.id 'proId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.biz_id 'bizId',
+        ifnull(pt.name, pro.name) 'name',
+        ifnull(pt.description, pro.description) 'description',
+        pro.tag,
+        pro.hot,
+        pro.fk_pro_state_code 'stateUs',
+        pro.fk_pro_attribute_code 'attributeUs',
+        (SELECT
+        attr.name
+        FROM
+        pro_attribute attr
+        WHERE attr.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND attr.code = pro.fk_pro_attribute_code) 'attributeCn',
+        pro.fk_pro_classify_code 'classifyUs',
+        (SELECT
+        cla.name
+        FROM
+        pro_classify cla
+        WHERE cla.fk_shp_shop_id = pro.fk_shp_shop_id
+        AND cla.code = pro.fk_pro_classify_code) 'classifyCn',
+        ifnull(pt.init_price, pro.init_price) 'showInitPrice',
+        ifnull(pt.trade_price, pro.init_price) 'initPrice',
+        ifnull(pt.trade_price, pro.trade_price) 'tradePrice',
+        ifnull( pt.trade_price, pro.agency_price ) 'agencyPrice',
+        ifnull( pt.trade_price, pro.sale_price) 'salePrice',
+        ifnull( pt.num, pro.total_num) 'totalNum',
+        pro.small_img 'smallImg',
+        pro.insert_time 'insertTime',
+        pro.update_time 'updateTime',
+        pro.remark,
+        pro.target_user 'targetUser'
+        FROM
+        pro_temp_product pt
+        LEFT JOIN pro_product pro
+        ON pt.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` = #{shopId} AND pt.`fk_pro_temp_id` = #{proTempId}
+        <include refid="NewParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="notDown == 'notDown'">
+                img.recentDownloadTime ASC,pro.insert_time DESC
+            </when>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+        ,pro.id desc
+    </select>
+    <select id="getProductLoadByPriceByPrice" resultType="java.util.Map"
+            parameterType="com.luxuryadmin.param.pro.ParamProTempProductQuery">
+
+        SELECT
+        ifnull(sum(ifnull( pt.num, pro.total_num)), 0) 'totalNum',
+        ifnull(FORMAT(sum( ifnull( pt.trade_price, pro.sale_price)* ifnull( pt.num, pro.total_num))/100,2), 0)
+        'totalSalePrice',
+        ifnull(FORMAT(sum(ifnull(pt.init_price, pro.init_price)* ifnull( pt.num, pro.total_num))/100,2), 0)
+        'totalInitPrice'
+        FROM
+        pro_temp_product pt
+        LEFT JOIN pro_product pro
+        ON pt.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` = #{shopId} AND pt.`fk_pro_temp_id` = #{proTempId}
+        <include refid="NewParamProductQueryCondition"/>
+    </select>
+
+    <!--ParamProductQuery参数的查询条件;针对ProProduct实体查询-->
+    <sql id="NewParamProductQueryCondition">
+        <include refid="StateCodeQueryCondition"/>
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description,pro.remark,det.unique_code) REGEXP #{proName}
+            OR CONCAT(det.unique_code,pro.remark,pro.description,pro.name) REGEXP #{proName}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            OR REPLACE(REPLACE(CONCAT(pro.name,pro.description,pro.remark,det.unique_code),'.',''),'-','') REGEXP
+            #{proName}
+            OR REPLACE(REPLACE(CONCAT(det.unique_code,pro.remark,pro.description,pro.name),'.',''),'-','') REGEXP
+            #{proName}
+            or pro.biz_id = #{proName}
+            )
+        </if>
+        <if test="recycleUserId != null and recycleUserId!=''">
+            AND pro.`recycle_admin` IN (${recycleUserId})
+        </if>
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code like #{classifyCode}
+        </if>
+        <if test="attributeCode != null and attributeCode != ''">
+            AND pro.fk_pro_attribute_code IN (${attributeCode})
+        </if>
+        <if test="targetUser != null and targetUser != ''">
+            AND pro.target_user IN (${targetUser})
+        </if>
+        <if test="quality != null and quality != ''">
+            AND pro.quality IN (${quality})
+        </if>
+        <if test="classifySub != null and classifySub != ''">
+            AND pro.fk_pro_classify_sub_name IN (${classifySub})
+        </if>
+        <if test="repairCard != null and repairCard != ''">
+            AND (SELECT repair_card FROM pro_detail WHERE fk_pro_product_id = pro.id)=#{repairCard}
+        </if>
+        <if test="uploadStDateTime != null and uploadStDateTime != ''">
+            AND pro.insert_time &gt;= #{uploadStDateTime}
+        </if>
+        <if test="uploadEtDateTime != null and uploadEtDateTime != ''">
+            AND pro.insert_time &lt;= #{uploadEtDateTime}
+        </if>
+        <if test="uploadUserId != null and uploadUserId != ''">
+            AND pro.insert_admin = #{uploadUserId}
+        </if>
+        <!--<choose>
+            <when test="priceType == 'salePrice'">-->
+        <if test="priceType == 'salePrice'">
+            <if test="priceMin != null">
+                <if test="defaultPrice =='salePrice'">
+                    AND ifnull(pt.trade_price, pro.sale_price) &gt;= #{priceMin}
+                </if>
+                <if test="defaultPrice =='initPrice'">
+                    AND ifnull(pt.trade_price, pro.init_price) &gt;= #{priceMin}
+                </if>
+                <if test="defaultPrice =='tradePrice'">
+                    AND ifnull(pt.trade_price, pro.trade_price) &gt;= #{priceMin}
+                </if>
+                <if test="defaultPrice =='agencyPrice'">
+                    AND ifnull(pt.trade_price, pro.agency_price) &gt;= #{priceMin}
+                </if>
+            </if>
+            <if test="priceMax != null">
+                <if test="defaultPrice =='salePrice'">
+                    AND ifnull(pt.trade_price, pro.sale_price) &lt;= #{priceMax}
+                </if>
+                <if test="defaultPrice =='initPrice'">
+                    AND ifnull(pt.trade_price, pro.init_price) &lt;= #{priceMax}
+                </if>
+                <if test="defaultPrice =='tradePrice'">
+                    AND ifnull(pt.trade_price, pro.trade_price) &lt;= #{priceMax}
+                </if>
+                <if test="defaultPrice =='agencyPrice'">
+                    AND ifnull(pt.trade_price, pro.agency_price) &lt;= #{priceMax}
+                </if>
+            </if>
+        </if>
+        <!--</when>-->
+
+        <!--<otherwise>-->
+        <if test="priceType == 'initPrice'">
+            <if test="priceMin != null">
+                AND ifnull(pt.init_price, pro.init_price)>= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND ifnull(pt.init_price, pro.init_price) &lt;= #{priceMax}
+            </if>
+        </if>
+        <!--<if test="defaultPrice ='salePrice' and priceMin != null">
+
+            AND ifnull(pt.trade_price, pro.sale_price) &gt;= #{priceMin}
+        </if>
+        <if test="defaultPrice ='salePrice' and priceMax != null">
+            AND ifnull(pt.trade_price, pro.sale_price) &lt;= #{priceMax}
+        </if>
+        <if test="defaultPrice ='initPrice' and priceMin != null">
+            AND ifnull(pt.trade_price, pro.init_price) &gt;= #{priceMin}
+        </if>
+        <if test="defaultPrice ='initPrice' and priceMax != null">
+            AND ifnull(pt.trade_price, pro.init_price) &lt;= #{priceMax}
+        </if>
+        <if test="defaultPrice ='tradePrice' and priceMin != null">
+            AND ifnull(pt.trade_price, pro.trade_price) &gt;= #{priceMin}
+        </if>
+        <if test="defaultPrice ='tradePrice' and priceMax != null">
+            AND ifnull(pt.trade_price, pro.trade_price) &lt;= #{priceMax}
+        </if>
+        <if test="defaultPrice ='agencyPrice' and priceMin != null">
+            AND ifnull(pt.trade_price, pro.agency_price) &gt;= #{priceMin}
+        </if>
+        <if test="defaultPrice ='agencyPrice' and priceMax != null">
+            AND ifnull(pt.trade_price, pro.agency_price) &lt;= #{priceMax}
+        </if>-->
+
+        <!--</otherwise>
+    </choose>-->
+    </sql>
+
+    <!--添加商品-->
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProProduct" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into pro_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProStateCode != null">
+                fk_pro_state_code,
+            </if>
+            <if test="fkProAttributeCode != null">
+                fk_pro_attribute_code,
+            </if>
+            <if test="fkProClassifyCode != null">
+                fk_pro_classify_code,
+            </if>
+            <if test="fkProClassifySubName != null">
+                fk_pro_classify_sub_name,
+            </if>
+            <if test="fkProSubSeriesName != null">
+                fk_pro_sub_series_name,
+            </if>
+            <if test="fkProSeriesModelName != null">
+                fk_pro_series_model_name,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="quality != null">
+                quality,
+            </if>
+            <if test="targetUser != null">
+                target_user,
+            </if>
+            <if test="tag != null">
+                tag,
+            </if>
+            <if test="totalNum != null">
+                total_num,
+            </if>
+            <if test="saleNum != null">
+                sale_num,
+            </if>
+            <if test="hot != null">
+                hot,
+            </if>
+            <if test="share != null">
+                share,
+            </if>
+            <if test="initPrice != null">
+                init_price,
+            </if>
+            <if test="tradePrice != null">
+                trade_price,
+            </if>
+            <if test="agencyPrice != null">
+                agency_price,
+            </if>
+            <if test="salePrice != null">
+                sale_price,
+            </if>
+
+            <if test="finishPrice != null">
+                finish_price,
+            </if>
+            <if test="smallImg != null">
+                small_img,
+            </if>
+            <if test="bizId != null">
+                biz_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="releaseTime != null">
+                release_time,
+            </if>
+            <if test="lockTime != null">
+                lock_time,
+            </if>
+            <if test="lockUserId != null">
+                lock_user_id,
+            </if>
+            <if test="finishTime != null">
+                finish_time,
+            </if>
+            <if test="saveEndTime != null">
+                save_end_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="unionState != null">
+                union_state,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="recycleAdmin != null">
+                recycle_admin,
+            </if>
+            <if test="conveyState != null">
+                convey_state,
+            </if>
+            <if test="fkProConveyId != null">
+                fk_pro_convey_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProStateCode != null">
+                #{fkProStateCode,jdbcType=INTEGER},
+            </if>
+            <if test="fkProAttributeCode != null">
+                #{fkProAttributeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifyCode != null">
+                #{fkProClassifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifySubName != null">
+                #{fkProClassifySubName,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProSubSeriesName != null">
+                #{fkProSubSeriesName,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProSeriesModelName != null">
+                #{fkProSeriesModelName,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="quality != null">
+                #{quality,jdbcType=VARCHAR},
+            </if>
+            <if test="targetUser != null">
+                #{targetUser,jdbcType=CHAR},
+            </if>
+            <if test="tag != null">
+                #{tag,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                #{totalNum,jdbcType=INTEGER},
+            </if>
+            <if test="saleNum != null">
+                #{saleNum,jdbcType=INTEGER},
+            </if>
+            <if test="hot != null">
+                #{hot,jdbcType=CHAR},
+            </if>
+            <if test="share != null">
+                #{share,jdbcType=VARCHAR},
+            </if>
+            <if test="initPrice != null">
+                #{initPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="tradePrice != null">
+                #{tradePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="agencyPrice != null">
+                #{agencyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                #{salePrice,jdbcType=DECIMAL},
+            </if>
+
+            <if test="finishPrice != null">
+                #{finishPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="smallImg != null">
+                #{smallImg,jdbcType=VARCHAR},
+            </if>
+            <if test="bizId != null">
+                #{bizId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="releaseTime != null">
+                #{releaseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lockTime != null">
+                #{lockTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lockUserId != null">
+                #{lockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="finishTime != null">
+                #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="saveEndTime != null">
+                #{saveEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="unionState != null">
+                #{unionState,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="recycleAdmin != null">
+                #{recycleAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="conveyState != null">
+                #{conveyState,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProConveyId != null">
+                #{fkProConveyId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <!--更新列-->
+    <sql id="updateColumn">
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProStateCode != null">
+                fk_pro_state_code = #{fkProStateCode,jdbcType=INTEGER},
+            </if>
+            <if test="fkProAttributeCode != null">
+                fk_pro_attribute_code = #{fkProAttributeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifyCode != null">
+                fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProClassifySubName != null">
+                fk_pro_classify_sub_name = #{fkProClassifySubName,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProSubSeriesName != null">
+                fk_pro_sub_series_name = #{fkProSubSeriesName,jdbcType=VARCHAR},
+            </if>
+            <if test="fkProSeriesModelName != null">
+                fk_pro_series_model_name = #{fkProSeriesModelName,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="quality != null">
+                quality = #{quality,jdbcType=VARCHAR},
+            </if>
+            <if test="targetUser != null">
+                target_user = #{targetUser,jdbcType=VARCHAR},
+            </if>
+            <if test="tag != null">
+                tag = #{tag,jdbcType=VARCHAR},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum,jdbcType=INTEGER},
+            </if>
+            <if test="saleNum != null">
+                sale_num = #{saleNum,jdbcType=INTEGER},
+            </if>
+            <if test="hot != null">
+                hot = #{hot,jdbcType=CHAR},
+            </if>
+            <if test="share != null">
+                share = #{share,jdbcType=VARCHAR},
+            </if>
+            <if test="initPrice != null">
+                init_price = #{initPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="tradePrice != null">
+                trade_price = #{tradePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="agencyPrice != null">
+                agency_price = #{agencyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DECIMAL},
+            </if>
+
+            <if test="finishPrice != null">
+                finish_price = #{finishPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="smallImg != null">
+                small_img = #{smallImg,jdbcType=VARCHAR},
+            </if>
+            <if test="bizId != null">
+                biz_id = #{bizId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="releaseTime != null">
+                release_time = #{releaseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lockTime != null">
+                lock_time = #{lockTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lockUserId != null">
+                lock_user_id = #{lockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="saveEndTime != null">
+                save_end_time = #{saveEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="unionState != null">
+                union_state = #{unionState,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="recycleAdmin != null">
+                recycle_admin = #{recycleAdmin,jdbcType=VARCHAR},
+            </if>
+            <if test="retrieveRemark != null">
+                retrieve_remark = #{retrieveRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="deleteRemark != null">
+                delete_remark = #{deleteRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="retrieveTime != null">
+                retrieve_time = #{retrieveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="fkShpRetrieveUserId != null">
+                fk_shp_retrieve_user_id = #{fkShpRetrieveUserId,jdbcType=INTEGER},
+            </if>
+            <if test="conveyState != null">
+                convey_state = #{conveyState,jdbcType=VARCHAR},
+            </if>
+        </set>
+    </sql>
+
+    <!--更新id更新实体-->
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProProduct">
+        update pro_product
+        <include refid="updateColumn"/>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--跟新bizId更新实体-->
+    <update id="updateProProductByShopIdBizId" parameterType="com.luxuryadmin.entity.pro.ProProduct">
+        update pro_product
+        <include refid="updateColumn"/>
+        where biz_id = #{bizId,jdbcType=INTEGER} AND fk_shp_shop_id=#{fkShpShopId}
+    </update>
+
+    <!--删除商品; 把商品状态改成"-90",已删除状态;所有状态都支持删除-->
+    <update id="deleteBatchProProductByShopIdBizId">
+        update pro_product
+        set
+        <if test="deleteRemark != null">
+            delete_remark = #{deleteRemark},
+        </if>
+        fk_pro_state_code = -90, update_admin = #{userId}, update_time = NOW()
+        where fk_shp_shop_id = #{shopId} AND biz_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--根据商品业务id和shopId 发布商品;把状态改成 '20';已上架状态; 发布前状态必须在[10,19](未上架)区间-->
+    <update id="releaseBatchProProductByShopIdBizId">
+        update pro_product
+        set
+        fk_pro_state_code = 20, update_admin = #{userId}, update_time = NOW(),release_time = NOW()
+        where fk_shp_shop_id = #{shopId} AND fk_pro_state_code BETWEEN 10 AND 19 AND biz_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据商品业务id和shopId 下架商品;把状态改成 '11'; 发布前状态必须在[20,39]区间-->
+    <update id="backOffBatchProProductByShopIdBizId">
+        update pro_product
+        set
+        fk_pro_state_code = 11, update_admin = #{userId}, update_time = NOW()
+        where fk_shp_shop_id = #{shopId} AND fk_pro_state_code BETWEEN 20 AND 39 AND biz_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据商品业务id和shopId 把质押商品存放到仓库;把状态改成 '10';-->
+    <update id="movePrivateProToStore">
+        update pro_product
+        set
+        fk_pro_state_code = 10, fk_pro_attribute_code = 10, insert_time = NOW(),
+        update_admin = #{userId}, update_time = NOW(), remark = '质押商品转成自有商品'
+        where fk_shp_shop_id = #{shopId} AND fk_pro_attribute_code = 30 AND biz_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from pro_product
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <select id="selectAllExpireProdBizId" resultType="com.luxuryadmin.vo.pro.VoExpireProd">
+        select
+        biz_id 'bizId',
+        fk_shp_shop_id 'shopId',
+        name 'proName'
+        from
+        pro_product
+        where del = '0' and
+        fk_pro_state_code = 12 AND fk_pro_attribute_code = 30
+        and
+        save_end_time &lt;= #{jobDayStartTime}
+    </select>
+    <select id="countProductByStateCode" resultType="java.lang.Integer">
+        select
+        count(1)
+        from
+        pro_product pro
+        where
+        pro.del = '0'
+        and
+        pro.fk_shp_shop_id = #{shopId}
+        <include refid="StateCodeQueryCondition"/>
+    </select>
+
+    <select id="getFirstProdImg" resultType="java.lang.String"
+            parameterType="com.luxuryadmin.param.pro.ParamProductQuery">
+        SELECT
+        pro.small_img
+        FROM
+        pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        where
+        pro.del = '0' AND pro.fk_shp_shop_id = #{shopId}
+        <include refid="ParamProductQueryCondition"/>
+        ORDER BY
+        <choose>
+            <when test="sortKeyDb != null &amp;&amp; sortKeyDb != ''">
+                ${sortKeyDb}
+            </when>
+            <otherwise>
+                pro.update_time DESC, pro.insert_time DESC
+            </otherwise>
+        </choose>
+        ,pro.id desc
+        LIMIT 1
+    </select>
+    <!--统计用户回收成本和件数-->
+    <select id="countRecycleInitPriceAndNum" resultType="java.util.Map">
+        select
+        ifnull(sum(pro.`init_price`),0) 'initPrice',
+        count(id) 'num'
+        from
+        pro_product pro
+        where pro.del = '0' and pro.`recycle_admin` = #{userId}
+        and pro.`fk_shp_shop_id` = #{shopId}
+        and pro.`insert_time` between #{startDateTime}
+        and #{endDateTime}
+        and pro.`fk_pro_state_code` >=10
+        and pro.`fk_pro_attribute_code` in(${proAttr});
+    </select>
+
+    <!-- 统计所有的上传商品数量 -->
+    <select id="countAllUploadProductNumByShopId" resultType="java.lang.Integer">
+        select
+        count(id) 'num'
+        from
+        pro_product pro
+        where pro.del = '0' and
+        pro.`fk_shp_shop_id` = #{shopId}
+    </select>
+
+    <!--获取所有在售商品的bizId-->
+    <select id="listOnSaleProductBizId" resultType="java.lang.String">
+        select biz_id from pro_product where del = '0' and fk_shp_shop_id = #{shopId} AND fk_pro_state_code BETWEEN 20
+        AND 39
+    </select>
+
+    <!-- 修改过期的质押商品状态为已过期-->
+    <update id="updateProdExpire">
+        update
+        pro_product
+        set
+        fk_pro_state_code = 13,
+        update_time = NOW()
+        where
+        fk_pro_state_code = 12 AND fk_pro_attribute_code = 30
+        and
+        save_end_time &lt;= #{jobDayStartTime}
+    </update>
+
+    <!--一键全店上架(把未上架的商品全部上架)-->
+    <update id="oneKeyReleaseProduct">
+        update pro_product
+        set
+        fk_pro_state_code = 20, update_admin = #{userId}, update_time = NOW(),release_time = NOW()
+        where fk_shp_shop_id = #{shopId} AND fk_pro_state_code BETWEEN 10 AND 19 AND fk_pro_attribute_code != 30
+    </update>
+
+    <!--一键全店下架(把已上架的商品全部下架)-->
+    <update id="oneKeyBackOffProduct">
+        update pro_product
+        set
+        fk_pro_state_code = 11, update_admin = #{userId}, update_time = NOW()
+        where fk_shp_shop_id = #{shopId} AND fk_pro_state_code BETWEEN 20 AND 39 AND fk_pro_attribute_code != 30
+    </update>
+    <select id="getShareShopProductListByShopId" resultType="com.luxuryadmin.vo.share.VoShareShopProduct">
+        select pro.id
+        , pro.fk_shp_shop_id as fkShpShopId
+        , pro.name as name
+        ,pro.target_user as targetUser
+        ,pro.biz_id as bizId
+        , pro.sale_price as salePrice
+        , pro.small_img as smallImg
+        from pro_product pro left join shp_shop ss on pro.fk_shp_shop_id = ss.id
+        where pro.del = '0' and pro.fk_pro_state_code BETWEEN 20 AND 29 and ss.number = #{shopNumber}
+        order by pro.insert_time
+    </select>
+
+    <update id="updateShareStare">
+        update pro_product pro
+        set share = #{share}
+        WHERE
+
+        pro.fk_shp_shop_id = #{shopId}  and pro.fk_pro_state_code BETWEEN 20 and 39
+
+    </update>
+
+
+    <!--根据临时仓id修改临时仓价格为null -->
+    <update id="updateSalePriceByTempId">
+        UPDATE pro_temp_product set trade_price=NULL WHERE fk_pro_temp_id=#{proTempId}
+    </update>
+
+
+    <select id="getShopNumById" resultType="java.lang.Integer">
+        select
+            total_num
+        from
+        pro_product
+        where del = '0' and
+        biz_id = #{bizId}
+    </select>
+
+
+    <select id="getRecycleUserList" parameterType="com.luxuryadmin.param.data.ParamDataRecycleQuery"
+            resultType="com.luxuryadmin.vo.data.VoRecycleUserList">
+        select
+        usr.fk_shp_user_id userId,
+        usr.name nickName,
+        (SELECT sutype.name FROM shp_user_type sutype WHERE usr.fk_shp_user_type_id = sutype.id ) AS roleName,
+        (SELECT head_img_url FROM shp_user su WHERE usr.fk_shp_user_id = su.id) AS headImgUrl,
+        IFNULL(SUM(pp.init_price*(pp.total_num+pp.sale_num)),0) as initAllPrice,
+        IFNULL(SUM(pp.total_num+pp.sale_num),0) as recycleCount
+        from
+        pro_product pp
+        LEFT JOIN pro_detail det
+        ON pp.`id` = det.`fk_pro_product_id`
+        left join shp_user_shop_ref usr
+        on pp.recycle_admin = usr.fk_shp_user_id
+        where pp.del = '0'
+        <include refid="RecycleQueryCondition"/>
+
+
+        group by pp.recycle_admin
+        order by
+        <choose>
+            <when test="sortColumn != null &amp;&amp; sortColumn != ''">
+                ${sortColumn} ${sortType}
+            </when>
+            <otherwise>
+                initAllPrice DESC
+            </otherwise>
+        </choose>
+    </select>
+    <select id="getRecycleProductList" parameterType="com.luxuryadmin.param.data.ParamDataRecycleQuery"
+            resultType="com.luxuryadmin.vo.data.VoRecycleProductList">
+        select
+        pp.id as proId,
+        pp.biz_id bizId,
+        pp.recycle_admin recycleAdmin,
+        usr.name AS recycleAdminName,
+        pp.name name,
+        pp.small_img smallImg,
+        pp.fk_pro_classify_code classifyUs,
+        pp.init_price initPrice,
+        pp.trade_price tradePrice,
+        pp.agency_price agencyPrice,
+        pp.sale_price salePrice,
+        pp.total_num totalNum,
+        pp.target_user targetUser,
+        pp.fk_pro_attribute_code attributeUs,
+        pp.insert_time insertTime
+        from
+        pro_product pp
+        LEFT JOIN pro_detail det
+        ON pp.`id` = det.`fk_pro_product_id`
+        left join shp_user_shop_ref usr on pp.recycle_admin = usr.fk_shp_user_id
+        where pp.del = '0'
+
+        <include refid="RecycleQueryCondition"/>
+
+        group by pp.id
+        order by
+        <choose>
+            <when test="sortColumn != null &amp;&amp; sortColumn != ''">
+                ${sortColumn} ${sortType},pp.id desc
+            </when>
+            <otherwise>
+                pp.insert_time DESC,pp.id desc
+            </otherwise>
+        </choose>
+    </select>
+    <select id="getRecycleClassifyHome" parameterType="com.luxuryadmin.param.data.ParamDataRecycleQuery"
+            resultType="com.luxuryadmin.vo.data.VoRecycleClassifyHome">
+        select
+        se.code classifyCode,
+        se.name classifyCodeName
+        from
+        sys_enum se
+        where se.type = "pro_classify"
+        <if test="classifyCode != null and classifyCode!=''">
+            AND se.`code` REGEXP #{classifyCode}
+        </if>
+    </select>
+
+    <select id="getRecycleClassifyCount" parameterType="com.luxuryadmin.param.data.ParamDataRecycleQuery"
+            resultType="java.util.Map">
+        select
+        IFNULL(SUM(pp.total_num+pp.sale_num), 0) totalNum,
+        IFNULL(SUM((pp.total_num+pp.sale_num) * pp.init_price),0) totalPrice
+        from
+        pro_product pp
+        LEFT JOIN pro_detail det
+        ON pp.`id` = det.`fk_pro_product_id`
+        left join shp_user_shop_ref usr on pp.recycle_admin = usr.fk_shp_user_id
+        where pp.del = '0'
+
+        <include refid="RecycleQueryCondition"/>
+    </select>
+
+
+    <sql id="RecycleQueryCondition">
+        and pp.fk_pro_state_code BETWEEN 10 and 49
+        <if test="shopId != null">
+            and pp.fk_shp_shop_id =#{shopId}   and usr.fk_shp_shop_id =#{shopId}
+        </if>
+        <if test="recycleAdmin != null">
+            and usr.fk_shp_user_id IN (${recycleAdmin})
+        </if>
+        <if test="recycleTimeStart != null">
+            and pp.insert_time <![CDATA[>=]]> #{recycleTimeStart}
+        </if>
+        <if test="recycleTimeEnd != null">
+            and pp.insert_time <![CDATA[<=]]> #{recycleTimeEnd}
+        </if>
+        <!--        <if test="classifyCode != null">-->
+        <!--            and pp.fk_pro_classify_code =#{classifyCode}-->
+        <!--        </if>-->
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pp.`fk_pro_classify_code` REGEXP #{classifyCode}
+        </if>
+        <if test="attributeCode != null and attributeCode != ''">
+            AND pp.`fk_pro_attribute_code` IN (${attributeCode})
+        </if>
+        <if test="proName != null">
+            AND (
+            CONCAT(pp.name,pp.description,pp.remark,det.unique_code) REGEXP #{proName}
+            OR CONCAT(det.unique_code,pp.remark,pp.description,pp.name) REGEXP #{proName}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            OR REPLACE(REPLACE(CONCAT(pp.name,pp.description,pp.remark,det.unique_code),'.',''),'-','') REGEXP
+            #{proName}
+            OR REPLACE(REPLACE(CONCAT(det.unique_code,pp.remark,pp.description,pp.name),'.',''),'-','') REGEXP
+            #{proName}
+
+            )
+        </if>
+    </sql>
+
+
+    <select id="getProductForDeleteList" parameterType="com.luxuryadmin.param.pro.ParamProductOrOrderForDeleteSearch"
+            resultType="com.luxuryadmin.vo.pro.VoProductOrOrderForDelete">
+        select
+        pp.biz_id bizId,
+        pp.init_price 'initPrice',
+        pp.trade_price 'tradePrice',
+        pp.agency_price 'agencyPrice',
+        pp.sale_price 'salePrice',
+        pp.fk_pro_attribute_code 'attributeCn',
+        pp.target_user 'targetUser',
+        pp.name name,
+        pp.small_img smallImg,
+        pp.update_time deleteTime,
+        pp.update_admin deleteAdmin,
+        IFNULL((SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = pp.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = pp.update_admin),'无') 'deleteAdminName',
+        pp.total_num totalNum
+        from
+        pro_product pp
+        where
+        <include refid="ProductForDeleteQuery"/>
+        order by
+        <choose>
+            <when test="sortValue != null &amp;&amp; sortValue != ''">
+                pp.update_time ${sortValue}
+            </when>
+            <otherwise>
+                pp.update_time desc
+            </otherwise>
+        </choose>
+    </select>
+    <sql id="ProductForDeleteQuery">
+        pp.fk_pro_state_code = -90 and pp.del ='0'
+        <if test="shopId != 10684">
+            and pp.fk_shp_shop_id =#{shopId}
+        </if>
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pp.fk_pro_classify_code in (${classifyCode})
+        </if>
+        <if test="attributeCode != null and attributeCode != ''">
+            AND pp.`fk_pro_attribute_code` IN (${attributeCode})
+        </if>
+        <if test="deleteUserId != null">
+            and pp.update_admin IN (${deleteUserId})
+        </if>
+        <if test="searchName != null and searchName!=''">
+            AND (
+            pp.name like CONCAT('%',#{searchName},'%')
+            OR pp.fk_pro_classify_sub_name like CONCAT('%',#{searchName},'%')
+            )
+        </if>
+        <if test="deleteTimeStart != null">
+            and pp.update_time <![CDATA[>=]]> #{deleteTimeStart}
+        </if>
+        <if test="deleteTimeEnd != null">
+            and pp.update_time <![CDATA[<=]]> #{deleteTimeEnd}
+        </if>
+    </sql>
+    <select id="getProductForDeleteCount" parameterType="com.luxuryadmin.param.pro.ParamProductOrOrderForDeleteSearch"
+            resultType="java.lang.Integer">
+        select
+        IFNULL(sum(pp.total_num), 0)
+        from
+        pro_product pp
+        where
+        <include refid="ProductForDeleteQuery"/>
+        order by pp.update_time desc
+    </select>
+
+    <!--获取店铺商品的回收人员-->
+    <select id="listRecycleUser" resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        SELECT
+          pro.recycle_admin 'userId',
+          ref.`name` 'nickname'
+        FROM
+          pro_product pro
+          LEFT JOIN shp_user_shop_ref ref
+            ON pro.`recycle_admin` = ref.`fk_shp_user_id`
+            AND ref.`fk_shp_shop_id` = #{shopId}
+        WHERE pro.fk_shp_shop_id = #{shopId}
+          AND pro.recycle_admin > 0
+          AND pro.`fk_pro_state_code` > 0
+          AND pro.del = 0
+        GROUP BY pro.recycle_admin
+        ORDER BY CONVERT(ref.`name` USING gbk) ASC
+    </select>
+    <select id="getProductDetailByShopIdId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        <include refid="vo_base_column_list"/>,
+        <include refid="vo_detail_column_list"/>
+        FROM pro_product pro
+        LEFT JOIN pro_detail det
+        ON pro.id = det.fk_pro_product_id
+        WHERE det.auto_number = #{autoNumber}
+        <if test="shopId != 10684">
+            AND pro.fk_shp_shop_id = #{shopId}
+        </if>
+        and pro.del = 0
+    </select>
+    <select id="listMoveProductToTemp" resultType="com.luxuryadmin.vo.pro.VoMoveProductLoad"
+            parameterType="com.luxuryadmin.param.pro.ParamTempProductMoveQuery">
+
+        SELECT
+        pro.biz_id 'bizId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.name 'name',
+        pro.tag,
+        pro.fk_pro_attribute_code 'attributeUs',
+        pro.fk_pro_state_code 'stateUs',
+        pro.small_img 'smallImg',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = tpm.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = tpm.insert_admin
+        ) moveUserName,
+        (SELECT pt.`name` FROM pro_temp pt
+        WHERE pt.fk_shp_shop_id = tpm.fk_shp_shop_id
+        AND pt.id = tpm.fk_remove_pro_temp_id
+        ) removeTempName,
+        (SELECT pt.`name` FROM pro_temp pt
+        WHERE pt.fk_shp_shop_id = tpm.fk_shp_shop_id
+        AND pt.id = tpm.fk_enter_pro_temp_id
+        ) enterTempName,
+        tpm.insert_time as moveTime,
+        tpm.remove_num as moveNum
+        FROM
+        pro_temp_product_move tpm
+        LEFT JOIN pro_product pro
+        ON tpm.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        WHERE pro.del = '0' and pro.`fk_shp_shop_id` = #{shopId}
+        <if test="enterTempId != null">
+            AND tpm.`fk_enter_pro_temp_id` = #{enterTempId}
+        </if>
+        <if test="removeTempId != null">
+            AND tpm.`fk_remove_pro_temp_id` = #{removeTempId}
+        </if>
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description,pro.remark,det.unique_code) REGEXP #{proName}
+            OR CONCAT(det.unique_code,pro.remark,pro.description,pro.name) REGEXP #{proName}
+            )
+        </if>
+        order by tpm.insert_time desc
+    </select>
+    <select id="getProductByIds"  resultMap="BaseResultMap"
+            parameterType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        pro_product
+        where id in
+        <foreach collection="proIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="listConveyProduct" resultType="com.luxuryadmin.vo.pro.VoProductLoad"
+            parameterType="com.luxuryadmin.param.pro.ParamConveyProductQuery">
+        SELECT
+        pcp.id 'id',
+        pro.biz_id 'bizId',
+        pro.fk_shp_shop_id 'shopId',
+        pro.small_img smallImg,
+        ifnull(pcp.name, pro.name) 'name',
+        ifnull(pcp.description, pro.description) 'description',
+        <if test="type == 'send' and type != null">
+            pro.update_time showTime,
+        </if>
+        <if test="type == 'receive' and type != null">
+            pc.receive_time showTime,
+            (select  pro.id from pro_product pro
+            where pcp.`fk_pro_product_id` = pro.`id` and 0> pro.fk_pro_state_code) proStateName,
+        </if>
+
+        <if test="defaultPrice=='initPrice' and defaultPrice != null">
+            ifnull( pcp.finish_price, pro.init_price) 'showPrice',
+        </if>
+        <if test="defaultPrice=='salePrice' and defaultPrice != null">
+            ifnull( pcp.finish_price, pro.sale_price) 'showPrice',
+        </if>
+        <if test="defaultPrice=='agencyPrice' and defaultPrice != null">
+            ifnull( pcp.finish_price, pro.agency_price) 'showPrice',
+        </if>
+        <if test="defaultPrice=='tradePrice' and defaultPrice != null">
+            ifnull( pcp.finish_price, pro.trade_price) 'showPrice',
+        </if>
+        <!-- 获取未锁单的商品数量-->
+        ifnull( pcp.num, pro.total_num - ifnull( (SELECT sum( lock_num ) FROM pro_lock_record  WHERE pro.id = fk_pro_product_id AND state = 0 ),0)) 'totalNum',
+        pro.`total_num` 'leftNum',
+        pro.`target_user` 'targetUser',
+        pcp.fk_pro_convey_id 'conveyId',
+        pro.fk_pro_attribute_code 'attributeUs'
+        FROM
+        pro_convey_product pcp
+        <choose>
+            <when test='type == "receive" and type != null'>
+                LEFT JOIN pro_product pro
+                ON pcp.`receive_product_id` = pro.`id`
+            </when>
+            <otherwise>
+                LEFT JOIN pro_product pro
+                ON pcp.`fk_pro_product_id` = pro.`id`
+            </otherwise>
+        </choose>
+
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        left join pro_convey pc on pc.id =pcp.fk_pro_convey_id
+        WHERE pro.del = '0' and  pro.fk_pro_state_code  >0
+        AND pcp.`fk_pro_convey_id` = #{conveyId}
+        <!-- 判断是否为以确定商品 已确定商品显示全部 未确定只显示有库存的商品-->
+        <if test="receiveState != null and receiveState == 0 ">
+            and pro.total_num> ifnull((
+            SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0)
+            and pro.total_num >0
+        </if>
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description,pro.remark,det.unique_code) REGEXP #{proName}
+            OR CONCAT(det.unique_code,pro.remark,pro.description,pro.name) REGEXP #{proName}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.auto_number = #{uniqueCode}
+            </if>
+            OR REPLACE(REPLACE(CONCAT(pro.name,pro.description,pro.remark,det.unique_code),'.',''),'-','') REGEXP
+            #{proName}
+            OR REPLACE(REPLACE(CONCAT(det.unique_code,pro.remark,pro.description,pro.name),'.',''),'-','') REGEXP
+            #{proName}
+            )
+        </if>
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code = #{classifyCode}
+        </if>
+        order by pcp.insert_time desc,pro.id desc
+    </select>
+    <!-- 寄卖传送数据统计-->
+    <select id="getConveyProductPriceCensus" resultType="java.util.Map"
+            parameterType="com.luxuryadmin.param.pro.ParamConveyProductQuery">
+
+        SELECT
+        <!-- 获取未锁单的商品数量*结-->
+        <if test="defaultPrice=='initPrice' and defaultPrice != null">
+            ifnull(sum( ifnull( pcp.finish_price, pro.init_price)* ifnull( pcp.num, pro.total_num - ifnull(
+            (SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0)) ), 0)
+            'totalPrice',
+        </if>
+        <if test="defaultPrice=='salePrice' and defaultPrice != null">
+            ifnull(sum( ifnull( pcp.finish_price, pro.sale_price)* ifnull( pcp.num, pro.total_num- ifnull(
+            (SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0) )), 0)
+            'totalPrice',
+        </if>
+        <if test="defaultPrice=='agencyPrice' and defaultPrice != null">
+            ifnull(sum( ifnull( pcp.finish_price, pro.agency_price)* ifnull( pcp.num, pro.total_num - ifnull(
+            (SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0))), 0)
+            'totalPrice',
+        </if>
+
+        <!-- -(select sum(lock_num) from pro_lock_record where pro.id = fk_pro_product_id and state =0)-->
+        <if test="defaultPrice=='tradePrice' and defaultPrice != null">
+            ifnull(sum( ifnull( pcp.finish_price, pro.trade_price)* ifnull( pcp.num, pro.total_num - ifnull(
+            (SELECT
+            sum( lock_num )
+            FROM
+            pro_lock_record
+            WHERE
+            pro.id = fk_pro_product_id
+            AND state = 0
+            ),0)) ), 0)
+            'totalPrice',
+        </if>
+        ifnull(sum(ifnull( pcp.num, pro.total_num  - ifnull( (SELECT sum( lock_num ) FROM pro_lock_record  WHERE pro.id = fk_pro_product_id AND state = 0 ),0))), 0) 'totalNum'
+
+        FROM
+        pro_convey_product pcp
+        <choose>
+            <when test='type == "receive" and type != null'>
+                LEFT JOIN pro_product pro
+                ON pcp.`receive_product_id` = pro.`id`
+                LEFT JOIN pro_product pros
+                ON pcp.`fk_pro_product_id` = pros.`id`
+            </when>
+            <otherwise>
+                LEFT JOIN pro_product pro
+                ON pcp.`fk_pro_product_id` = pro.`id`
+            </otherwise>
+        </choose>
+
+        WHERE pro.del = '0' and  pro.fk_pro_state_code  >0  AND pcp.`fk_pro_convey_id` = #{conveyId}
+        and pro.total_num> ifnull((
+        SELECT
+        sum( lock_num )
+        FROM
+        pro_lock_record
+        WHERE
+        pro.id = fk_pro_product_id
+        AND state = 0
+        ),0)
+        and pro.total_num >0
+        <if test="type=='receive' and type != null">
+            and pros.fk_pro_state_code >0
+        </if>
+        <if test="type=='send' and type != null">
+            and pro.fk_pro_state_code >0
+        </if>
+    </select>
+
+    <!--商家联盟下架-->
+    <update id="updateProUnionState">
+        update pro_product
+        set
+        union_state = #{unionState}
+        where id in (${ids})
+    </update>
+</mapper>

@@ -1,0 +1,11 @@
+一、模块添加权限配置
+同行模块
+商家联盟
+查看联盟商家信息 show:union:unionShop
+临时仓 转仓 pro:temp:move
+
+销售模块
+发货管理 deliver /default/functionIcon/deliver.png
+ pro:deliver:list
+发货管理首页显示需添加控制 ios显示 安卓不显示
+H5链接记得把图标拉进oss

@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProDeliverMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProDeliver">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_pro_lock_record_id" jdbcType="INTEGER" property="fkProLockRecordId"/>
+
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+
+        <result column="num" jdbcType="INTEGER" property="num"/>
+
+        <result column="fk_ord_order_id" jdbcType="INTEGER" property="fkOrdOrderId"/>
+
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+
+        <result column="number" jdbcType="VARCHAR" property="number"/>
+
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+        <result column="logistics_number" jdbcType="VARCHAR" property="logisticsNumber"/>
+
+        <result column="logistics_company" jdbcType="VARCHAR" property="logisticsCompany"/>
+
+        <result column="deliver_imgs" jdbcType="LONGVARCHAR" property="deliverImgs"/>
+
+        <result column="deliver_time" jdbcType="TIMESTAMP" property="deliverTime"/>
+
+        <result column="deliver_type" jdbcType="VARCHAR" property="deliverType"/>
+
+        <result column="deliver_source" jdbcType="VARCHAR" property="deliverSource"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="fk_ord_address_id" jdbcType="INTEGER" property="fkOrdAddressId"/>
+
+        <result column="del" jdbcType="VARCHAR" property="del"/>
+
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_pro_lock_record_id,
+		fk_ord_order_id,
+		fk_shp_shop_id,
+		fk_shp_user_id,
+		number,
+		state,
+		logistics_number,
+		logistics_company,
+		deliver_imgs,
+		deliver_time,
+		deliver_type,
+		deliver_source,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fk_pro_product_id,
+		num,
+		fk_ord_address_id
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProDeliver" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into pro_deliver
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="num!=null ">
+                num,
+            </if>
+            <if test="fkOrdAddressId!=null ">
+                fk_ord_address_id,
+            </if>
+            <if test="fkProLockRecordId!=null ">
+                fk_pro_lock_record_id,
+            </if>
+            <if test="fkProProductId!=null ">
+                fk_pro_product_id,
+            </if>
+
+            <if test="fkOrdOrderId!=null ">
+                fk_ord_order_id,
+            </if>
+            <if test="fkShpShopId!=null ">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId!=null ">
+                fk_shp_user_id,
+            </if>
+            <if test="number!=null ">
+                number,
+            </if>
+            <if test="state!=null ">
+                state,
+            </if>
+            <if test="logisticsNumber!=null ">
+                logistics_number,
+            </if>
+            <if test="logisticsCompany!=null ">
+                logistics_company,
+            </if>
+            <if test="deliverImgs!=null ">
+                deliver_imgs,
+            </if>
+            <if test="deliverTime!=null ">
+                deliver_time,
+            </if>
+            <if test="deliverType!=null ">
+                deliver_type,
+            </if>
+            <if test="deliverSource!=null ">
+                deliver_source,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+            <if test="remark!=null ">
+                remark,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="num!=null">
+                #{num,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdAddressId!=null">
+                #{fkOrdAddressId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProLockRecordId!=null">
+                #{fkProLockRecordId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId!=null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdOrderId!=null">
+                #{fkOrdOrderId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId!=null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="number!=null">
+                #{number,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="logisticsNumber!=null">
+                #{logisticsNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="logisticsCompany!=null">
+                #{logisticsCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverImgs!=null">
+                #{deliverImgs,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="deliverTime!=null">
+                #{deliverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliverType!=null">
+                #{deliverType,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverSource!=null">
+                #{deliverSource,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="remark!=null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  pro_deliver 
+
+		where id = #{id} 
+ 
+
+	</delete>
+    <delete id="deleteDeliverInfoByLockId" parameterType="java.lang.Integer">
+		update pro_deliver set del = 1,update_time=now() where fk_pro_lock_record_id = #{lockId} and state = 0
+	</delete>
+    <delete id="deleteDeliverInfoByOrderInfo" parameterType="java.lang.Integer">
+        update pro_deliver set del = 1,update_time=now() where fk_ord_order_id = #{orderId} and state = 0
+    </delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProDeliver">
+        update pro_deliver
+        <set>
+            <if test="fkProLockRecordId!=null">
+                fk_pro_lock_record_id = #{fkProLockRecordId,jdbcType=INTEGER},
+            </if>
+            <if test="num!=null">
+                num = #{num,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdAddressId!=null">
+                fk_ord_address_id = #{fkOrdAddressId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdOrderId!=null">
+                fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId!=null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId!=null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId!=null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="number!=null and number!=''">
+                number = #{number,jdbcType=VARCHAR},
+            </if>
+            <if test="state!=null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="logisticsNumber!=null and logisticsNumber!=''">
+                logistics_number = #{logisticsNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="logisticsCompany!=null and logisticsCompany!=''">
+                logistics_company = #{logisticsCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverImgs!=null and deliverImgs!=''">
+                deliver_imgs = #{deliverImgs,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="deliverTime!=null">
+                deliver_time = #{deliverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliverType!=null and deliverType!=''">
+                deliver_type = #{deliverType,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverSource!=null and deliverSource!=''">
+                deliver_source = #{deliverSource,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null and del!=''">
+                del = #{del,jdbcType=VARCHAR},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_pro_lock_record_id,
+		fk_ord_order_id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		fk_shp_user_id,
+		number,
+		state,
+		logistics_number,
+		logistics_company,
+		deliver_imgs,
+		deliver_time,
+		deliver_type,
+		deliver_source,
+		insert_time,
+		update_time,
+		fk_ord_address_id,
+		num,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from pro_deliver
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="getDeliverByLockId" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_deliver where fk_pro_lock_record_id = #{lockId} and `del` = 0
+    </select>
+    <select id="getProDeliverOrderDetail" resultType="com.luxuryadmin.vo.pro.VoProDeliverDetail"
+            parameterType="java.lang.Integer">
+        SELECT
+            pd.id AS deliverId,
+            pp.biz_id AS bizId,
+            ( SELECT uShopR.`name` FROM shp_user_shop_ref uShopR WHERE uShopR.fk_shp_shop_id = oo.fk_shp_shop_id AND uShopR.fk_shp_user_id = oo.fk_shp_user_id ) disposeUserName,
+            oo.insert_time AS disposeTime,
+            oo.total_num AS num,
+            pd.deliver_type AS deliverType,
+            ( SELECT uShopR.`name` FROM shp_user_shop_ref uShopR WHERE uShopR.fk_shp_shop_id = pd.fk_shp_shop_id AND uShopR.fk_shp_user_id = pd.fk_shp_user_id ) deliverNickname,
+            pd.deliver_time AS deliverTime,
+            pd.deliver_imgs AS deliverImgStr
+        FROM
+            pro_deliver pd
+            LEFT JOIN ord_order oo ON pd.fk_ord_order_id = oo.id
+            LEFT JOIN pro_product pp ON oo.fk_pro_product_id = pp.id
+        WHERE
+            pd.del = 0
+            AND pd.id = #{id}
+            AND pd.state = 1
+    </select>
+    <select id="getFiltrateinfoByShopId" resultType="com.luxuryadmin.vo.pro.VoOrderUserInfo"
+            parameterType="java.lang.Integer">
+        SELECT
+            pro_deliver.fk_shp_user_id AS userId,
+            uShopR.`name` AS nickname
+        FROM
+            pro_deliver
+            LEFT JOIN shp_user_shop_ref uShopR ON uShopR.fk_shp_user_id = pro_deliver.fk_shp_user_id
+            AND uShopR.fk_shp_shop_id = pro_deliver.fk_shp_shop_id
+        WHERE
+            pro_deliver.fk_shp_user_id IS NOT NULL
+            AND pro_deliver.del = 0
+            and pro_deliver.fk_shp_shop_id = #{shopId}
+        GROUP BY
+	        pro_deliver.fk_shp_user_id
+        ORDER BY
+            CONVERT ( uShopR.`name` USING gbk ) ASC
+    </select>
+    <select id="getProDeliverLockDetail" resultType="com.luxuryadmin.vo.pro.VoProDeliverDetail"
+            parameterType="java.lang.Integer">
+        SELECT
+            pd.id AS deliverId,
+            pp.biz_id AS bizId,
+            ( SELECT uShopR.`name` FROM shp_user_shop_ref uShopR WHERE uShopR.fk_shp_shop_id = pl.fk_shp_shop_id AND uShopR.fk_shp_user_id = pl.lock_user_id ) disposeUserName,
+            pd.insert_time AS disposeTime,
+            pd.num AS num,
+            pd.deliver_type AS deliverType,
+            ( SELECT uShopR.`name` FROM shp_user_shop_ref uShopR WHERE uShopR.fk_shp_shop_id = pd.fk_shp_shop_id AND uShopR.fk_shp_user_id = pd.fk_shp_user_id ) deliverNickname,
+            pd.deliver_time AS deliverTime,
+            pd.deliver_imgs AS deliverImgStr
+        FROM
+            pro_deliver pd
+            LEFT JOIN pro_lock_record pl ON pd.fk_pro_lock_record_id = pl.id
+            LEFT JOIN pro_product pp ON pd.fk_pro_product_id = pp.id
+        WHERE
+            pd.del = 0
+            AND pd.id = #{id}
+
+            AND pd.state = 1
+    </select>
+    <select id="listDeliver" resultMap="BaseResultMap"
+            parameterType="com.luxuryadmin.param.pro.ParamProPageDeliver">
+        select
+        pro_deliver.*
+        from pro_deliver
+        LEFT JOIN pro_product  ON pro_deliver.fk_pro_product_id = pro_product.id
+        LEFT JOIN ord_address  on pro_deliver.fk_ord_address_id = ord_address.id
+        where
+        pro_deliver.state = #{state}
+        and pro_deliver.del = 0
+        AND pro_deliver.fk_shp_shop_id = #{shopId}
+        <if test="startTime!=null and startTime!=''">
+            and pro_deliver.insert_time &gt; #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and pro_deliver.insert_time &lt; #{endTime}
+        </if>
+        <if test="shpUserId!=null and shpUserId!=''">
+            and pro_deliver.fk_shp_user_id = #{shpUserId}
+        </if>
+        <if test="deliverStartTime!=null and deliverStartTime!=''">
+            and pro_deliver.deliver_time &gt; #{deliverStartTime}
+        </if>
+        <if test="deliverEndTime!=null and deliverEndTime!=''">
+            and pro_deliver.deliver_time &lt; #{deliverEndTime}
+        </if>
+        <if test="proName!=null and proName!=''">
+            and
+            (
+            pro_product.`name` like CONCAT('%',#{proName},'%')
+            or
+            pro_deliver.`remark` like CONCAT('%',#{proName},'%')
+            or
+            ord_address.receive_address like CONCAT('%',#{proName},'%')
+            )
+        </if>
+        <if test="sortKey != null and sortKey=='updateTime'">
+            <if test="state == 0">
+                <if test="sortValue=='asc' or sortValue=='ASC'">
+                    order by pro_deliver.insert_time asc
+                </if>
+                <if test="sortValue=='desc' or sortValue=='DESC'">
+                    order by pro_deliver.insert_time desc
+                </if>
+            </if>
+            <if test="state == 1">
+                <if test="sortValue=='asc' or sortValue=='ASC'">
+                    order by pro_deliver.deliver_time asc
+                </if>
+                <if test="sortValue=='desc' or sortValue=='DESC'">
+                    order by pro_deliver.deliver_time desc
+                </if>
+            </if>
+
+        </if>
+    </select>
+    <select id="listDeliverAll" resultMap="BaseResultMap"
+            parameterType="com.luxuryadmin.param.pro.ParamProPageDeliver">
+        select
+        pro_deliver.*
+        from pro_deliver
+        LEFT JOIN pro_product  ON pro_deliver.fk_pro_product_id = pro_product.id
+        LEFT JOIN ord_address  on pro_deliver.fk_ord_address_id = ord_address.id
+        where
+        pro_deliver.state = 0
+        and pro_deliver.del = 0
+        AND pro_deliver.fk_shp_shop_id = #{shopId}
+        <if test="startTime!=null and startTime!=''">
+            and pro_deliver.insert_time &gt; #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and pro_deliver.insert_time &lt; #{endTime}
+        </if>
+        <if test="shpUserId!=null and shpUserId!=''">
+            and pro_deliver.fk_shp_user_id = #{shpUserId}
+        </if>
+        <if test="deliverStartTime!=null and deliverStartTime!=''">
+            and pro_deliver.deliver_time &gt; #{deliverStartTime}
+        </if>
+        <if test="deliverEndTime!=null and deliverEndTime!=''">
+            and pro_deliver.deliver_time &lt; #{deliverEndTime}
+        </if>
+        <if test="proName!=null and proName!=''">
+            and
+            (
+            pro_product.`name` like CONCAT('%',#{proName},'%')
+            or
+            pro_deliver.`remark` like CONCAT('%',#{proName},'%')
+            or
+            ord_address.receive_address like CONCAT('%',#{proName},'%')
+            )
+        </if>
+    </select>
+
+</mapper>

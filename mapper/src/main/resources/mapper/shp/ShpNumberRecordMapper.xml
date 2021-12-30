@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpNumberRecordMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpNumberRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="start_number" jdbcType="INTEGER" property="startNumber"/>
+        <result column="end_number" jdbcType="INTEGER" property="endNumber"/>
+        <result column="total_num" jdbcType="INTEGER" property="totalNum"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, type, insert_time, insert_admin, start_number, end_number, total_num, del, remark
+  </sql>
+
+
+    <select id="getLastRecordByType" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from shp_number_record where type = #{type} order by insert_time desc limit 1
+    </select>
+
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_number_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpNumberRecord">
+        insert into shp_number_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="startNumber != null">
+                start_number,
+            </if>
+            <if test="endNumber != null">
+                end_number,
+            </if>
+            <if test="totalNum != null">
+                total_num,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="startNumber != null">
+                #{startNumber,jdbcType=INTEGER},
+            </if>
+            <if test="endNumber != null">
+                #{endNumber,jdbcType=INTEGER},
+            </if>
+            <if test="totalNum != null">
+                #{totalNum,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpNumberRecord">
+        update shp_number_record
+        <set>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="startNumber != null">
+                start_number = #{startNumber,jdbcType=INTEGER},
+            </if>
+            <if test="endNumber != null">
+                end_number = #{endNumber,jdbcType=INTEGER},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpNumberRecord">
+    update shp_number_record
+    set type = #{type,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      start_number = #{startNumber,jdbcType=INTEGER},
+      end_number = #{endNumber,jdbcType=INTEGER},
+      total_num = #{totalNum,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

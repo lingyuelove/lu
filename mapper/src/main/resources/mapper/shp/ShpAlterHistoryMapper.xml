@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpAlterHistoryMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpAlterHistory">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="code" jdbcType="VARCHAR" property="code" />
+
+		<result column="hours" jdbcType="DECIMAL" property="hours" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="versions" jdbcType="INTEGER" property="versions" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		code,
+		hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpAlterHistory" keyProperty="id" useGeneratedKeys="true" >
+		insert into shp_alter_history
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="code!=null ">
+				code, 
+			</if>
+			<if test="hours!=null ">
+				hours, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="versions!=null ">
+				versions, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="code!=null">
+				#{code,jdbcType=VARCHAR},
+			</if>
+			<if test="hours!=null">
+				#{hours,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				#{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  shp_alter_history 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpAlterHistory" >
+		update shp_alter_history
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="code!=null and code!=''">
+				code = #{code,jdbcType=VARCHAR},
+			 </if>
+			<if test="hours!=null">
+				hours = #{hours,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				versions = #{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		code,
+		hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_alter_history
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+	<select id="selectAll" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		code,
+		hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_alter_history
+		<where>
+		<if test="id!=null "> and shp_alter_history.id = #{id,jdbcType=INTEGER}</if>
+		<if test="fkShpShopId!=null "> and shp_alter_history.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}</if>
+		<if test="code!=null and code!=''"> and shp_alter_history.code = #{code,jdbcType=VARCHAR}</if>
+		<if test="hours!=null "> and shp_alter_history.hours = #{hours,jdbcType=DECIMAL}</if>
+		<if test="insertTime!=null "> and shp_alter_history.insert_time = #{insertTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateTime!=null "> and shp_alter_history.update_time = #{updateTime,jdbcType=TIMESTAMP}</if>
+		<if test="insertAdmin!=null "> and shp_alter_history.insert_admin = #{insertAdmin,jdbcType=INTEGER}</if>
+		<if test="updateAdmin!=null "> and shp_alter_history.update_admin = #{updateAdmin,jdbcType=INTEGER}</if>
+		<if test="versions!=null "> and shp_alter_history.versions = #{versions,jdbcType=INTEGER}</if>
+		<if test="remark!=null and remark!=''"> and shp_alter_history.remark = #{remark,jdbcType=VARCHAR}</if>
+		</where>
+		<choose>
+          <when test="orderByString!=null and orderByString!=''">
+              ${orderByString}
+          </when>
+          <otherwise>
+              order by id desc
+          </otherwise>
+      </choose>
+
+	</select>
+
+	<select id="selectByCondition" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		code,
+		hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_alter_history
+		<where>
+		<if test="id!=null "> and shp_alter_history.id = #{id,jdbcType=INTEGER}</if>
+		<if test="fkShpShopId!=null "> and shp_alter_history.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}</if>
+		<if test="code!=null and code!=''"> and shp_alter_history.code = #{code,jdbcType=VARCHAR}</if>
+		<if test="hours!=null "> and shp_alter_history.hours = #{hours,jdbcType=DECIMAL}</if>
+		<if test="insertTime!=null "> and shp_alter_history.insert_time = #{insertTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateTime!=null "> and shp_alter_history.update_time = #{updateTime,jdbcType=TIMESTAMP}</if>
+		<if test="insertAdmin!=null "> and shp_alter_history.insert_admin = #{insertAdmin,jdbcType=INTEGER}</if>
+		<if test="updateAdmin!=null "> and shp_alter_history.update_admin = #{updateAdmin,jdbcType=INTEGER}</if>
+		<if test="versions!=null "> and shp_alter_history.versions = #{versions,jdbcType=INTEGER}</if>
+		<if test="remark!=null and remark!=''"> and shp_alter_history.remark = #{remark,jdbcType=VARCHAR}</if>
+		</where>
+		<choose>
+          <when test="orderByString!=null and orderByString!=''">
+              ${orderByString}
+          </when>
+          <otherwise>
+              order by id desc
+          </otherwise>
+      </choose>
+
+	</select>
+
+	<select resultMap="BaseResultMap" id="shpAlterHistorytest" >
+		select * from shp_alter_history
+	</select>
+
+
+</mapper>

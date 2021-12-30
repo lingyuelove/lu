@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinShopRecordMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinShopRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="inout_type" jdbcType="VARCHAR" property="inoutType" />
+    <result column="inout_sub_type" jdbcType="VARCHAR" property="inoutSubType" />
+    <result column="record_type" jdbcType="VARCHAR" property="recordType" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="img_url_detail" jdbcType="VARCHAR" property="imgUrlDetail" />
+    <result column="stream_no" jdbcType="VARCHAR" property="streamNo" />
+    <result column="change_amount" jdbcType="DECIMAL" property="changeAmount" />
+    <result column="fk_order_id" jdbcType="VARCHAR" property="fkOrderId" />
+    <result column="happen_time" jdbcType="TIMESTAMP" property="happenTime" />
+    <result column="happen_date" jdbcType="VARCHAR" property="happenDate" />
+    <result column="happen_month" jdbcType="VARCHAR" property="happenMonth" />
+    <result column="happen_year" jdbcType="VARCHAR" property="happenYear" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="del" jdbcType="CHAR" property="del" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id, inout_type, inout_sub_type, record_type, img_url,img_url_detail,
+    stream_no, change_amount, fk_order_id, happen_time, happen_date, happen_month, happen_year,
+    insert_time, update_time, insert_admin, update_admin, note, del
+  </sql>
+  <sql id="queryCond">
+    <if test="finShopRecordTypeName != null">
+      and inout_sub_type = #{finShopRecordTypeName}
+    </if>
+    <if test="happenTimeStart != null">
+      and happen_time >= #{happenTimeStart}
+    </if>
+    <if test="happenTimeEnd != null">
+      and #{happenTimeEnd} >= happen_time
+    </if>
+    <if test="happenTimeEnd != null">
+      and #{happenTimeEnd} >= happen_time
+    </if>
+    <if test="userId != null">
+      and insert_admin = #{userId}
+    </if>
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fin_shop_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from fin_shop_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 删除指定时间范围内的店铺账单记录 -->
+  <delete id="delFinShopRecordByDateRange">
+    delete
+    from
+      fin_shop_record
+    where
+      fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+    <if test="startTime != null">
+      and insert_time >= #{startTime}
+    </if>
+    <if test="endTime != null">
+      and #{endTime} >= insert_time
+    </if>
+  </delete>
+
+  <insert id="insert" parameterType="com.luxuryadmin.entity.fin.FinShopRecord">
+    insert into fin_shop_record (id, fk_shp_shop_id, inout_type, 
+      inout_sub_type, record_type, img_url, img_url_detail,
+      stream_no, change_amount, fk_order_id, 
+      happen_time, happen_date, happen_month, 
+      happen_year, insert_time, update_time, 
+      insert_admin, update_admin, note, 
+      del)
+    values (#{id,jdbcType=INTEGER}, #{fkShpShopId,jdbcType=INTEGER}, #{inoutType,jdbcType=VARCHAR}, 
+      #{inoutSubType,jdbcType=VARCHAR}, #{recordType,jdbcType=VARCHAR}, #{imgUrl,jdbcType=VARCHAR}, #{imgUrlDetail,jdbcType=VARCHAR},
+    #{streamNo,jdbcType=VARCHAR}, #{changeAmount,jdbcType=DECIMAL}, #{fkOrderId,jdbcType=VARCHAR},
+      #{happenTime,jdbcType=TIMESTAMP}, #{happenDate,jdbcType=VARCHAR}, #{happenMonth,jdbcType=VARCHAR}, 
+      #{happenYear,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, 
+      #{del,jdbcType=CHAR})
+  </insert>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinShopRecord" useGeneratedKeys="true" keyProperty="id">
+    insert into fin_shop_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="inoutType != null">
+        inout_type,
+      </if>
+      <if test="inoutSubType != null">
+        inout_sub_type,
+      </if>
+      <if test="recordType != null">
+        record_type,
+      </if>
+      <if test="imgUrl != null">
+        img_url,
+      </if>
+      <if test="imgUrlDetail != null">
+        img_url_detail,
+      </if>
+      <if test="streamNo != null">
+        stream_no,
+      </if>
+      <if test="changeAmount != null">
+        change_amount,
+      </if>
+      <if test="fkOrderId != null">
+        fk_order_id,
+      </if>
+      <if test="happenTime != null">
+        happen_time,
+      </if>
+      <if test="happenDate != null">
+        happen_date,
+      </if>
+      <if test="happenMonth != null">
+        happen_month,
+      </if>
+      <if test="happenYear != null">
+        happen_year,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="inoutType != null">
+        #{inoutType,jdbcType=VARCHAR},
+      </if>
+      <if test="inoutSubType != null">
+        #{inoutSubType,jdbcType=VARCHAR},
+      </if>
+      <if test="recordType != null">
+        #{recordType,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null">
+        #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrlDetail != null">
+        #{imgUrlDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="streamNo != null">
+        #{streamNo,jdbcType=VARCHAR},
+      </if>
+      <if test="changeAmount != null">
+        #{changeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="fkOrderId != null">
+        #{fkOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="happenTime != null">
+        #{happenTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="happenDate != null">
+        #{happenDate,jdbcType=VARCHAR},
+      </if>
+      <if test="happenMonth != null">
+        #{happenMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="happenYear != null">
+        #{happenYear,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinShopRecord">
+    update fin_shop_record
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="inoutType != null">
+        inout_type = #{inoutType,jdbcType=VARCHAR},
+      </if>
+      <if test="inoutSubType != null">
+        inout_sub_type = #{inoutSubType,jdbcType=VARCHAR},
+      </if>
+      <if test="recordType != null">
+        record_type = #{recordType,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null">
+        img_url = #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrlDetail != null">
+        img_url_detail = #{imgUrlDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="streamNo != null">
+        stream_no = #{streamNo,jdbcType=VARCHAR},
+      </if>
+      <if test="changeAmount != null">
+        change_amount = #{changeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="fkOrderId != null">
+        fk_order_id = #{fkOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="happenTime != null">
+        happen_time = #{happenTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="happenDate != null">
+        happen_date = #{happenDate,jdbcType=VARCHAR},
+      </if>
+      <if test="happenMonth != null">
+        happen_month = #{happenMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="happenYear != null">
+        happen_year = #{happenYear,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.fin.FinShopRecord">
+    update fin_shop_record
+    set fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      inout_type = #{inoutType,jdbcType=VARCHAR},
+      inout_sub_type = #{inoutSubType,jdbcType=VARCHAR},
+      record_type = #{recordType,jdbcType=VARCHAR},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      img_url_detail = #{imgUrlDetail,jdbcType=VARCHAR},
+      stream_no = #{streamNo,jdbcType=VARCHAR},
+      change_amount = #{changeAmount,jdbcType=DECIMAL},
+      fk_order_id = #{fkOrderId,jdbcType=VARCHAR},
+      happen_time = #{happenTime,jdbcType=TIMESTAMP},
+      happen_date = #{happenDate,jdbcType=VARCHAR},
+      happen_month = #{happenMonth,jdbcType=VARCHAR},
+      happen_year = #{happenYear,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR},
+      del = #{del,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectFinShopRecordById" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from
+      fin_shop_record
+    where
+      fk_shp_shop_id = #{shopId}
+    and
+      del='0'
+    and
+      id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="listFinShopRecordByShopId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from
+    fin_shop_record
+    where
+    fk_shp_shop_id = #{shopId}
+    and
+    del='0'
+    <include refid="queryCond"/>
+    order by happen_time desc,insert_time desc,id desc
+  </select>
+
+  <select id="selectFinShopRecordHomePageTop" resultType="com.luxuryadmin.vo.fin.VoFinShopRecordHomePageTop">
+    SELECT
+      IFNULL(
+          FORMAT(SUM(
+            IF (
+              inout_type = 'in',
+              change_amount,
+              0
+            )
+          ) / 100.00,2),0.00
+        ) 'totalInAmount',
+      IFNULL(
+        FORMAT(SUM(
+          IF (
+            inout_type = 'out',
+            change_amount,
+            0
+          )
+        ) / 100.00,2),0.00
+      ) 'totalOutAmount'
+    FROM
+      fin_shop_record
+    WHERE
+      fk_shp_shop_id = #{shopId}
+    AND del = '0'
+    <include refid="queryCond"/>
+  </select>
+</mapper>

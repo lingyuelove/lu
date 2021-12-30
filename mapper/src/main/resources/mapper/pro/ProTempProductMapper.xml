@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProTempProductMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProTempProduct">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_pro_temp_id" jdbcType="INTEGER" property="fkProTempId"/>
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="num" jdbcType="INTEGER" property="num"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="init_price" jdbcType="DECIMAL" property="initPrice"/>
+        <result column="trade_price" jdbcType="DECIMAL" property="tradePrice"/>
+        <result column="agency_price" jdbcType="DECIMAL" property="agencyPrice"/>
+        <result column="sale_price" jdbcType="DECIMAL" property="salePrice"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_shp_shop_id, fk_pro_temp_id, fk_pro_product_id, name, num, description,init_price,trade_price,
+        agency_price, sale_price, insert_time, update_time, insert_admin, update_admin, remark
+    </sql>
+    <select id="getProTempProductById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_temp_product
+        where id = #{id} AND fk_shp_shop_id = #{shopId}
+    </select>
+
+    <!--获取这个临时仓的所有商品的id-->
+    <select id="listProTempIdByShopId" resultType="java.lang.Integer">
+        SELECT
+        fk_pro_product_id 'proId'
+        FROM
+        pro_temp_product
+        WHERE
+        fk_shp_shop_id = #{shopId}
+        AND fk_pro_temp_id = #{tempId}
+    </select>
+
+    <!--获取临时仓商品的详情-->
+    <select id="getVoProductFromTempProduct" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        name,
+        fk_shp_shop_id 'shopId',
+        fk_pro_product_id 'proId',
+        description,
+        trade_price 'tradePrice',
+        agency_price 'agencyPrice',
+        num 'totalNum',
+        sale_price 'salePrice',
+        init_price 'showInitPrice'
+        FROM
+        pro_temp_product
+        where
+        fk_shp_shop_id = #{shopId}
+        and
+        fk_pro_temp_id = #{tempId}
+        and
+        fk_pro_product_id = #{proId}
+    </select>
+
+    <!--获取临时仓商品的详情-->
+    <select id="getProTempProduct" resultType="com.luxuryadmin.entity.pro.ProTempProduct">
+        SELECT
+        id,
+        NAME,
+        description,
+        trade_price 'tradePrice',
+        agency_price 'agencyPrice',
+        sale_price 'salePrice',
+        num
+        FROM
+        pro_temp_product
+        WHERE fk_shp_shop_id = #{shopId}
+        AND fk_pro_temp_id = #{tempId}
+        AND fk_pro_product_id = #{proId}
+    </select>
+
+    <!--获取临时仓商品的详情-->
+    <select id="getNewProTempProduct" resultType="com.luxuryadmin.vo.pro.VoProTempProduct">
+        SELECT
+        pt.id,
+        pt.NAME,
+        pt.description,
+        pro.id proId,
+        ifnull(pt.init_price, pro.init_price) 'showInitPrice',
+        ifnull(pt.trade_price, pro.init_price) 'initPrice',
+        ifnull(pt.trade_price, pro.trade_price) 'tradePrice',
+        ifnull( pt.trade_price, pro.agency_price ) 'agencyPrice',
+        ifnull( pt.trade_price, pro.sale_price) 'salePrice',
+        ifnull( pt.num, pro.total_num) num
+        FROM
+        pro_temp_product pt
+        LEFT JOIN pro_product pro
+        ON pt.`fk_pro_product_id` = pro.`id`
+        WHERE pt.fk_shp_shop_id = #{shopId}
+        AND pt.fk_pro_temp_id = #{tempId}
+        AND pt.fk_pro_product_id = #{proId}
+    </select>
+
+    <!--判断该商品数量是否大于临时仓数量-->
+    <select id="selectProductNum" resultType="com.luxuryadmin.vo.pro.VoTempForPro">
+        SELECT
+        tem.id as tempId,
+        tem.name as tempName
+        FROM
+        pro_temp_product pt
+        left join pro_temp tem on pt.fk_pro_temp_id = tem.id
+        WHERE
+        pt.num <![CDATA[>]]> #{totalNum}
+        AND pt.fk_pro_product_id = #{proId}
+    </select>
+
+    <!--获取临时仓的所有商品id-->
+    <select id="listProIdFromTempProduct" resultType="java.lang.Integer">
+        select fk_pro_product_id 'proId'
+        from pro_temp_product
+        where fk_pro_temp_id = #{tempId}
+        and fk_shp_shop_id = #{shopId}
+    </select>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from pro_temp_product
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--删除临时仓的商品-->
+    <delete id="deleteProTempProductByTempIdAndProId">
+        DELETE
+        FROM
+        pro_temp_product
+        WHERE fk_shp_shop_id = #{shopId}
+        AND fk_pro_temp_id = #{tempId}
+        AND fk_pro_product_id IN (${proIds})
+    </delete>
+
+    <!--根据临时仓id删除所有临时仓的商品-->
+    <delete id="deleteAllProTempProductByTempId">
+        DELETE
+        FROM
+        pro_temp_product
+        WHERE fk_shp_shop_id = #{shopId}
+        AND fk_pro_temp_id = #{tempId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProTempProduct">
+        insert into pro_temp_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkProTempId != null">
+                fk_pro_temp_id,
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="initPrice != null">
+                init_price,
+            </if>
+            <if test="tradePrice != null">
+                trade_price,
+            </if>
+            <if test="agencyPrice != null">
+                agency_price,
+            </if>
+            <if test="salePrice != null">
+                sale_price,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProTempId != null">
+                #{fkProTempId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId != null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="initPrice != null">
+                #{initPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="tradePrice != null">
+                #{tradePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="agencyPrice != null">
+                #{agencyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!--批量添加临时仓的商品-->
+    <insert id="saveBatchProTempProduct">
+        insert into pro_temp_product (fk_shp_shop_id, fk_pro_temp_id,
+        fk_pro_product_id,insert_admin,num)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{shopId}, #{tempId}, #{item}, #{userId},1)
+        </foreach>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProTempProduct">
+        update pro_temp_product
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProTempId != null">
+                fk_pro_temp_id = #{fkProTempId,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="initPrice != null">
+                init_price = #{initPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="tradePrice != null">
+                trade_price = #{tradePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="agencyPrice != null">
+                agency_price = #{agencyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateProTempProductById">
+        UPDATE
+        pro_temp_product
+        SET
+        <if test="name != null">
+        name = #{name},
+        </if>
+        <if test="description != null">
+        description = #{description},
+        </if>
+        <if test="initPrice != null">
+        init_price = #{initPrice},
+        </if>
+        <if test="tradePrice != null">
+        trade_price = #{tradePrice},
+        </if>
+        <if test="agencyPrice != null">
+        agency_price = #{agencyPrice},
+        </if>
+        <if test="salePrice != null">
+        sale_price = #{salePrice},
+        </if>
+        <if test="num != null">
+        num = #{num}
+        </if>
+        WHERE id = #{id} and fk_shp_shop_id = #{shopId}
+    </update>
+
+
+    <update id="updateTempPriceTypeById">
+        UPDATE
+        pro_temp
+        SET
+            price_type=#{priceType}
+        WHERE
+            id = #{proTempId}
+    </update>
+
+    <select id="getTempProductOrgByApp" parameterType="com.luxuryadmin.param.pro.ParamTempProductOrgPageBySearch"
+            resultType="com.luxuryadmin.vo.pro.VoTempProductOrgPageByApp">
+        select
+        tp.id as tempProductId
+        ,tp.fk_pro_product_id as productId
+        ,pp.name as name
+        ,pp.small_img as smallImg
+        ,IFNULL(tp.num,pp.total_num) as productCount
+        ,IFNULL(tp.trade_price,pp.trade_price) as tradePrice
+        ,pp.fk_pro_state_code as stateUs
+        ,ss.name as shopName
+        ,shpDet.`city` 'address'
+        ,ot.show_seat as showSeat
+        ,ot.temp_seat_name as tempSeatName
+        ,ot.id as organizationTempId
+        ,tp.fk_pro_temp_id as tempId
+        from pro_temp_product tp
+        left join pro_product pp on tp.fk_pro_product_id =pp.id
+        left join shp_shop ss on tp.fk_shp_shop_id =ss.id
+        LEFT JOIN shp_detail shpDet ON ss.`id` = shpDet.`fk_shp_shop_id`
+        left join org_organization_temp ot on ot.fk_pro_temp_id =tp.fk_pro_temp_id
+        <where>
+            pp.fk_pro_state_code BETWEEN 10 AND 39
+            <if test="tempProductOrgPageBySearch.tempId != null">
+                and tp.fk_pro_temp_id = #{tempProductOrgPageBySearch.tempId,jdbcType=INTEGER}
+            </if>
+            <if test="tempProductOrgPageBySearch.organizationId != null">
+                and ot.fk_org_organization_id = #{tempProductOrgPageBySearch.organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="tempProductOrgPageBySearch.priceMin != null">
+                AND IFNULL(tp.trade_price,pp.trade_price) &gt;= #{tempProductOrgPageBySearch.priceMin}
+            </if>
+            <if test="tempProductOrgPageBySearch.priceMax != null">
+                AND IFNULL(tp.trade_price,pp.trade_price) &lt;= #{tempProductOrgPageBySearch.priceMax}
+            </if>
+            <if test="tempProductOrgPageBySearch.classifyCode != null and tempProductOrgPageBySearch.classifyCode!=''">
+                AND pp.fk_pro_classify_code like #{tempProductOrgPageBySearch.classifyCode}
+            </if>
+            <if test="tempProductOrgPageBySearch.proName != null and tempProductOrgPageBySearch.proName!=''">
+                AND (CONCAT(IFNULL(tp.name,pp.name),IFNULL(tp.description,pp.description)) REGEXP
+                #{tempProductOrgPageBySearch.proName} OR
+                CONCAT(IFNULL(tp.description,pp.description),IFNULL(tp.name,pp.name)) REGEXP
+                #{tempProductOrgPageBySearch.proName})
+            </if>
+        </where>
+        ORDER BY
+
+        <choose>
+            <when test="tempProductOrgPageBySearch.sortKey == 'price'">
+                IFNULL(tp.trade_price,pp.trade_price) ${tempProductOrgPageBySearch.sortValue}
+            </when>
+            <when test="tempProductOrgPageBySearch.sortKey== 'time'">
+                tp.update_time ${tempProductOrgPageBySearch.sortValue}, tp.insert_time
+                ${tempProductOrgPageBySearch.sortValue}
+            </when>
+            <when test="tempProductOrgPageBySearch.sortKey== 'updateTime'">
+                tp.update_time ${tempProductOrgPageBySearch.sortValue}, tp.insert_time
+                ${tempProductOrgPageBySearch.sortValue}
+            </when>
+            <otherwise>
+                tp.update_time DESC, tp.insert_time DESC
+            </otherwise>
+        </choose>
+
+
+    </select>
+
+
+    <select id="getTempProductOrgDetail" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.vo.pro.VoTempProductOrgDetailByApp">
+        select
+        tp.id as tempProductId
+        ,tp.fk_pro_product_id as productId
+        ,pp.name as name
+        ,pp.description as description
+        ,IFNULL((tp.trade_price),pp.trade_price) as tradePrice
+        ,pp.target_user as targetUser
+        ,det.product_img as productImg
+        ,det.video_url as videoUrl
+        ,ss.name as shopName
+        ,ss.contact as shopContact
+        ,tp.fk_pro_temp_id as tempId
+        from pro_temp_product tp
+        left join pro_product pp on tp.fk_pro_product_id =pp.id
+        LEFT JOIN pro_detail det ON tp.fk_pro_product_id = det.fk_pro_product_id
+        left join shp_shop ss on tp.fk_shp_shop_id =ss.id
+        where tp.id = #{tempProductId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getTempProductOrgByApplets" parameterType="com.luxuryadmin.param.pro.ParamTempProductOrgPageBySearch"
+            resultType="com.luxuryadmin.vo.pro.VoTempProductOrgPageByApplets">
+        select
+        tp.id as tempProductId
+        ,tp.fk_pro_product_id as productId
+        ,pp.name as name
+        ,pp.small_img as smallImg
+        ,IFNULL((tp.num),pp.total_num) as productCount
+        ,IFNULL((tp.trade_price),pp.trade_price) as tradePrice
+        ,pp.fk_pro_state_code as stateUs
+        ,ss.name as shopName
+        ,shpDet.`city` 'address'
+        ,ot.show_seat as showSeat
+        ,ot.temp_seat_name as tempSeatName
+        ,tp.fk_pro_temp_id as tempId
+
+        from pro_temp_product tp
+        left join pro_product pp on tp.fk_pro_product_id =pp.id
+        left join shp_shop ss on tp.fk_shp_shop_id =ss.id
+        LEFT JOIN shp_detail shpDet ON ss.`id` = shpDet.`fk_shp_shop_id`
+        left join org_organization_temp ot on ot.fk_pro_temp_id =tp.fk_pro_temp_id
+        <where>
+            pp.fk_pro_state_code BETWEEN 10 AND 39
+            <if test="tempProductOrgPageBySearch.tempId != null">
+                and tp.fk_pro_temp_id = #{tempProductOrgPageBySearch.tempId,jdbcType=INTEGER}
+            </if>
+            <if test="tempProductOrgPageBySearch.tempSeatName != null">
+                and ot.temp_seat_name = #{tempProductOrgPageBySearch.tempSeatName,jdbcType=VARCHAR}
+            </if>
+            <if test="tempProductOrgPageBySearch.organizationId != null">
+                and ot.fk_org_organization_id = #{tempProductOrgPageBySearch.organizationId,jdbcType=INTEGER}
+            </if>
+            <if test="tempProductOrgPageBySearch.priceMin != null">
+                AND IFNULL(tp.trade_price,pp.trade_price) &gt;= #{tempProductOrgPageBySearch.priceMin}
+            </if>
+            <if test="tempProductOrgPageBySearch.priceMax != null">
+                AND IFNULL(tp.trade_price,pp.trade_price) &lt;= #{tempProductOrgPageBySearch.priceMax}
+            </if>
+            <if test="tempProductOrgPageBySearch.classifyCode != null and tempProductOrgPageBySearch.classifyCode!=''">
+                AND pp.fk_pro_classify_code like #{tempProductOrgPageBySearch.classifyCode}
+            </if>
+            <if test="tempProductOrgPageBySearch.proName != null and tempProductOrgPageBySearch.proName!=''">
+                AND (CONCAT(IFNULL(tp.name,pp.name),IFNULL(tp.description,pp.description)) REGEXP
+                #{tempProductOrgPageBySearch.proName} OR
+                CONCAT(IFNULL(tp.description,pp.description),IFNULL(tp.name,pp.name)) REGEXP
+                #{tempProductOrgPageBySearch.proName})
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="tempProductOrgPageBySearch.sortKey == 'price'">
+                IFNULL(tp.trade_price,pp.trade_price) ${tempProductOrgPageBySearch.sortValue}
+            </when>
+            <otherwise>
+                tp.update_time DESC, tp.insert_time DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <select id="getByTempId" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.vo.pro.VoTempProductOrgByApplets">
+        select
+        ss.name as shopName
+        ,ss.contact as shopContact
+        ,ss.head_img_url as headImgUrl
+        ,ss.cover_img_url as coverImgUrl
+        ,ot.show_seat as showSeat
+        ,ot.temp_seat_name as tempSeatName
+        from pro_temp_product tp
+        left join shp_shop ss on tp.fk_shp_shop_id =ss.id
+        left join org_organization_temp ot on ot.fk_pro_temp_id =tp.fk_pro_temp_id
+        <where>
+            1=1
+            <if test="tempId != null">
+                and tp.fk_pro_temp_id = #{tempId,jdbcType=INTEGER}
+            </if>
+        </where>
+        limit 1
+    </select>
+</mapper>

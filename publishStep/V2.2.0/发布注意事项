@@ -1,0 +1,69 @@
+一、需要初始化的数据及接口
+   1.店铺服务类型
+     接口地址：更换成线上的
+     http://test.m.luxuryadmin.com/sys/initAllShpServiceType?token=1
+
+    2.记账流水类型
+     接口地址：更换成线上的
+     http://test.m.luxuryadmin.com/sys/initAllShpFinRecordType?token=1
+
+二、后台添加APP首页菜单
+  测试和线上OSS图片都已上传，线上后台管理系统需要配置。
+
+  1.销售模块
+  (1)维修保养:shopService
+      /default/functionIcon/shopService.png
+      pro:check:service
+
+      /listShpService 接口已添加权限
+
+  2.店铺模块(以下的接口还未添加对应的权限)
+  (1)薪资管理:salaryManage
+      /default/functionIcon/salaryManage.png
+      fin:check:salary
+
+  (2)店铺设置:setupShop
+      /default/functionIcon/setupShop.png
+      shop:check:setting
+
+  (3)记账本:shopBill
+      /default/functionIcon/shopBill.png
+      shop:check:shopBill
+
+  (4)打印设置:printSetting
+     /default/functionIcon/printSetting.png
+     shop:check:printSetting
+
+  3.分享模块(以下的接口还未添加对应的权限)
+    整个模块待添加
+    (1)小程序店铺:miniProgramShop
+          /default/functionIcon/miniProgramShop.png
+          share:check:miniProgramShop
+
+    (2)分享商品:shareProd
+          /default/functionIcon/shareProd.png
+          share:check:shareProd
+
+    (3)拼图制作:friendBatchImg
+          /default/functionIcon/friendBatchImg.png
+          share:check:friendBatchImg
+
+  【友商店铺】更名为【友商相册】
+
+  4.消息
+    商品相关
+    (1)上传商品：msg:pro:upload
+
+    (2)质押商品赎回: msg:pro:redeem
+
+    (3)质押商品到期: msg:pro:expire
+
+    店铺相关
+    (4)日报: msg:shop:dailyReport
+
+三、后台添加权限
+    1.商品赎回权限
+        位置：
+            4【操作】-4.1【商品操作】-4.1.11【商品赎回】
+        权限：
+            pro:redeemProduct

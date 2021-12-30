@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpShareTotalMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpShareTotal">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_shp_share_type_code" jdbcType="INTEGER" property="fkShpShareTypeCode" />
+
+		<result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+
+		<result column="total_count" jdbcType="INTEGER" property="totalCount" />
+
+		<result column="total_hours" jdbcType="DECIMAL" property="totalHours" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="versions" jdbcType="INTEGER" property="versions" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpShareTotal" keyProperty="id" useGeneratedKeys="true" >
+		insert into shp_share_total
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkShpShareTypeCode!=null ">
+				fk_shp_share_type_code, 
+			</if>
+			<if test="fkShpUserId!=null ">
+				fk_shp_user_id, 
+			</if>
+			<if test="totalCount!=null ">
+				total_count, 
+			</if>
+			<if test="totalHours!=null ">
+				total_hours, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="versions!=null ">
+				versions, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShareTypeCode!=null">
+				#{fkShpShareTypeCode,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpUserId!=null">
+				#{fkShpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="totalCount!=null">
+				#{totalCount,jdbcType=INTEGER},
+			</if>
+			<if test="totalHours!=null">
+				#{totalHours,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				#{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  shp_share_total 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpShareTotal" >
+		update shp_share_total
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShareTypeCode!=null">
+				fk_shp_share_type_code = #{fkShpShareTypeCode,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpUserId!=null">
+				fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="totalCount!=null">
+				total_count = #{totalCount,jdbcType=INTEGER},
+			</if>
+			<if test="totalHours!=null">
+				total_hours = #{totalHours,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="versions!=null">
+				versions = #{versions,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_shp_share_type_code,
+		fk_shp_user_id,
+		total_count,
+		total_hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_share_total
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+	<select id="getShareTotalByYest" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_shp_share_type_code,
+		fk_shp_user_id,
+		total_count,
+		total_hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_share_total
+		where date_add(DATE_FORMAT(insert_time,'%Y-%m-%d'), interval 1 day)  =DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+	<select id="listObject" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_shp_share_type_code,
+		fk_shp_user_id,
+		total_count,
+		total_hours,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		versions,
+		remark
+		from shp_share_total
+		<where>
+		<if test="id!=null "> and shp_share_total.id = #{id,jdbcType=INTEGER}</if>
+		<if test="fkShpShopId!=null "> and shp_share_total.fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}</if>
+		<if test="fkShpShareTypeCode!=null "> and shp_share_total.fk_shp_share_type_code = #{fkShpShareTypeCode,jdbcType=INTEGER}</if>
+		<if test="fkShpUserId!=null "> and shp_share_total.fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}</if>
+		<if test="totalCount!=null "> and shp_share_total.total_count = #{totalCount,jdbcType=INTEGER}</if>
+		<if test="totalHours!=null "> and shp_share_total.total_hours = #{totalHours,jdbcType=DECIMAL}</if>
+		<if test="insertTime!=null "> and shp_share_total.insert_time = #{insertTime,jdbcType=TIMESTAMP}</if>
+		<if test="updateTime!=null "> and shp_share_total.update_time = #{updateTime,jdbcType=TIMESTAMP}</if>
+		<if test="insertAdmin!=null "> and shp_share_total.insert_admin = #{insertAdmin,jdbcType=INTEGER}</if>
+		<if test="updateAdmin!=null "> and shp_share_total.update_admin = #{updateAdmin,jdbcType=INTEGER}</if>
+		<if test="versions!=null "> and shp_share_total.versions = #{versions,jdbcType=INTEGER}</if>
+		<if test="remark!=null and remark!=''"> and shp_share_total.remark = #{remark,jdbcType=VARCHAR}</if>
+		</where>
+		<choose>
+          <when test="orderByString!=null and orderByString!=''">
+              ${orderByString}
+          </when>
+          <otherwise>
+              order by id desc
+          </otherwise>
+      </choose>
+
+	</select>
+
+	<select id="getShareTotalByToDay" resultType="com.luxuryadmin.vo.shp.VoShpShareTotal" >
+		select
+		id,
+		fk_shp_shop_id shopId,
+		fk_shp_user_id shpUserId ,
+		total_count totalCount,
+		total_hours totalHours,
+		insert_time insertTime,
+		versions,
+		remark
+		from
+		 shp_share_total
+		where
+		 fk_shp_share_type_code=#{code,jdbcType=VARCHAR}
+		and
+		 fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+		and
+		DATE_FORMAT(insert_time,'%Y-%m-%d')  =DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+
+	<select id="getByShopId" resultType="com.luxuryadmin.vo.shp.VoShopMemberAddHour" >
+		select
+		st.total_hours as shareCount,
+		ss.total_hours as totalHours,
+		DATE_FORMAT(ifnull(ss.pay_end_time_old, ss.pay_end_time),'%Y-%m-%d') as payEndTime
+		from
+		shp_shop ss  left join shp_share_total st on st.fk_shp_shop_id =ss.id
+		where
+		fk_shp_share_type_code=#{code,jdbcType=VARCHAR}
+		and
+		fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+		and
+		DATE_FORMAT(st.insert_time,'%Y-%m-%d')  =DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+
+
+</mapper>

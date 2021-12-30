@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProCheckProductMapper">
+
+    <select id="getCheckProductForApi"
+            resultType="com.luxuryadmin.vo.pro.VoCheckProductListForApi">
+        select
+        a.id
+        ,a.fk_pro_product_id as fkProProductId
+        ,b.name as name
+        ,b.biz_id as bizId
+        ,b.target_user as targetUser
+        ,b.fk_pro_attribute_code as attributeShortCn
+        ,b.small_img as smallImg
+        ,ifnull(tp.num, b.total_num) as totalNum
+        ,a.check_type as checkType
+        ,a.check_state as checkState
+        ,pc.fk_pro_temp_id as tempId
+        ,pc.type as type
+        from pro_check_product a
+        left join pro_product b on b.id = a.fk_pro_product_id
+        left join pro_check pc on a.fk_pro_check_id = pc.id
+        LEFT JOIN pro_temp_product tp ON a.fk_pro_product_id = tp.fk_pro_product_id
+        AND pc.fk_pro_temp_id = tp.fk_pro_temp_id
+        <where>
+            1=1
+            <if test="fkProCheckId != null">
+                AND a.fk_pro_check_id = #{fkProCheckId}
+            </if>
+            <if test="bizId != null">
+                AND b.biz_id = #{bizId}
+            </if>
+
+        </where>
+        limit 1
+    </select>
+    <select id="getCountBySearch"
+            resultType="java.lang.Integer">
+        select sum(ifnull(tp.num, b.total_num)) as totalCount from pro_check_product a left join pro_product b on b.id = a.fk_pro_product_id
+        left join pro_check pc on a.fk_pro_check_id = pc.id
+        LEFT JOIN pro_temp_product tp ON a.fk_pro_product_id = tp.fk_pro_product_id
+        AND pc.fk_pro_temp_id = tp.fk_pro_temp_id
+        <where>
+            <if test="checkState != null and checkState != ''">
+                AND a.check_state = #{checkState}
+            </if>
+            <if test="checkType != null and checkType != ''">
+                AND a.check_type = #{checkType}
+            </if>
+            <if test="fkProCheckId != null">
+                AND a.fk_pro_check_id = #{fkProCheckId}
+            </if>
+            <if test="fkProClassifyCode != null and fkProClassifyCode != ''">
+                AND b.fk_pro_classify_code = #{fkProClassifyCode}
+            </if>
+           and b.fk_pro_state_code BETWEEN 10 and 39
+        </where>
+
+        group by fk_pro_check_id
+    </select>
+
+    <select id="getTempCountBySearch" resultType="java.lang.Integer">
+
+        select  sum(ifnull(b.num, pro.total_num)) as totalCount from pro_check_product a left join pro_temp_product b on b.fk_pro_product_id = a.fk_pro_product_id and b.fk_pro_temp_id = #{tempId}
+        LEFT JOIN pro_product pro ON a.`fk_pro_product_id` = pro.`id`
+        <where>
+            <if test="checkState != null and checkState != ''">
+                AND a.check_state = #{checkState}
+            </if>
+            <if test="checkType != null and checkType != ''">
+                AND a.check_type = #{checkType}
+            </if>
+            <if test="fkProCheckId != null">
+                AND a.fk_pro_check_id = #{fkProCheckId}
+            </if>
+        </where>
+
+        group by fk_pro_check_id
+    </select>
+    <select id="getCheckProductById"
+            resultType="com.luxuryadmin.entity.pro.ProCheckProduct">
+        select
+        a.id
+        ,a.fk_pro_product_id as fkProProductId
+        ,a.fk_pro_check_id as fkProCheckId
+        ,a.check_type as checkType
+        ,a.check_state as checkState
+        from pro_check_product a
+
+        <where>
+            id=#{id}
+        </where>
+        limit 1
+    </select>
+
+    <select id="getCheckProductListForApi" parameterType="com.luxuryadmin.param.pro.ParamCheckProductListForApiBySearch"
+            resultType="com.luxuryadmin.vo.pro.VoCheckProductListForApi">
+        select
+        a.id
+        ,a.fk_pro_product_id as fkProProductId
+        ,ifnull(tp.name, b.name) as name
+        ,b.biz_id as bizId
+        ,b.small_img as smallImg
+        ,ifnull( tp.num, b.total_num ) as totalNum
+        ,a.check_type as checkType
+        ,a.check_state as checkState
+        ,b.target_user as targetUser
+        ,b.fk_pro_attribute_code as attributeShortCn
+        ,pc.fk_pro_temp_id as tempId
+        ,pc.type as type
+        from pro_check_product a
+        left join pro_product b on b.id = a.fk_pro_product_id
+        LEFT JOIN pro_detail det
+        ON b.`id` = det.`fk_pro_product_id`
+        left join pro_check pc on a.fk_pro_check_id = pc.id
+        LEFT JOIN pro_temp_product tp ON a.fk_pro_product_id = tp.fk_pro_product_id
+        AND pc.fk_pro_temp_id = tp.fk_pro_temp_id
+        <where>
+            ifnull( tp.num, b.total_num) > 0 and b.fk_pro_state_code >0
+            <if test="checkProductListForApiBySearch.tempId == null ">
+            and b.fk_pro_state_code BETWEEN 10 and 39
+            </if>
+            <if test="checkProductListForApiBySearch.productName != null and checkProductListForApiBySearch.productName != ''">
+                AND (
+                CONCAT(b.name,b.description,b.remark) REGEXP #{checkProductListForApiBySearch.productName}
+                OR CONCAT(b.remark,b.description,b.name) REGEXP #{checkProductListForApiBySearch.productName}
+                <if test="checkProductListForApiBySearch.uniqueCode != null and checkProductListForApiBySearch.uniqueCode!=''">
+                    OR det.unique_code = #{checkProductListForApiBySearch.uniqueCode}
+                    OR det.auto_number = #{checkProductListForApiBySearch.uniqueCode}
+                </if>
+                )
+
+            </if>
+            <if test="checkProductListForApiBySearch.fkProClassifyCode != null and checkProductListForApiBySearch.fkProClassifyCode != ''">
+                and b.fk_pro_classify_code = #{checkProductListForApiBySearch.fkProClassifyCode,jdbcType=VARCHAR}
+            </if>
+            <if test="checkProductListForApiBySearch.fkProCheckId != null">
+                AND a.fk_pro_check_id = #{checkProductListForApiBySearch.fkProCheckId}
+            </if>
+            <if test="checkProductListForApiBySearch.checkType != null and checkProductListForApiBySearch.checkType != ''">
+                AND a.check_type = #{checkProductListForApiBySearch.checkType}
+            </if>
+            <if test="checkProductListForApiBySearch.checkState != null and checkProductListForApiBySearch.checkState != ''">
+                AND a.check_state = #{checkProductListForApiBySearch.checkState}
+            </if>
+        </where>
+        order by b.update_time desc, b.id desc
+    </select>
+    <select id="getCheckProductDetailByApi" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.vo.pro.VoCheckProductDetailByApi">
+        select a.id
+        , a.fk_pro_product_id as fkProProductId
+        , a.fk_pro_check_id as checkId
+        , b.name as name
+        , b.biz_id as bizId
+        , b.small_img as smallImg
+        , b.fk_pro_state_code as 'stateUs'
+        , a.check_type as checkType
+        , a.check_state as checkState
+        , a.update_time as updateTime
+        , a.update_admin as updateAdmin
+        , d.nickname as updateAdminName
+        , a.remark as remark
+        , e.product_img as productImg
+        from pro_check_product a
+        left join pro_product b on b.id = a.fk_pro_product_id
+        left join shp_user d on a.update_admin = d.id
+        left join pro_detail e on e.fk_pro_product_id = a.fk_pro_product_id
+        where a.id = #{id}
+    </select>
+
+    <insert id="addCheckProductList" parameterType="com.luxuryadmin.param.pro.ParamCheckProductAddList">
+        insert into pro_check_product
+        ( fk_pro_product_id
+        , fk_pro_check_id
+        , check_state
+        , insert_time
+        , insert_admin
+        )
+        select a.id as fk_pro_product_id
+        , #{checkProductAddList.fkProCheckId} as fk_pro_check_id
+        ,'no' as inventory_state
+        , now() as insert_time
+        , #{checkProductAddList.fkShpUserId}
+        from pro_product a
+        <where>
+            a.total_num > 0
+            and a.fk_pro_state_code BETWEEN 10 and 39
+            <if test="checkProductAddList.fkShpShopId != null and checkProductAddList.fkShpShopId != ''">
+                AND a.fk_shp_shop_id = #{checkProductAddList.fkShpShopId}
+            </if>
+            <if test="checkProductAddList.salePriceStart != null and checkProductAddList.salePriceStart != ''">
+                AND a.sale_price <![CDATA[>=]]> #{checkProductAddList.salePriceStart}
+            </if>
+            <if test="checkProductAddList.salePriceEnd != null and checkProductAddList.salePriceEnd != ''">
+                AND a.sale_price <![CDATA[<=]]> #{checkProductAddList.salePriceEnd}
+            </if>
+            <if test="checkProductAddList.fkProAttributeCodeList != null ">
+                AND a.fk_pro_attribute_code in
+                <foreach collection="checkProductAddList.fkProAttributeCodeList" item="item" index="index" open="("
+                         separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="checkProductAddList.fkProClassifyCodeList != null ">
+                AND a.fk_pro_classify_code in
+                <foreach collection="checkProductAddList.fkProClassifyCodeList" item="item" index="index" open="("
+                         separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </insert>
+    <insert id="addCheckTempProductList" parameterType="com.luxuryadmin.param.pro.ParamCheckProductAddList">
+        insert into pro_check_product
+        ( fk_pro_product_id
+        , fk_pro_check_id
+        , check_state
+        , insert_time
+        , insert_admin
+        )
+        select a.fk_pro_product_id as fk_pro_product_id
+        , #{checkProductAddList.fkProCheckId} as fk_pro_check_id
+        ,'no' as inventory_state
+        , now() as insert_time
+        , #{checkProductAddList.fkShpUserId}
+        from pro_temp_product a
+        LEFT JOIN pro_product pro ON a.`fk_pro_product_id` = pro.`id`
+        <where>
+            ifnull( a.num, pro.total_num) > 0 and pro.fk_pro_state_code >0
+            <if test="checkProductAddList.fkShpShopId != null and checkProductAddList.fkShpShopId != ''">
+                AND a.fk_shp_shop_id = #{checkProductAddList.fkShpShopId}
+            </if>
+            <if test="checkProductAddList.tempId != null and checkProductAddList.tempId != ''">
+                AND a.fk_pro_temp_id = #{checkProductAddList.tempId}
+            </if>
+
+        </where>
+    </insert>
+
+    <update id="updateCheckProduct">
+        update pro_check_product
+
+        <set>
+            update_time = now(),
+            <if test="checkState != null and checkState != ''">
+                check_state= #{checkState},
+            </if>
+            <if test="userId != null and userId != ''">
+                update_admin= #{userId},
+            </if>
+            <if test="checkType != null and checkType != ''">
+                check_type= #{checkType} ,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark= #{remark},
+            </if>
+        </set>
+        <where>
+            1=1
+
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+
+
+    </update>
+
+    <delete id="deleteByCheckId">
+        delete from pro_check_product where fk_pro_check_id = #{fkProCheckId}
+    </delete>
+
+    <!--删除盘点数据(用于注销店铺时的操作)-->
+    <delete id="deleteProCheckProductByShopId">
+        DELETE pcp
+        FROM pro_check_product pcp
+        LEFT JOIN pro_check pc
+        ON pcp.`fk_pro_check_id` = pc.id
+        WHERE pc.fk_shp_shop_id = #{shopId}
+    </delete>
+</mapper>

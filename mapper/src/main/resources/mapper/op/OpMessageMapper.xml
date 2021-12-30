@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.op.OpMessageMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.op.OpMessage">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="sub_type" jdbcType="VARCHAR" property="subType" />
+    <result column="title_img_url" jdbcType="VARCHAR" property="titleImgUrl" />
+    <result column="click_h5_url" jdbcType="VARCHAR" property="clickH5Url" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="push_platform" jdbcType="VARCHAR" property="pushPlatform" />
+    <result column="send_type" jdbcType="VARCHAR" property="sendType" />
+    <result column="pre_send_time" jdbcType="TIMESTAMP" property="preSendTime" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+    <result column="is_push_all_user" jdbcType="VARCHAR" property="isPushAllUser" />
+    <result column="push_state" jdbcType="VARCHAR" property="pushState" />
+    <result column="create_source" jdbcType="VARCHAR" property="createSource" />
+    <result column="jump_type" jdbcType="VARCHAR" property="jumpType" />
+    <result column="native_page" jdbcType="VARCHAR" property="nativePage" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="push_user_excel_url" jdbcType="VARCHAR" property="pushUserExcelUrl" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, title, content, type, sub_type, title_img_url, click_h5_url,
+    insert_time, update_time, del, push_platform, send_type, pre_send_time, send_time, is_push_all_user,
+    push_state, create_source, jump_type, native_page,insert_admin, update_admin,push_user_excel_url
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from op_message
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <!-- 根据用户ID获取消息列表 ，不包含【店铺】【友商申请】【系统】3类消息-->
+  <select id="selectOpMessageOtherListByShopIdAndUserId" resultType="com.luxuryadmin.vo.op.VoOpMessageDetail" parameterType="java.util.Map">
+    SELECT
+        omsur.id as id,
+        om.title as title,
+        om.content as content,
+        om.title_img_url as titleImgUrl,
+        omsur.click_state as clickState,
+        om.insert_time as insertTime,
+        om.type as type,
+        om.jump_type as jumpType,
+        om.click_h5_url as clickH5Url,
+        om.native_page as nativePage,
+        omsur.extra_param as extraParam
+    FROM(
+          SELECT
+              id,message_id,fk_shp_shop_id,fk_shp_user_id,click_state,insert_time,extra_param
+          FROM
+              op_message_shop_user_ref
+          WHERE
+              1=1
+          AND
+              fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+          AND
+              del = '0'
+      )omsur
+      LEFT JOIN(
+          SELECT
+              *
+          FROM
+              op_message
+          WHERE
+              del = '0'
+      )om
+    ON
+      omsur.message_id = om.id
+    WHERE
+      type not in ('shop','friendBusiness')
+    <if test="fkShpShopId != null">
+      AND (fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER} OR fk_shp_shop_id is null)
+    </if>
+    <if test="fkShpUserId != null">
+      AND fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+    </if>
+    ORDER BY omsur.id desc
+  </select>
+
+    <!-- 根据类型查询【消息列表】,只能为【shop|system】 -->
+    <select id="selectOpMessageListByType" resultType="com.luxuryadmin.vo.op.VoOpMessageDetail" parameterType="java.util.Map">
+      SELECT
+      omsur.id as id,
+      om.title as title,
+      om.content as content,
+      om.title_img_url as titleImgUrl,
+      omsur.click_state as clickState,
+      om.insert_time as insertTime,
+      om.type as type,
+      om.jump_type as jumpType,
+      om.click_h5_url as clickH5Url,
+      om.native_page as nativePage,
+      omsur.extra_param as extraParam
+      FROM(
+              SELECT
+                  id,message_id,fk_shp_shop_id,fk_shp_user_id,click_state,insert_time,extra_param
+              FROM
+                  op_message_shop_user_ref
+              WHERE
+                  1=1
+              AND
+                  fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+              AND
+                  del = '0'
+          )omsur
+          LEFT JOIN(
+              SELECT
+                *
+              FROM
+                op_message
+              WHERE
+                del = '0'
+          )om
+      ON
+      omsur.message_id = om.id
+      WHERE
+      type = #{type,jdbcType=VARCHAR}
+      <if test="fkShpShopId != null">
+        AND fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+      </if>
+      <if test="fkShpUserId != null">
+        AND fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+      </if>
+      <if test="subType != null">
+        AND sub_type = #{subType,jdbcType=VARCHAR}
+      </if>
+      ORDER BY omsur.id desc
+    </select>
+
+  <select id="selectOpMessageOtherListUnReadCountByShopIdAndUserId" resultType="java.lang.Integer">
+    SELECT
+      COUNT(1)
+    FROM(
+        SELECT
+          id,message_id,fk_shp_shop_id,fk_shp_user_id,click_state,insert_time
+        FROM
+          op_message_shop_user_ref
+        WHERE
+          1=1
+        AND
+          fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+        AND
+          click_state = '0'
+        AND
+          del = '0'
+        )omsur
+        LEFT JOIN(
+        SELECT
+          *
+        FROM
+          op_message
+        WHERE
+          del = '0'
+    )om
+    ON
+      omsur.message_id = om.id
+    WHERE
+     type not in ('shop','friendBusiness')
+      <if test="fkShpShopId != null">
+        AND (fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER} OR fk_shp_shop_id is null)
+      </if>
+      <if test="fkShpUserId != null">
+        AND fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER}
+      </if>
+  </select>
+    <select id="selectOpVoMessageForCms" resultType="com.luxuryadmin.vo.op.VoOpMessage" parameterType="com.luxuryadmin.param.op.ParamOpMessageQuery">
+      select
+      om.id as id,
+      om.title as title,
+      om.content as content,
+      om.push_platform as pushPlatform,
+      om.type as type,
+      om.insert_time as insertTime,
+      om.send_type as sendType,
+      om.pre_send_time as preSendTime,
+      om.send_time as sendTime,
+      om.jump_type as jumpType,
+      om.click_h5_url as clickH5Url,
+      om.native_page as nativePage,
+      om.is_push_all_user as isPushAllUser,
+      om.push_state as pushState,
+      om.create_source as createSource,
+      om.push_user_excel_url as pushUserExcelUrl
+      from op_message om
+      where (1=1)
+      and om.del = '0'
+      and om.create_source = 'cms'
+      <if test="id != null">
+        and om.id = #{id}
+      </if>
+      <if test="title != null">
+        and om.title like CONCAT('%',#{title},'%')
+      </if>
+      <if test="type != null">
+        and om.type = #{type}
+      </if>
+      <if test="pushState != null">
+        and om.push_state = #{pushState}
+      </if>
+      <if test="pushTimeStart != null">
+        and om.send_time >= #{pushTimeStart}
+      </if>
+      <if test="pushTimeEnd != null">
+        and #{pushTimeEnd} >= om.send_time
+      </if>
+      order by om.insert_time desc
+    </select>
+
+  <select id="selectOpMessageByIdForCms" resultType="com.luxuryadmin.vo.op.VoOpMessage" parameterType="java.lang.Long">
+    select
+    om.id as id,
+    om.title as title,
+    om.content as content,
+    om.push_platform as pushPlatform,
+    om.type as type,
+    om.insert_time as insertTime,
+    om.send_type as sendType,
+    om.pre_send_time as preSendTime,
+    om.send_time as sendTime,
+    om.jump_type as jumpType,
+    om.click_h5_url as clickH5Url,
+    om.native_page as nativePage,
+    om.is_push_all_user as isPushAllUser,
+    om.push_state as pushState,
+    om.create_source as createSource,
+    om.push_user_excel_url as pushUserExcelUrl
+    from op_message om
+    where (1=1)
+    and om.del = '0'
+    and om.create_source = 'cms'
+    and om.id = #{id}
+  </select>
+
+  <select id="selectAllUnPushPreSendMsgId" resultType="java.lang.Long">
+    select
+        id
+    from
+        op_message
+    where
+        (1=1)
+    and
+        del = '0'
+    and
+        push_state = 'no_push'
+    and
+        pre_send_time &lt;= NOW()
+  </select>
+  <select id="selectMsgCountByCountDate" resultType="java.lang.Integer">
+    SELECT
+        COUNT(1)
+    FROM
+        op_message
+    WHERE
+        DATE(insert_time) = DATE(#{countDate})
+    AND
+        type = #{msgType,jdbcType=VARCHAR}
+    AND
+        sub_type = #{msgSubType,jdbcType=VARCHAR}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from op_message
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.luxuryadmin.entity.op.OpMessage">
+    insert into op_message (id, title, content,
+      type, sub_type, title_img_url,
+      click_h5_url, click_state, insert_time,
+      update_time, del, push_platform,
+      send_type, pre_send_time, send_time,
+      is_push_all_user, push_state, create_source,
+      jump_type, native_page,insert_admin, update_admin,push_user_excel_url)
+    values (#{id,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+      #{type,jdbcType=VARCHAR}, #{subType,jdbcType=VARCHAR}, #{titleImgUrl,jdbcType=VARCHAR},
+      #{clickH5Url,jdbcType=VARCHAR}, #{clickState,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}, #{del,jdbcType=CHAR}, #{pushPlatform,jdbcType=VARCHAR},
+      #{sendType,jdbcType=VARCHAR}, #{preSendTime,jdbcType=TIMESTAMP}, #{sendTime,jdbcType=TIMESTAMP},
+      #{isPushAllUser,jdbcType=VARCHAR}, #{pushState,jdbcType=VARCHAR}, #{createSource,jdbcType=VARCHAR},
+      #{jumpType,jdbcType=VARCHAR}, #{nativePage,jdbcType=VARCHAR}),#{insertAdmin,jdbcType=INTEGER},
+      #{updateAdmin,jdbcType=INTEGER},#{pushUserExcelUrl,jdbcType=VARCHAR}
+  </insert>
+  <insert id="insertSelective" parameterType="com.luxuryadmin.entity.op.OpMessage" useGeneratedKeys="true" keyProperty="id">
+    insert into op_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="subType != null">
+        sub_type,
+      </if>
+      <if test="titleImgUrl != null">
+        title_img_url,
+      </if>
+      <if test="clickH5Url != null">
+        click_h5_url,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="pushPlatform != null">
+        push_platform,
+      </if>
+      <if test="sendType != null">
+        send_type,
+      </if>
+      <if test="preSendTime != null">
+        pre_send_time,
+      </if>
+      <if test="sendTime != null">
+        send_time,
+      </if>
+      <if test="isPushAllUser != null">
+        is_push_all_user,
+      </if>
+      <if test="pushState != null">
+        push_state,
+      </if>
+      <if test="createSource != null">
+        create_source,
+      </if>
+      <if test="jumpType != null">
+        jump_type,
+      </if>
+      <if test="nativePage != null">
+        native_page,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="pushUserExcelUrl != null">
+        push_user_excel_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="subType != null">
+        #{subType,jdbcType=VARCHAR},
+      </if>
+      <if test="titleImgUrl != null">
+        #{titleImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="clickH5Url != null">
+        #{clickH5Url,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="pushPlatform != null">
+        #{pushPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="sendType != null">
+        #{sendType,jdbcType=VARCHAR},
+      </if>
+      <if test="preSendTime != null">
+        #{preSendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTime != null">
+        #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isPushAllUser != null">
+        #{isPushAllUser,jdbcType=VARCHAR},
+      </if>
+      <if test="pushState != null">
+        #{pushState,jdbcType=VARCHAR},
+      </if>
+      <if test="createSource != null">
+        #{createSource,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpType != null">
+        #{jumpType,jdbcType=VARCHAR},
+      </if>
+      <if test="nativePage != null">
+        #{nativePage,jdbcType=VARCHAR},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="pushUserExcelUrl != null">
+        #{pushUserExcelUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.op.OpMessage">
+    update op_message
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="subType != null">
+        sub_type = #{subType,jdbcType=VARCHAR},
+      </if>
+      <if test="titleImgUrl != null">
+        title_img_url = #{titleImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="clickH5Url != null">
+        click_h5_url = #{clickH5Url,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null">
+          del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="pushPlatform != null">
+          push_platform = #{pushPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="sendType != null">
+          send_type = #{sendType,jdbcType=VARCHAR},
+      </if>
+      <if test="preSendTime != null">
+          pre_send_time = #{preSendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTime != null">
+          send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isPushAllUser != null">
+          is_push_all_user = #{isPushAllUser,jdbcType=VARCHAR},
+      </if>
+      <if test="pushState != null">
+          push_state = #{pushState,jdbcType=VARCHAR},
+      </if>
+      <if test="createSource != null">
+          create_source = #{createSource,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpType != null">
+        jump_type = #{jumpType,jdbcType=VARCHAR},
+      </if>
+      <if test="nativePage != null">
+        native_page = #{nativePage,jdbcType=VARCHAR},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="pushUserExcelUrl != null">
+        push_user_excel_url = #{pushUserExcelUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.op.OpMessage">
+    update op_message
+      title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      sub_type = #{subType,jdbcType=VARCHAR},
+      title_img_url = #{titleImgUrl,jdbcType=VARCHAR},
+      click_h5_url = #{clickH5Url,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      del = #{del,jdbcType=CHAR},
+      push_platform = #{pushPlatform,jdbcType=VARCHAR},
+      send_type = #{sendType,jdbcType=VARCHAR},
+      pre_send_time = #{preSendTime,jdbcType=TIMESTAMP},
+      send_time = #{sendTime,jdbcType=TIMESTAMP},
+      is_push_all_user = #{isPushAllUser,jdbcType=VARCHAR},
+      push_state = #{pushState,jdbcType=VARCHAR},
+      create_source = #{createSource,jdbcType=VARCHAR},
+      jump_type = #{jumpType,jdbcType=VARCHAR},
+      native_page = #{nativePage,jdbcType=VARCHAR},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      push_user_excel_url = #{pushUserExcelUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>

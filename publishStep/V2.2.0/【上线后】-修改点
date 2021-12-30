@@ -1,0 +1,7 @@
+1.修改【友商相册】-【查看】为【查看友商商品】
+  在首页展示
+  leaguer:check:shop --> leaguer:check:prod
+
+2.新增【友商相册】-【查看友商信息】权限
+  不在首页展示
+  leaguer:check:info

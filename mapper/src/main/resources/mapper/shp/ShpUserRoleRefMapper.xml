@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpUserRoleRefMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpUserRoleRef">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="fk_shp_role_id" jdbcType="INTEGER" property="fkShpRoleId"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_user_id, fk_shp_role_id, fk_shp_shop_id, insert_time, update_time, insert_admin, 
+    update_admin, versions, del, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user_role_ref
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--获取用户所在店铺拥有的角色-->
+    <select id="listUserRoleRefByUserId" resultType="com.luxuryadmin.vo.shp.VoUserRoleRef">
+        select
+          ur.`fk_shp_role_id` 'roleId',
+          ur.`fk_shp_user_id` 'userId',
+          role.`role_name` 'roleName'
+        from
+          shp_user_role_ref ur
+          left join shp_role role
+            on ur.`fk_shp_role_id` = role.`id`
+        where ur.`fk_shp_shop_id` = #{shopId}
+          and ur.`fk_shp_user_id` = #{userId}
+          and role.`fk_shp_shop_id` = #{shopId}
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_user_role_ref
+    where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteShpUserRoleByShopIdUserId">
+        DELETE FROM shp_user_role_ref WHERE fk_shp_shop_id = #{shopId} AND fk_shp_user_id = #{userId}
+    </delete>
+    <!--删除用户对应的角色-->
+    <delete id="deleteUserRoleRef">
+        DELETE
+        FROM
+          shp_user_role_ref
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_id = #{userId}
+          AND fk_shp_role_id = #{roleId}
+    </delete>
+    <!-- 删除某个用户的所有角色 -->
+    <delete id="deleteByUserId" parameterType="java.lang.Integer">
+         DELETE
+        FROM
+          shp_user_role_ref
+        WHERE (1=1)
+          AND fk_shp_user_id = #{userId}
+    </delete>
+    <insert id="saveBatch" parameterType="com.luxuryadmin.entity.shp.ShpUserRoleRef">
+        insert into shp_user_role_ref
+        (fk_shp_user_id, fk_shp_role_id,
+        fk_shp_shop_id, insert_time, insert_admin)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.fkShpUserId,jdbcType=INTEGER}, #{item.fkShpRoleId,jdbcType=INTEGER},
+            #{item.fkShpShopId,jdbcType=INTEGER}, #{item.insertTime,jdbcType=TIMESTAMP},
+            #{item.insertAdmin,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpUserRoleRef">
+        insert into shp_user_role_ref
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="fkShpRoleId != null">
+                fk_shp_role_id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpRoleId != null">
+                #{fkShpRoleId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpUserRoleRef">
+        update shp_user_role_ref
+        <set>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpRoleId != null">
+                fk_shp_role_id = #{fkShpRoleId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

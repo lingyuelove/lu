@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinFundRecordMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinFundRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_fin_bill_id" jdbcType="INTEGER" property="fkFinBillId" />
+    <result column="money" jdbcType="DECIMAL" property="money" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="way" jdbcType="VARCHAR" property="way" />
+    <result column="fin_classify_name" jdbcType="VARCHAR" property="finClassifyName" />
+    <result column="fund_type" jdbcType="VARCHAR" property="fundType" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_ord_order_id" jdbcType="INTEGER" property="fkOrdOrderId" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="happen_time" jdbcType="TIMESTAMP" property="happenTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="versions" jdbcType="INTEGER" property="versions" />
+    <result column="del" jdbcType="CHAR" property="del" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_fin_bill_id, money, state, way, fin_classify_name,fund_type , fk_shp_shop_id, fk_ord_order_id, insert_time,
+    update_time, happen_time, insert_admin, update_admin, versions, del, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fin_fund_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from fin_fund_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinFundRecord">
+    insert into fin_fund_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkFinBillId != null">
+        fk_fin_bill_id,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="initPrice != null">
+        init_price,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="way != null">
+        way,
+      </if>
+      <if test="finClassifyName != null">
+        fin_classify_name,
+      </if>
+      <if test="fundType != null">
+        fund_type,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkOrdOrderId != null">
+        fk_ord_order_id,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="happenTime != null">
+        happen_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="versions != null">
+        versions,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinBillId != null">
+        #{fkFinBillId,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="initPrice != null">
+        #{initPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="way != null">
+        #{way,jdbcType=VARCHAR},
+      </if>
+      <if test="finClassifyName != null">
+        #{finClassifyName,jdbcType=VARCHAR},
+      </if>
+      <if test="fundType != null">
+        #{fundType,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOrdOrderId != null">
+        #{fkOrdOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="happenTime != null">
+        #{happenTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinFundRecord">
+    update fin_fund_record
+    <set>
+      <if test="money != null">
+        money = #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="way != null">
+        way = #{way,jdbcType=VARCHAR},
+      </if>
+      <if test="finClassifyName != null">
+        fin_classify_name = #{finClassifyName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkOrdOrderId != null">
+        fk_ord_order_id = #{fkOrdOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="happenTime != null">
+        happen_time = #{happenTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="versions != null">
+        versions = #{versions,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

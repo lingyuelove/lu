@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpServiceRecordCostMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpServiceRecordCost">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_shp_service_record_id" jdbcType="INTEGER" property="fkShpServiceRecordId" />
+
+		<result column="repair_content" jdbcType="VARCHAR" property="repairContent" />
+
+		<result column="service_cost" jdbcType="DECIMAL" property="serviceCost" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		fk_shp_service_record_id,
+		repair_content,
+		service_cost,
+		insert_time,
+		update_time
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecordCost" keyProperty="id" useGeneratedKeys="true" >
+		insert into shp_service_record_cost
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkShpServiceRecordId!=null ">
+				fk_shp_service_record_id, 
+			</if>
+			<if test="repairContent!=null ">
+				repair_content, 
+			</if>
+			<if test="serviceCost!=null ">
+				service_cost, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpServiceRecordId!=null">
+				#{fkShpServiceRecordId,jdbcType=INTEGER},
+			</if>
+			<if test="repairContent!=null">
+				#{repairContent,jdbcType=VARCHAR},
+			</if>
+			<if test="serviceCost!=null">
+				#{serviceCost,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  shp_service_record_cost 
+
+		where id = #{id} 
+ 
+
+	</delete>
+	<delete id="deleteByServiceRecordId" parameterType="java.lang.Integer">
+		delete from  shp_service_record_cost
+
+		where fk_shp_service_record_id = #{serviceRecordId,jdbcType=INTEGER}
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecordCost" >
+		update shp_service_record_cost
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpServiceRecordId!=null">
+				fk_shp_service_record_id = #{fkShpServiceRecordId,jdbcType=INTEGER},
+			</if>
+			<if test="repairContent!=null and repairContent!=''">
+				repair_content = #{repairContent,jdbcType=VARCHAR},
+			 </if>
+			<if test="serviceCost!=null">
+				service_cost = #{serviceCost,jdbcType=DECIMAL},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_shp_service_record_id,
+		repair_content,
+		service_cost,
+		insert_time,
+		update_time
+		from shp_service_record_cost
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="listCostForServiceRecordId" resultType="com.luxuryadmin.vo.shp.VoServiceRecordCost"
+            parameterType="java.lang.Integer">
+		select
+		id,
+		fk_shp_service_record_id as serviceRecordId,
+		repair_content as repairContent,
+		service_cost as serviceCostPrice,
+		service_cost as serviceCost
+		from shp_service_record_cost
+		where fk_shp_service_record_id = #{serviceRecordId,jdbcType=INTEGER}
+	</select>
+
+
+</mapper>

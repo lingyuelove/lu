@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinBillDayMapper">
+    <select id="getBillDayPageByApps" resultType="com.luxuryadmin.vo.fin.VoBillDayPageByApp">
+        select
+        bd.id as billDayId,
+        bd.fk_shp_shop_id as shopId,
+        bd.profit_money as profitMoney,
+        bd.salary_money as salaryMoney,
+        bd.other_money as otherMoney,
+        bd.service_money as serviceMoney,
+        bd.biz_time as bizTime
+        from fin_bill_day bd
+        <where> 1=1
+            <if test="shopId != null ">
+                AND bd.fk_shp_shop_id = #{shopId}
+            </if>
+            <if test="billId != null ">
+                AND bd.fk_fin_bill_id = #{billId}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND bd.biz_time <![CDATA[>=]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND bd.biz_time <![CDATA[<=]]> #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="getBillList" resultType="com.luxuryadmin.entity.fin.FinBill">
+        select
+        id,
+        fk_shp_shop_id as fkShpShopId,
+        name ,
+        money,
+        total_money as totalMoney,
+        types,
+        insert_time as insertTime,
+        update_time as updateTime,
+        insert_admin as insertAdmin,
+        update_admin as updateAdmin,
+        state,
+        remark
+        from fin_bill
+        <where> state>0
+            <if test="shopId != null and shopId != ''">
+                AND fk_shp_shop_id = #{shopId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinBillDay" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into fin_bill_day
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkFinBillId != null">
+                fk_fin_bill_id,
+            </if>
+            <if test="totalMoney != null">
+                total_money ,
+            </if>
+            <if test="cashMoney != null">
+                cash_money,
+            </if>
+            <if test="productMoney != null">
+                product_money,
+            </if>
+            <if test="profitMoney != null">
+                profit_money,
+            </if>
+            <if test="salaryMoney != null">
+                salary_money,
+            </if>
+            <if test="otherMoney != null">
+                other_money,
+            </if>
+            <if test="serviceMoney != null">
+                service_money,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="bizTime != null">
+                biz_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkFinBillId != null">
+                #{fkFinBillId,jdbcType=INTEGER},
+            </if>
+            <if test="totalMoney != null">
+                #{totalMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="cashMoney != null">
+                #{cashMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="productMoney != null">
+                #{productMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="profitMoney != null">
+                #{profitMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="salaryMoney != null">
+                #{salaryMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="otherMoney != null">
+                #{otherMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="serviceMoney != null">
+                #{serviceMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="bizTime != null">
+                #{bizTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+</mapper>

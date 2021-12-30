@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProModifyRecordMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProModifyRecord">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+
+		<result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+
+		<result column="type" jdbcType="VARCHAR" property="type" />
+		<result column="attribute_name" jdbcType="VARCHAR" property="attributeName" />
+		<result column="before_value" jdbcType="VARCHAR" property="beforeValue" />
+
+		<result column="after_value" jdbcType="VARCHAR" property="afterValue" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+		<result column="source" jdbcType="VARCHAR" property="source" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProModifyRecord" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_modify_record
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkShpUserId!=null ">
+				fk_shp_user_id, 
+			</if>
+			<if test="fkProProductId!=null ">
+				fk_pro_product_id, 
+			</if>
+			<if test="type!=null ">
+				type, 
+			</if>
+			 <if test="attributeName!=null ">
+				 attribute_name,
+			 </if>
+			 <if test="beforeValue!=null ">
+				 before_value,
+			 </if>
+			<if test="afterValue!=null ">
+				after_value, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			 <if test="source!=null ">
+				 source,
+			 </if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpUserId!=null">
+				#{fkShpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				#{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="attributeName!=null">
+				#{attributeName,jdbcType=VARCHAR},
+			</if>
+			<if test="beforeValue!=null">
+				#{beforeValue,jdbcType=VARCHAR},
+			</if>
+			<if test="afterValue!=null">
+				#{afterValue,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="source!=null">
+				#{source,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_modify_record 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProModifyRecord" >
+		update pro_modify_record
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpUserId!=null">
+				fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="type!=null and type!=''">
+				type = #{type,jdbcType=VARCHAR},
+			 </if>
+			<if test="attributeName!=null and attributeName!=''">
+				attribute_name = #{attributeName,jdbcType=VARCHAR},
+			</if>
+			<if test="beforeValue!=null and beforeValue!=''">
+				before_value = #{beforeValue,jdbcType=VARCHAR},
+			</if>
+
+			<if test="afterValue!=null and afterValue!=''">
+				after_value = #{afterValue,jdbcType=VARCHAR},
+			 </if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="source!=null">
+				source = #{source,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_shp_user_id,
+		fk_pro_product_id,
+		type,
+		attribute_name,
+		before_value,
+		after_value,
+		insert_time,
+		source,
+		remark
+		from pro_modify_record
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+	<!--查询商品修改记录-->
+	<select id="listProModifyRecord" parameterType="com.luxuryadmin.param.pro.ParamModifyRecordSearch" resultType="com.luxuryadmin.entity.pro.ProModifyRecord">
+		select
+		id,
+		fk_shp_shop_id 'fkShpShopId',
+		fk_shp_user_id 'fkShpUserId',
+		fk_pro_product_id 'fkProProductId',
+		type,
+		attribute_name 'attributeName',
+		before_value 'beforeValue',
+		after_value 'afterValue',
+		insert_time 'insertTime',
+		source,
+		remark
+		from pro_modify_record
+		where fk_shp_shop_id = #{shopId} and fk_pro_product_id = #{proId}
+		<if test="operateTimeStart != null">
+			and DATE_FORMAT(insert_time,'%Y-%m-%d') <![CDATA[>=]]> #{operateTimeStart}
+		</if>
+		<if test="operateTimeEnd != null">
+			and #{operateTimeEnd} <![CDATA[>=]]> DATE_FORMAT(insert_time,'%Y-%m-%d')
+		</if>
+		<if test="searchContentKey != null">
+			and (attribute_name like CONCAT('%',#{searchContentKey},'%') OR type like
+			CONCAT('%',#{searchContentKey},'%') OR before_value like
+			CONCAT('%',#{searchContentKey},'%') OR after_value like
+			CONCAT('%',#{searchContentKey},'%'))
+		</if>
+		<if test="operateUserId != null">
+			and fk_shp_user_id = #{operateUserId}
+		</if>
+		order by id desc
+	</select>
+
+
+</mapper>

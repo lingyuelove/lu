@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinSalaryMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinSalary">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="salary_state" jdbcType="VARCHAR" property="salaryState"/>
+        <result column="salary_money" jdbcType="DECIMAL" property="salaryMoney"/>
+        <result column="salary_name" jdbcType="VARCHAR" property="salaryName"/>
+        <result column="salary_st_time" jdbcType="TIMESTAMP" property="salaryStTime"/>
+        <result column="salary_et_time" jdbcType="TIMESTAMP" property="salaryEtTime"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_id, salary_state, salary_money, salary_name, salary_st_time, 
+    salary_et_time, insert_time, update_time, insert_admin, update_admin, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fin_salary
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--获取店铺的工资条-->
+    <select id="listFinSalaryByDate" resultType="com.luxuryadmin.vo.fin.VoFinSalary">
+        SELECT
+        sa.id 'salaryId',
+        sa.salary_state 'salaryState',
+        sa.salary_money 'salaryMoney',
+        sa.salary_name 'salaryName',
+        sa.insert_time 'insertTime',
+        us.`id` 'userId',
+        us.`head_img_url` 'headImgUrl',
+        (SELECT
+        NAME
+        FROM
+        shp_user_type
+        WHERE id =
+        (SELECT
+        fk_shp_user_type_id 'userTypeId'
+        FROM
+        shp_user_shop_ref uShopR
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+        AND uShopR.`fk_shp_user_id` = us.id
+        ORDER BY state DESC
+        LIMIT 1)) 'userTypeName',
+        (SELECT
+        name
+        FROM
+        shp_user_shop_ref uShopR
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+        AND uShopR.`fk_shp_user_id` = us.id
+        ORDER BY state DESC
+        LIMIT 1) 'nickname'
+        FROM
+        fin_salary sa
+        LEFT JOIN shp_user us
+        ON sa.`fk_shp_user_id` = us.`id`
+        WHERE sa.fk_shp_shop_id = #{shopId}
+        <if test="userId != null">
+            AND sa.fk_shp_user_id = #{userId}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND sa.salary_st_time &gt;= '${startDate} 00:00:00'
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND sa.salary_et_time &lt;= '${endDate} 23:59:59'
+        </if>
+        ORDER BY sa.`salary_money` DESC,  userTypeName DESC, sa.id ASC
+    </select>
+    <!--统计薪资总额(分)-->
+    <select id="countSalaryMoney" resultType="java.lang.Long">
+        SELECT IFNULL(SUM(sa.salary_money),0) FROM fin_salary sa
+        WHERE sa.fk_shp_shop_id = #{shopId}
+        <if test="userId != null">
+            AND sa.fk_shp_user_id = #{userId}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND sa.salary_st_time >= '${startDate} 00:00:00'
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND sa.salary_et_time &lt;= '${endDate} 23:59:59'
+        </if>
+    </select>
+
+    <!--获取该月份已经创建好薪资的userId-->
+    <select id="listAlreadyCreateSalaryUserId" resultType="java.lang.Integer">
+        SELECT
+          fk_shp_user_id 'userId'
+        FROM
+          fin_salary
+        WHERE fk_shp_shop_id = #{shopId}
+          AND salary_st_time = #{startDate}
+          AND salary_et_time &lt;= #{endDate}
+    </select>
+
+
+    <!--根据条件获取薪资ID-->
+    <select id="listFinSalaryId" resultType="java.lang.Integer">
+        SELECT
+          id
+        FROM
+          fin_salary
+        WHERE fk_shp_shop_id = #{shopId}
+          AND salary_st_time BETWEEN #{startDateTime}
+          AND #{endDateTime}
+    </select>
+
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from fin_salary
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <!--删除薪资-->
+    <delete id="deleteFinSalary">
+        delete from fin_salary where id in (${finSalaryIds})
+    </delete>
+
+    <!--删除整个店铺的薪资-->
+    <delete id="deleteFinSalaryByShopId">
+         delete from fin_salary where fk_shp_shop_id = #{shopId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinSalary"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into fin_salary
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="salaryState != null">
+                salary_state,
+            </if>
+            <if test="salaryMoney != null">
+                salary_money,
+            </if>
+            <if test="salaryName != null">
+                salary_name,
+            </if>
+            <if test="salaryStTime != null">
+                salary_st_time,
+            </if>
+            <if test="salaryEtTime != null">
+                salary_et_time,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="salaryState != null">
+                #{salaryState,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryMoney != null">
+                #{salaryMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="salaryName != null">
+                #{salaryName,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryStTime != null">
+                #{salaryStTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="salaryEtTime != null">
+                #{salaryEtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinSalary">
+        update fin_salary
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="salaryState != null">
+                salary_state = #{salaryState,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryMoney != null">
+                salary_money = #{salaryMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="salaryName != null">
+                salary_name = #{salaryName,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryStTime != null">
+                salary_st_time = #{salaryStTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="salaryEtTime != null">
+                salary_et_time = #{salaryEtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

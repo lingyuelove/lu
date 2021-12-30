@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpUnionVerifyMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpUnionVerify">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_mp_user_id" jdbcType="INTEGER" property="fkMpUserId" />
+
+		<result column="fk_pro_classify_code" jdbcType="VARCHAR" property="fkProClassifyCode" />
+
+		<result column="license_img_url" jdbcType="VARCHAR" property="licenseImgUrl" />
+
+		<result column="valid_img_url" jdbcType="VARCHAR" property="validImgUrl" />
+
+		<result column="stock_img_url" jdbcType="VARCHAR" property="stockImgUrl" />
+
+		<result column="empower_img_url" jdbcType="VARCHAR" property="empowerImgUrl" />
+
+		<result column="other_user_img_url" jdbcType="VARCHAR" property="otherUserImgUrl" />
+
+		<result column="state" jdbcType="VARCHAR" property="state" />
+
+		<result column="shop_user_type" jdbcType="VARCHAR" property="shopUserType" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+		<result column="fail_remark" jdbcType="VARCHAR" property="failRemark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_mp_user_id,
+		fk_pro_classify_code,
+		license_img_url,
+		valid_img_url,
+		stock_img_url,
+		empower_img_url,
+		other_user_img_url,
+		state,
+		shop_user_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fail_remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.MpUnionVerify" keyProperty="id" useGeneratedKeys="true" >
+		insert into mp_union_verify
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkMpUserId!=null ">
+				fk_mp_user_id, 
+			</if>
+			<if test="fkProClassifyCode!=null ">
+				fk_pro_classify_code, 
+			</if>
+			<if test="licenseImgUrl!=null ">
+				license_img_url, 
+			</if>
+			<if test="validImgUrl!=null ">
+				valid_img_url, 
+			</if>
+			<if test="stockImgUrl!=null ">
+				stock_img_url, 
+			</if>
+			<if test="empowerImgUrl!=null ">
+				empower_img_url, 
+			</if>
+			<if test="otherUserImgUrl!=null ">
+				other_user_img_url, 
+			</if>
+			<if test="state!=null ">
+				state, 
+			</if>
+			<if test="shopUserType!=null ">
+				shop_user_type, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="del!=null ">
+				del, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+			<if test="failRemark!=null ">
+				fail_remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkMpUserId!=null">
+				#{fkMpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null">
+				#{fkProClassifyCode,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseImgUrl!=null">
+				#{licenseImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="validImgUrl!=null">
+				#{validImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="stockImgUrl!=null">
+				#{stockImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="empowerImgUrl!=null">
+				#{empowerImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="otherUserImgUrl!=null">
+				#{otherUserImgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="state!=null">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="shopUserType!=null">
+				#{shopUserType,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="failRemark!=null">
+				#{failRemark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  mp_union_verify 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.MpUnionVerify" >
+		update mp_union_verify
+		<set>
+			<if test="fkMpUserId!=null">
+				fk_mp_user_id = #{fkMpUserId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyCode!=null and fkProClassifyCode!=''">
+				fk_pro_classify_code = #{fkProClassifyCode,jdbcType=VARCHAR},
+			 </if>
+			<if test="licenseImgUrl!=null and licenseImgUrl!=''">
+				license_img_url = #{licenseImgUrl,jdbcType=VARCHAR},
+			 </if>
+			<if test="validImgUrl!=null and validImgUrl!=''">
+				valid_img_url = #{validImgUrl,jdbcType=VARCHAR},
+			 </if>
+			<if test="stockImgUrl!=null and stockImgUrl!=''">
+				stock_img_url = #{stockImgUrl,jdbcType=VARCHAR},
+			 </if>
+			<if test="empowerImgUrl!=null and empowerImgUrl!=''">
+				empower_img_url = #{empowerImgUrl,jdbcType=VARCHAR},
+			 </if>
+			<if test="otherUserImgUrl!=null and otherUserImgUrl!=''">
+				other_user_img_url = #{otherUserImgUrl,jdbcType=VARCHAR},
+			 </if>
+			<if test="state!=null and state!=''">
+				state = #{state,jdbcType=VARCHAR},
+			 </if>
+			<if test="shopUserType!=null and shopUserType!=''">
+				shop_user_type = #{shopUserType,jdbcType=VARCHAR},
+			 </if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			 </if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+			<if test="failRemark!=null and failRemark!=''">
+				fail_remark = #{failRemark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_mp_user_id,
+		fk_pro_classify_code,
+		license_img_url,
+		valid_img_url,
+		stock_img_url,
+		empower_img_url,
+		other_user_img_url,
+		state,
+		shop_user_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark,
+		fail_remark
+		from mp_union_verify
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinSaleTopMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinSaleTop">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="biz_date" jdbcType="DATE" property="bizDate"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="sale_cost" jdbcType="DECIMAL" property="saleCost"/>
+        <result column="sale_price" jdbcType="DECIMAL" property="salePrice"/>
+        <result column="sale_order_count" jdbcType="INTEGER" property="saleOrderCount"/>
+        <result column="gross_profit" jdbcType="DECIMAL" property="grossProfit"/>
+        <result column="gross_profit_rate" jdbcType="DOUBLE" property="grossProfitRate"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, biz_date, fk_shp_shop_id, fk_shp_user_id, sale_cost, sale_price, sale_order_count, 
+    gross_profit, gross_profit_rate, insert_time, del, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fin_sale_top
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--获取销售排行榜;-->
+    <select id="listSaleTopByShopId" resultType="com.luxuryadmin.vo.fin.VoSaleTop">
+        SELECT
+          us.`id` 'userId',
+          us.`number` 'userNumber',
+          us.`nickname` 'nickname',
+          us.head_img_url 'headImageUrl',
+          (SELECT
+            (SELECT
+              userType.name
+            FROM
+              shp_user_type userType
+            WHERE userType.fk_shp_shop_id = top.fk_shp_shop_id
+              AND userType.code = ref.type)
+          FROM
+            shp_user_shop_ref ref
+          WHERE ref.`fk_shp_shop_id` = top.fk_shp_shop_id
+            AND us.id = ref.`fk_shp_user_id`) 'role',
+          SUM(sale_order_count) 'saleOrderCount',
+          SUM(sale_price) 'salePrice',
+          SUM(gross_profit) 'grossProfit'
+        FROM
+          fin_sale_top top
+          LEFT JOIN shp_user us
+            ON top.`fk_shp_user_id` = us.`id`
+        WHERE top.fk_shp_shop_id = #{shopId}
+          AND biz_date &gt;= #{startDate}
+          AND biz_date &lt;= #{endDate}
+        <if test="saleUserId != null">
+          AND top.fk_shp_user_id = #{saleUserId}
+        </if>
+        GROUP BY top.fk_shp_user_id
+        <if test="sortKey != null">
+          ORDER BY ${sortKey} ${sort}
+        </if>
+    </select>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinSaleTop">
+        insert into fin_sale_top
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="bizDate != null">
+                biz_date,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="saleCost != null">
+                sale_cost,
+            </if>
+            <if test="salePrice != null">
+                sale_price,
+            </if>
+            <if test="saleOrderCount != null">
+                sale_order_count,
+            </if>
+            <if test="grossProfit != null">
+                gross_profit,
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="bizDate != null">
+                #{bizDate,jdbcType=DATE},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="saleCost != null">
+                #{saleCost,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="saleOrderCount != null">
+                #{saleOrderCount,jdbcType=INTEGER},
+            </if>
+            <if test="grossProfit != null">
+                #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                #{grossProfitRate,jdbcType=DOUBLE},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinSaleTop">
+        update fin_sale_top
+        <set>
+            <if test="bizDate != null">
+                biz_date = #{bizDate,jdbcType=DATE},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="saleCost != null">
+                sale_cost = #{saleCost,jdbcType=DECIMAL},
+            </if>
+            <if test="salePrice != null">
+                sale_price = #{salePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="saleOrderCount != null">
+                sale_order_count = #{saleOrderCount,jdbcType=INTEGER},
+            </if>
+            <if test="grossProfit != null">
+                gross_profit = #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate = #{grossProfitRate,jdbcType=DOUBLE},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpServiceRecordMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpServiceRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="prod_img_urls" jdbcType="VARCHAR" property="prodImgUrls"/>
+        <result column="prod_name" jdbcType="VARCHAR" property="prodName"/>
+        <result column="unique_code" jdbcType="VARCHAR" property="uniqueCode"/>
+        <result column="cost_amount" jdbcType="DECIMAL" property="costAmount"/>
+        <result column="real_receive_amount" jdbcType="DECIMAL" property="realReceiveAmount"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="service_shp_user_id" jdbcType="INTEGER" property="serviceShpUserId"/>
+        <result column="receive_shp_user_id" jdbcType="INTEGER" property="receiveShpUserId"/>
+        <result column="note" jdbcType="VARCHAR" property="note"/>
+        <result column="customer_info" jdbcType="VARCHAR" property="customerInfo"/>
+        <result column="service_status" jdbcType="VARCHAR" property="serviceStatus"/>
+        <result column="service_number" jdbcType="VARCHAR" property="serviceNumber"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, fk_shp_shop_id, prod_img_urls, prod_name, unique_code, cost_amount, real_receive_amount,
+        type_name, service_shp_user_id,receive_shp_user_id, note, customer_info, service_status, service_number,
+        finish_time, cancel_time, insert_time, update_time, insert_admin, update_admin, del
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_service_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectShpServiceRecord" resultType="com.luxuryadmin.vo.shp.VoShpServiceRecord">
+        select
+        id 'id',
+        substring_index(prod_img_urls,';',1) 'prodImgUrl',
+        prod_name 'prodName',
+        note 'note',
+        insert_time  'insertTime',
+        type_name 'serviceTypeName',
+        service_status 'serviceStatus',
+        cost_amount  'costAmount',
+        real_receive_amount  'realReceiveAmount',
+        finish_time  'finishTime',
+        cancel_time  'cancelTime',
+        service_shp_user_id  'serviceShpUserId',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ssr.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ssr.service_shp_user_id
+        ) 'serviceShpUserName',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ssr.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ssr.receive_shp_user_id
+        ) 'receiveShpUserName',
+        sum( (select sum(service_cost) from shp_service_record_cost src WHERE src.fk_shp_service_record_id =ssr.id)) totalCost,
+        receive_shp_user_id 'receiveShpUserId'
+        from
+        shp_service_record ssr
+        where
+
+        <include refid="ServiceRecordQuery"/>
+        group by ssr.id
+        ORDER BY
+        <choose>
+            <when test="orderClause != null &amp;&amp; orderClause != ''">
+                ${orderClause}
+            </when>
+            <otherwise>
+                insert_time DESC
+            </otherwise>
+        </choose>
+    </select>
+    <sql id="ServiceRecordQuery">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        <if test="serviceStatus != null">
+            and service_status = #{serviceStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="searchContent != null">
+            and (
+           <!-- CONCAT(prod_name,unique_code,note,customer_info) REGEXP #{searchContent}
+            OR CONCAT(customer_info,note,unique_code,prod_name) REGEXP #{searchContent}-->
+            customer_info like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            or
+            unique_code like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            or
+            note like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            or
+            prod_name like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            )
+        </if>
+        <if test="serviceShpUserId != null">
+            and service_shp_user_id IN (${serviceShpUserId})
+        </if>
+        <if test="receiveShpUserId != null">
+            and receive_shp_user_id IN (${receiveShpUserId})
+        </if>
+        <if test="typeName != null">
+            and type_name REGEXP (${typeName})
+        </if>
+        <choose>
+            <when test="serviceStatus != null &amp;&amp; serviceStatus == 'finish'">
+                <if test="startTime != null">
+                    and finish_time <![CDATA[>=]]> #{startTime}
+                </if>
+                <if test="endTime != null">
+                    and finish_time <![CDATA[<=]]>  #{endTime}
+                </if>
+            </when>
+            <otherwise>
+                <if test="startTime != null">
+                    and insert_time <![CDATA[>=]]> #{startTime}
+                </if>
+                <if test="endTime != null">
+                    and insert_time <![CDATA[<=]]> #{endTime}
+                </if>
+            </otherwise>
+        </choose>
+    </sql>
+    <select id="selectShpServiceById" resultType="com.luxuryadmin.vo.shp.VoShpServiceRecordDetail">
+        select
+        id 'id',
+        prod_img_urls 'prodImgUrls',
+        prod_name 'prodName',
+        unique_code 'uniqueCode',
+        cost_amount 'costAmount',
+        real_receive_amount 'realReceiveAmount',
+        type_name 'typeName',
+        service_shp_user_id 'serviceShpUserId',
+        receive_shp_user_id 'receiveShpUserId',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ssr.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ssr.service_shp_user_id
+        ) 'serviceShpUserName',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ssr.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ssr.receive_shp_user_id
+        ) 'receiveShpUserName',
+        service_number 'serviceNumber',
+        service_status 'serviceStatus',
+        (SELECT uShopR.`name` FROM shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = ssr.fk_shp_shop_id
+        AND uShopR.fk_shp_user_id = ssr.insert_admin
+        ) 'insertUserName',
+        insert_time 'insertTime',
+        note 'note',
+        customer_info 'customerInfo',
+        IFNULL(finish_time,cancel_time) 'finishOrCancelTime'
+        from
+        shp_service_record ssr
+        where
+        fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        and
+        id = #{shpServiceId,jdbcType=INTEGER}
+        and
+        del = '0'
+        limit
+        1
+    </select>
+
+    <select id="selectTotalFinishServiceProfit" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(real_receive_amount)-SUM(cost_amount),0)
+        FROM
+        shp_service_record
+        WHERE
+        fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        AND
+        service_shp_user_id = #{userId,jdbcType=INTEGER}
+        AND
+        service_status = 'finish'
+        <if test="insertTimeStart != null">
+            and finish_time >= #{insertTimeStart}
+        </if>
+        <if test="insertTimeEnd != null">
+            and #{insertTimeEnd} >= finish_time
+        </if>
+    </select>
+
+    <select id="selectShpServiceRecordByShopIdTypeName" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        shp_service_record
+        where
+        fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+        and
+        type_name = #{typeName,jdbcType=VARCHAR}
+    </select>
+
+    <!--获取维修保养编号-->
+    <select id="listServiceNumber" resultType="java.lang.String">
+        SELECT
+        id
+        FROM
+        shp_service_record
+        WHERE
+        fk_shp_shop_id = #{shopId}
+        AND
+        insert_time BETWEEN #{startDateTime} AND #{endDateTime}
+    </select>
+
+    <select id="countTodaySettle" resultType="com.luxuryadmin.vo.shp.VoShpServiceSettleCount">
+        SELECT
+        COUNT(1) AS 'serviceSettleNum',
+        IFNULL(SUM(real_receive_amount),0)/100 AS 'serviceSettleSellAmount',
+        IFNULL(SUM(cost_amount),0)/100 AS 'serviceSettleCostAmount',
+        IFNULL(SUM(real_receive_amount)-SUM(cost_amount),0)/100 AS 'serviceSettleProfitAmount'
+        FROM
+        shp_service_record
+        WHERE
+        fk_shp_shop_id = #{shopId}
+        AND finish_time &gt;= '${todayDate} 00:00:00'
+        AND finish_time &lt;= '${todayDate} 23:59:59'
+        AND service_status = 'finish'
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from shp_service_record
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 根据店铺服务ID批量删除 -->
+    <delete id="deleteShpService">
+        delete from shp_service_record where fk_shp_shop_id = #{shopId} and id in (${numberStr})
+    </delete>
+
+    <delete id="deleteShpServiceRecordByShopId">
+        delete from shp_service_record where fk_shp_shop_id = #{shopId}
+    </delete>
+
+    <insert id="insert" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecord">
+        insert into shp_service_record (id, fk_shp_shop_id, prod_img_urls,
+        prod_name, unique_code, cost_amount,
+        real_receive_amount, type_name,
+        service_shp_user_id, note, customer_info,
+        service_status, service_number, finish_time,
+        cancel_time, insert_time, update_time,
+        insert_admin, update_admin, del
+        )
+        values (#{id,jdbcType=INTEGER}, #{fkShpShopId,jdbcType=INTEGER}, #{prodImgUrls,jdbcType=VARCHAR},
+        #{prodName,jdbcType=VARCHAR}, #{uniqueCode,jdbcType=VARCHAR}, #{costAmount,jdbcType=DECIMAL},
+        #{realReceiveAmount,jdbcType=DECIMAL}, #{typeName,jdbcType=VARCHAR},
+        #{serviceShpUserId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{customerInfo,jdbcType=VARCHAR},
+        #{serviceStatus,jdbcType=VARCHAR}, #{serviceNumber,jdbcType=VARCHAR}, #{finishTime,jdbcType=TIMESTAMP},
+        #{cancelTime,jdbcType=TIMESTAMP}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{del,jdbcType=CHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into shp_service_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="prodImgUrls != null">
+                prod_img_urls,
+            </if>
+            <if test="prodName != null">
+                prod_name,
+            </if>
+            <if test="uniqueCode != null">
+                unique_code,
+            </if>
+            <if test="costAmount != null">
+                cost_amount,
+            </if>
+            <if test="realReceiveAmount != null">
+                real_receive_amount,
+            </if>
+            <if test="typeName != null">
+                type_name,
+            </if>
+            <if test="serviceShpUserId != null">
+                service_shp_user_id,
+            </if>
+            <if test="receiveShpUserId != null">
+                receive_shp_user_id,
+            </if>
+            <if test="note != null">
+                note,
+            </if>
+            <if test="customerInfo != null">
+                customer_info,
+            </if>
+            <if test="serviceStatus != null">
+                service_status,
+            </if>
+            <if test="serviceNumber != null">
+                service_number,
+            </if>
+            <if test="finishTime != null">
+                finish_time,
+            </if>
+            <if test="cancelTime != null">
+                cancel_time,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="prodImgUrls != null">
+                #{prodImgUrls,jdbcType=VARCHAR},
+            </if>
+            <if test="prodName != null">
+                #{prodName,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueCode != null">
+                #{uniqueCode,jdbcType=VARCHAR},
+            </if>
+            <if test="costAmount != null">
+                #{costAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="realReceiveAmount != null">
+                #{realReceiveAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="typeName != null">
+                #{typeName,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceShpUserId != null">
+                #{serviceShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="receiveShpUserId != null">
+                #{receiveShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="customerInfo != null">
+                #{customerInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceStatus != null">
+                #{serviceStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceNumber != null">
+                #{serviceNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="finishTime != null">
+                #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cancelTime != null">
+                #{cancelTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecord">
+        update shp_service_record
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="prodImgUrls != null">
+                prod_img_urls = #{prodImgUrls,jdbcType=VARCHAR},
+            </if>
+            <if test="prodName != null">
+                prod_name = #{prodName,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueCode != null">
+                unique_code = #{uniqueCode,jdbcType=VARCHAR},
+            </if>
+            <if test="costAmount != null">
+                cost_amount = #{costAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="realReceiveAmount != null">
+                real_receive_amount = #{realReceiveAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="typeName != null">
+                type_name = #{typeName,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceShpUserId != null">
+                service_shp_user_id = #{serviceShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="receiveShpUserId != null">
+                receive_shp_user_id = #{receiveShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                note = #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="customerInfo != null">
+                customer_info = #{customerInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceStatus != null">
+                service_status = #{serviceStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceNumber != null">
+                service_number = #{serviceNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cancelTime != null">
+                cancel_time = #{cancelTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpServiceRecord">
+        update shp_service_record
+        set fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+        prod_img_urls = #{prodImgUrls,jdbcType=VARCHAR},
+        prod_name = #{prodName,jdbcType=VARCHAR},
+        unique_code = #{uniqueCode,jdbcType=VARCHAR},
+        cost_amount = #{costAmount,jdbcType=DECIMAL},
+        real_receive_amount = #{realReceiveAmount,jdbcType=DECIMAL},
+        type_name = #{typeName,jdbcType=VARCHAR},
+        service_shp_user_id = #{serviceShpUserId,jdbcType=INTEGER},
+        note = #{note,jdbcType=VARCHAR},
+        customer_info = #{customerInfo,jdbcType=VARCHAR},
+        service_status = #{serviceStatus,jdbcType=VARCHAR},
+        service_number = #{serviceNumber,jdbcType=VARCHAR},
+        finish_time = #{finishTime,jdbcType=TIMESTAMP},
+        cancel_time = #{cancelTime,jdbcType=TIMESTAMP},
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+        del = #{del,jdbcType=CHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <!--获取利润-->
+    <select id="getProfitPrice" parameterType="com.luxuryadmin.param.shp.ParamShpServiceQuery"
+            resultType="com.luxuryadmin.vo.shp.VoShpServiceRecordPrice">
+        SELECT
+        COUNT(1) AS 'serviceNum',
+        sum(cost_amount) AS 'serviceInitPrice',
+        sum(real_receive_amount) AS 'serviceFinishPrice'
+        FROM
+        shp_service_record
+        WHERE
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        <if test="serviceStatus != null">
+            and service_status = #{serviceStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="serviceShpUserId != null">
+            and service_shp_user_id IN (${serviceShpUserId})
+        </if>
+        <if test="searchContent != null">
+            and (
+            customer_info like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            or
+            unique_code like CONCAT('%',#{searchContent,jdbcType=VARCHAR},'%')
+            )
+        </if>
+        <choose>
+            <when test="serviceStatus != null &amp;&amp; serviceStatus == 'finish'">
+                <if test="startTime != null">
+                    and finish_time <![CDATA[>=]]> #{startTime}
+                </if>
+                <if test="endTime != null">
+                    and finish_time <![CDATA[<=]]>  #{endTime}
+                </if>
+            </when>
+            <otherwise>
+                <if test="startTime != null">
+                    and insert_time <![CDATA[>=]]> #{startTime}
+                </if>
+                <if test="endTime != null">
+                    and insert_time <![CDATA[<=]]> #{endTime}
+                </if>
+            </otherwise>
+        </choose>
+
+    </select>
+    <select id="getServiceRecordPrice" resultType="com.luxuryadmin.vo.shp.VoShpServiceRecordPrice"
+            parameterType="com.luxuryadmin.param.shp.ParamShpServiceQuery">
+        SELECT
+        COUNT(1) AS 'serviceNum',
+        sum(cost_amount) AS 'serviceInitPrice',
+        sum(real_receive_amount) AS 'serviceFinishPrice',
+        sum( (select sum(service_cost) from shp_service_record_cost src WHERE src.fk_shp_service_record_id =ssr.id)) totalCost
+        FROM
+        shp_service_record ssr
+        WHERE
+        <include refid="ServiceRecordQuery"/>
+
+    </select>
+    <select id="listServiceUser" resultType="com.luxuryadmin.vo.shp.VoEmployee"
+            parameterType="java.lang.Integer">
+        SELECT
+        ssr.service_shp_user_id 'userId',
+        ref.`name` 'nickname'
+        FROM
+        shp_service_record ssr
+        LEFT JOIN shp_user_shop_ref ref
+        ON ssr.`service_shp_user_id` = ref.`fk_shp_user_id`
+        AND ref.`fk_shp_shop_id` = #{shopId}
+        WHERE ssr.fk_shp_shop_id = #{shopId} and service_shp_user_id is not null
+        GROUP BY ssr.service_shp_user_id
+        ORDER BY CONVERT(ref.`name` USING gbk) ASC
+    </select>
+    <select id="listReceiveUser" resultType="com.luxuryadmin.vo.shp.VoEmployee"
+            parameterType="java.lang.Integer">
+        SELECT
+        ssr.receive_shp_user_id 'userId',
+        ref.`name` 'nickname'
+        FROM
+        shp_service_record ssr
+        LEFT JOIN shp_user_shop_ref ref
+        ON ssr.`receive_shp_user_id` = ref.`fk_shp_user_id`
+        AND ref.`fk_shp_shop_id` = #{shopId}
+        WHERE ssr.fk_shp_shop_id = #{shopId} and receive_shp_user_id is not null
+        GROUP BY ssr.receive_shp_user_id
+        ORDER BY CONVERT(ref.`name` USING gbk) ASC
+    </select>
+</mapper>

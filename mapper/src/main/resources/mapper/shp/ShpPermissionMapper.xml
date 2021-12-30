@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpPermissionMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpPermission">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="http_url" jdbcType="VARCHAR" property="httpUrl"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="permission" jdbcType="VARCHAR" property="permission"/>
+        <result column="new_state" jdbcType="VARCHAR" property="newState"/>
+        <result column="cost_state" jdbcType="VARCHAR" property="costState"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="display" jdbcType="INTEGER" property="display"/>
+        <result column="icon_url" jdbcType="VARCHAR" property="iconUrl"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, parent_id, name, code, url, permission, type, display, icon_url, sort,  insert_time,
+    update_time, insert_admin, update_admin, versions, del, remark,http_url,new_state,cost_state
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_permission
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--该权限是否存在-->
+    <select id="existsShpPermission" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM shp_permission perm
+        WHERE
+        perm.`parent_id` = #{parentId}
+        AND perm.`name` = #{name}
+    </select>
+
+    <!--code是否存在-->
+    <select id="existsShpPermissionCode" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM shp_permission perm
+        WHERE
+        perm.`code` = #{code}
+        and perm.`code` != 'h5'
+    </select>
+
+    <!--获取店铺模块的所有权限-所有店铺通用-->
+    <select id="listAppShpPermission" resultType="com.luxuryadmin.vo.shp.VoShpPermission">
+        select
+        id, parent_id 'parentId', name, display, code, sort, color,http_url 'httpUrl',new_state 'newState',
+        cost_state 'costState', url, permission, type, icon_url 'iconUrl',remark,versions,http_url 'httpUrl'
+        from shp_permission
+        <where>
+            versions !=90
+            <if test="version99 == null">
+                and versions != 99
+            </if>
+        </where>
+        ORDER BY type asc,sort ASC,parentId asc,id ASC
+    </select>
+
+    <!--获取店铺模块的所有权限id-所有店铺通用-->
+    <select id="listAppShpPermissionId" resultType="java.lang.Integer">
+        select id from shp_permission ORDER BY type asc,sort ASC,parent_id asc,id ASC
+    </select>
+
+    <!--in查询权限-->
+    <select id="listShpPermissionByIds" resultType="com.luxuryadmin.vo.shp.VoUsualFunction">
+        select
+          perm.id 'permId',
+          perm.name,
+          perm.code,
+          perm.icon_url 'iconUrl',
+          parPerm.`id` 'parentId',
+          parPerm.`name` 'parentName',
+          parPerm.`code` 'parentCode'
+        from
+          shp_permission perm
+          left join shp_permission parPerm
+            on perm.`parent_id` = parPerm.`id`
+        where perm.`id` in (${ids})
+    </select>
+
+    <!--是否已存在权限标识符-->
+    <select id="existsPerms" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM shp_permission WHERE permission in(${permission})
+    </select>
+
+    <!--根据permission获取实体-->
+    <select id="getShpPermissionByPermission" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_permission
+        where permission = #{permission}
+    </select>
+
+    <!--根据授权码获取权限id-->
+    <select id="listPermIdByPermCode" resultType="java.lang.Integer">
+        select  id from shp_permission   where permission in (${permCodes})
+    </select>
+
+    <!--根据授权码获取权限id-->
+    <select id="listPermCodeByPermIds" resultType="java.lang.String">
+         select  permission from shp_permission   where id in (${ids})
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <!-- 根据id删除权限，删除多个 -->
+    <delete id="deleteObjects" parameterType="java.lang.String">
+    delete from shp_permission
+    where id in (${ids})
+  </delete>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpPermission" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into shp_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="httpUrl != null">
+                http_url,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="permission != null">
+                permission,
+            </if>
+            <if test="newState != null">
+                new_state,
+            </if>
+            <if test="costState != null">
+                cost_state,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="display != null">
+                display,
+            </if>
+            <if test="iconUrl != null">
+                icon_url,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="httpUrl != null">
+                #{httpUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="newState != null">
+                #{newState,jdbcType=VARCHAR},
+            </if>
+            <if test="costState != null">
+                #{costState,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="display != null">
+                #{display,jdbcType=INTEGER},
+            </if>
+            <if test="iconUrl != null">
+                #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpPermission">
+        update shp_permission
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="httpUrl != null">
+                http_url = #{httpUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                permission = #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="newState != null">
+                new_state = #{newState,jdbcType=VARCHAR},
+            </if>
+            <if test="costState != null">
+                cost_state = #{costState,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="display != null">
+                display = #{display,jdbcType=INTEGER},
+            </if>
+            <if test="iconUrl != null">
+                icon_url = #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

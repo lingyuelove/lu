@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProProductClassifyMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProProductClassify">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_pro_classify_type_id" jdbcType="INTEGER" property="fkProClassifyTypeId" />
+
+		<!--<result column="classify_type_name" jdbcType="VARCHAR" property="classifyTypeName" />-->
+
+		<result column="classify_type_detail_name" jdbcType="VARCHAR" property="classifyTypeDetailName" />
+
+		<result column="type_detail_sub_name" jdbcType="VARCHAR" property="typeDetailSubName" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+
+		<result column="del" jdbcType="VARCHAR" property="del" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		fk_pro_classify_type_id,
+	<!--	classify_type_name,-->
+		classify_type_detail_name,
+		type_detail_sub_name,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProProductClassify" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_product_classify
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkProProductId!=null ">
+				fk_pro_product_id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkProClassifyTypeId!=null ">
+				fk_pro_classify_type_id,
+			</if>
+			<!--<if test="classifyTypeName!=null ">
+				classify_type_name, 
+			</if>-->
+			<if test="classifyTypeDetailName!=null ">
+				classify_type_detail_name, 
+			</if>
+			<if test="typeDetailSubName!=null ">
+				type_detail_sub_name, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="updateTime!=null ">
+				update_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="updateAdmin!=null ">
+				update_admin, 
+			</if>
+			<if test="del!=null ">
+				del, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				#{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyTypeId!=null">
+				#{fkProClassifyTypeId,jdbcType=INTEGER},
+			</if>
+			<!--<if test="classifyTypeName!=null">
+				#{classifyTypeName,jdbcType=VARCHAR},
+			</if>-->
+			<if test="classifyTypeDetailName!=null">
+				#{classifyTypeDetailName,jdbcType=VARCHAR},
+			</if>
+			<if test="typeDetailSubName!=null">
+				#{typeDetailSubName,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				#{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null">
+				#{del,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_product_classify 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProProductClassify" >
+		update pro_product_classify
+		<set>
+			<if test="fkProProductId!=null">
+				fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProClassifyTypeId!=null">
+				fk_pro_classify_type_id = #{fkProClassifyTypeId,jdbcType=INTEGER},
+			</if>
+			<!--<if test="classifyTypeName!=null and classifyTypeName!=''">
+				classify_type_name = #{classifyTypeName,jdbcType=VARCHAR},
+			 </if>-->
+			<if test="classifyTypeDetailName!=null and classifyTypeDetailName!=''">
+				classify_type_detail_name = #{classifyTypeDetailName,jdbcType=VARCHAR},
+			 </if>
+			<if test="typeDetailSubName!=null and typeDetailSubName!=''">
+				type_detail_sub_name = #{typeDetailSubName,jdbcType=VARCHAR},
+			 </if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime!=null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="updateAdmin!=null">
+				update_admin = #{updateAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="del!=null and del!=''">
+				del = #{del,jdbcType=VARCHAR},
+			 </if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		fk_pro_classify_type_id,
+		<!--classify_type_name,-->
+		classify_type_detail_name,
+		type_detail_sub_name,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from pro_product_classify
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+	<!--编辑商品时使用设置删除状态 -->
+	<update id="updateDelByProductId">
+		update pro_product_classify set del = '1' where fk_pro_product_id =  #{productId,jdbcType=INTEGER}
+	</update>
+
+	<!--编辑商品后使用删除无用值 -->
+	<delete id="delByProductId">
+		delete FROM pro_product_classify where fk_pro_product_id =  #{productId,jdbcType=INTEGER} and del = '1'
+
+	</delete>
+	<!--获取商品补充信息一级列表  废弃-->
+	<!--
+	<select id="getClassifyTypeList" parameterType="com.luxuryadmin.param.pro.ParamClassifyTypeSearch" resultType="com.luxuryadmin.vo.pro.VoClassifyTypeList" >
+		select
+		ct.id,
+		ct.name,
+		sort
+		from pro_product_classify pc left join pro_classify_type ct on pc.fk_pro_classify_type_id = ct.id
+		where pc.fk_pro_product_id = #{productId,jdbcType=INTEGER}  group by pc.fk_pro_classify_type_id order by ct.sort,ct.insert_time desc
+	</select>-->
+	<!--获取商品补充信息二级列表 -->
+	<select id="getClassifyTypeSonList" parameterType="com.luxuryadmin.param.pro.ParamClassifyTypeSearch" resultType="com.luxuryadmin.vo.pro.VoClassifyTypeSonList" >
+		select
+
+		pc.classify_type_detail_name as name,
+		pc.type_detail_sub_name as content,
+		sort
+		from pro_product_classify pc left join pro_classify_type ct on pc.fk_pro_classify_type_id = ct.pro_classify_type_id and pc.classify_type_detail_name =ct.name
+		where pc.fk_pro_product_id = #{productId,jdbcType=INTEGER}  order by ct.sort,ct.insert_time desc
+	</select>
+	<!--获取商品补充信息 -->
+	<select id="getProductClassifyBySearch"  resultMap="BaseResultMap" >
+		select
+		id,
+		fk_pro_product_id,
+		fk_shp_shop_id,
+		fk_pro_classify_type_id,
+		<!--classify_type_name,-->
+		classify_type_detail_name,
+		type_detail_sub_name,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del,
+		remark
+		from pro_product_classify pc
+		where pc.fk_pro_product_id = #{productId,jdbcType=INTEGER}  and pc.classify_type_detail_name = #{classifyTypeDetailName,jdbcType=INTEGER}
+	</select>
+</mapper>

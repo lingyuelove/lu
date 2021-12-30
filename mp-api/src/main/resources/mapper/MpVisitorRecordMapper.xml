@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpVisitorRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpVisitorRecord">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_be_mp_user_id" jdbcType="INTEGER" property="fkBeMpUserId"/>
+
+        <result column="fk_mp_user_id" jdbcType="INTEGER" property="fkMpUserId"/>
+
+        <result column="master_type" jdbcType="VARCHAR" property="masterType"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="CHAR" property="del"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_be_mp_user_id,
+		fk_mp_user_id,
+		master_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.MpVisitorRecord" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into mp_visitor_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkBeMpUserId!=null ">
+                fk_be_mp_user_id,
+            </if>
+            <if test="fkMpUserId!=null ">
+                fk_mp_user_id,
+            </if>
+            <if test="masterType!=null ">
+                master_type,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeMpUserId!=null">
+                #{fkBeMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkMpUserId!=null">
+                #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="masterType!=null">
+                #{masterType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=CHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  mp_visitor_record 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.MpVisitorRecord">
+        update mp_visitor_record
+        <set>
+            <if test="fkBeMpUserId!=null">
+                fk_be_mp_user_id = #{fkBeMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkMpUserId!=null">
+                fk_mp_user_id = #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="masterType!=null and masterType!=''">
+                master_type = #{masterType,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_be_mp_user_id,
+		fk_mp_user_id,
+		master_type,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+		from mp_visitor_record
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+    <select id="getVisitorRecord" resultType="com.luxuryadmin.vo.visitor.VOVisitorRecordList"
+            parameterType="com.luxuryadmin.param.visitor.ParamVisitorRecordList">
+        SELECT
+        mvr.id AS id,
+        mu.head_img_url AS headImgUrl,
+        mu.nickname AS nickname,
+        mu.username AS username,
+        ( SELECT mp_user.username FROM mp_user WHERE mp_user.id = mvr.fk_be_mp_user_id ) AS visitorNickname,
+        mvr.insert_time AS visitorTime,
+        mu.try_end_time AS tryEndTime,
+        mu.pay_end_time AS payEndTime,
+        mu.member_state AS memberState
+        FROM
+        mp_visitor_record mvr
+        LEFT JOIN mp_user mu ON mvr.fk_mp_user_id = mu.id
+        <include refid="visitorSql"/>
+        order by mvr.insert_time desc
+    </select>
+    <select id="getVisitorPersonNum" resultType="java.lang.Integer"
+            parameterType="com.luxuryadmin.param.visitor.ParamVisitorRecordList">
+        SELECT
+        count(mvr.id)
+        FROM
+        mp_visitor_record mvr
+        LEFT JOIN mp_user mu ON mvr.fk_mp_user_id = mu.id
+        <include refid="visitorSql"/>
+        group by mvr.fk_mp_user_id
+    </select>
+    <sql id="visitorSql">
+        where
+        mvr.del = 0
+        <if test="nickname!=null and nickname!=''">
+            and mu.nickname like CONCAT('%',#{nickname},'%')
+        </if>
+        <if test="username!=null and username!=''">
+            and mu.username = #{username}
+        </if>
+        <if test="inviteId!=null">
+            and mvr.fk_be_mp_user_id = #{inviteId}
+        </if>
+        <if test="startTime!=null">
+            and mvr.insert_time &gt; #{startTime}
+        </if>
+        <if test="endTime!=null">
+            and mvr.insert_time &lt; #{endTime}
+        </if>
+    </sql>
+
+
+</mapper>

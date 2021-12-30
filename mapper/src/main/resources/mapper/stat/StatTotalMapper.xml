@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.stat.StatTotalMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.stat.StatTotal">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="count_date" jdbcType="VARCHAR" property="countDate" />
+    <result column="count_month" jdbcType="VARCHAR" property="countMonth" />
+    <result column="count_year" jdbcType="VARCHAR" property="countYear" />
+    <result column="reg_person_num" jdbcType="INTEGER" property="regPersonNum" />
+    <result column="reg_shop_num" jdbcType="INTEGER" property="regShopNum" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+    <result column="order_sell_amount" jdbcType="DECIMAL" property="orderSellAmount" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, count_date, count_month, count_year, reg_person_num, reg_shop_num, order_num, 
+    order_sell_amount, insert_time, update_time
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from stat_total
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据统计日期查询汇总数据 -->
+  <select id="selectStatTotalByCountDate" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from
+      stat_total
+    where
+      count_date = DATE(#{countDate})
+    LIMIT 1
+  </select>
+
+  <select id="selectAllCountDate" resultType="com.luxuryadmin.vo.stat.VoStateDataTotalAll">
+    select
+      SUM(reg_person_num) 'regPersonNumTotal',
+      SUM(reg_shop_num) 'regShopNumTotal',
+      SUM(order_num) 'orderNumTotal',
+      SUM(order_sell_amount)/100 'orderSellAmountTotal'
+    from
+      stat_total
+  </select>
+
+  <!-- 根据条件查询汇总数据 -->
+  <select id="selectStatTotalByRangeDate" resultMap="BaseResultMap" parameterType="com.luxuryadmin.param.stat.ParamRegDataQuery">
+    select
+      <include refid="Base_Column_List" />
+    from
+      stat_total
+    where
+      count_date between #{regStartDate} and #{regEndDate}
+    order by
+      count_date asc,id asc
+  </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from stat_total
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.stat.StatTotal">
+    insert into stat_total
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="countDate != null">
+        count_date,
+      </if>
+      <if test="countMonth != null">
+        count_month,
+      </if>
+      <if test="countYear != null">
+        count_year,
+      </if>
+      <if test="regPersonNum != null">
+        reg_person_num,
+      </if>
+      <if test="regShopNum != null">
+        reg_shop_num,
+      </if>
+      <if test="orderNum != null">
+        order_num,
+      </if>
+      <if test="orderSellAmount != null">
+        order_sell_amount,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="countDate != null">
+        #{countDate,jdbcType=VARCHAR},
+      </if>
+      <if test="countMonth != null">
+        #{countMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="countYear != null">
+        #{countYear,jdbcType=VARCHAR},
+      </if>
+      <if test="regPersonNum != null">
+        #{regPersonNum,jdbcType=INTEGER},
+      </if>
+      <if test="regShopNum != null">
+        #{regShopNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderSellAmount != null">
+        #{orderSellAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.stat.StatTotal">
+    update stat_total
+    <set>
+      <if test="countDate != null">
+        count_date = #{countDate,jdbcType=VARCHAR},
+      </if>
+      <if test="countMonth != null">
+        count_month = #{countMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="countYear != null">
+        count_year = #{countYear,jdbcType=VARCHAR},
+      </if>
+      <if test="regPersonNum != null">
+        reg_person_num = #{regPersonNum,jdbcType=INTEGER},
+      </if>
+      <if test="regShopNum != null">
+        reg_shop_num = #{regShopNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null">
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderSellAmount != null">
+        order_sell_amount = #{orderSellAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.stat.StatTotal">
+    update stat_total
+    set count_date = #{countDate,jdbcType=VARCHAR},
+      count_month = #{countMonth,jdbcType=VARCHAR},
+      count_year = #{countYear,jdbcType=VARCHAR},
+      reg_person_num = #{regPersonNum,jdbcType=INTEGER},
+      reg_shop_num = #{regShopNum,jdbcType=INTEGER},
+      order_num = #{orderNum,jdbcType=INTEGER},
+      order_sell_amount = #{orderSellAmount,jdbcType=DECIMAL},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

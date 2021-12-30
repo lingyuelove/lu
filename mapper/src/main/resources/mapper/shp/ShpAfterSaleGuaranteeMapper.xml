@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpAfterSaleGuaranteeMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpAfterSaleGuarantee">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="guarantee_name" jdbcType="VARCHAR" property="guaranteeName"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, guarantee_name, insert_admin, update_admin, insert_time, update_time, 
+    del
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_after_sale_guarantee
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByShopIdAndGuaranteeId" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_after_sale_guarantee
+        where id = #{id,jdbcType=INTEGER}
+        AND fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+        AND del = '0'
+        LIMIT 1
+    </select>
+
+    <select id="selectGuaranteeListByShopId" resultType="com.luxuryadmin.vo.shp.VoShpAfterSaleGuarantee"
+            parameterType="java.lang.Integer">
+    select
+      `id` 'guaranteeId',
+      `guarantee_name` 'guaranteeName'
+    from shp_after_sale_guarantee
+    where fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER}
+    AND del = '0'
+  </select>
+
+    <select id="selectAllNeedInitShopId" resultType="java.lang.Integer">
+        SELECT
+            id
+        FROM
+            shp_shop
+        WHERE
+            id NOT IN (
+                SELECT DISTINCT
+                    (fk_shp_shop_id)
+                FROM
+                    shp_after_sale_guarantee
+                WHERE
+                    guarantee_name = '一年内八折回收'
+            )
+        ORDER BY
+            ID
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from shp_after_sale_guarantee
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <delete id="deleteShpAfterSaleGuaranteeByShopId">
+      delete from shp_after_sale_guarantee where fk_shp_shop_id = #{shopId}
+    </delete>
+    <insert id="insert" parameterType="com.luxuryadmin.entity.shp.ShpAfterSaleGuarantee">
+    insert into shp_after_sale_guarantee (id, fk_shp_shop_id, guarantee_name, 
+      insert_admin, update_admin, insert_time, 
+      update_time, del)
+    values (#{id,jdbcType=INTEGER}, #{fkShpShopId,jdbcType=INTEGER}, #{guaranteeName,jdbcType=VARCHAR}, 
+      #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{insertTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{del,jdbcType=CHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.luxuryadmin.entity.shp.ShpAfterSaleGuarantee"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into shp_after_sale_guarantee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="guaranteeName != null">
+                guarantee_name,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="guaranteeName != null">
+                #{guaranteeName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.shp.ShpAfterSaleGuarantee">
+        update shp_after_sale_guarantee
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="guaranteeName != null">
+                guarantee_name = #{guaranteeName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.shp.ShpAfterSaleGuarantee">
+    update shp_after_sale_guarantee
+    set fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      guarantee_name = #{guaranteeName,jdbcType=VARCHAR},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      del = #{del,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.ord.OrdShareReceiptMapper">
+    <!--此mapper类实体与sql不同 特此标记-->
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.ord.OrdShareReceipt">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="shop_number" jdbcType="INTEGER" property="shopNumber"/>
+        <result column="user_number" jdbcType="INTEGER" property="userNumber"/>
+        <result column="show_product" jdbcType="VARCHAR" property="showProduct"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="share_batch" jdbcType="VARCHAR" property="shareBatch"/>
+        <result column="share_name" jdbcType="VARCHAR" property="shareName"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+   id, fk_shp_shop_id, fk_shp_user_id, shop_number, user_number, show_product, order_no, share_batch,
+    share_name, insert_time
+  </sql>
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from ord_receipt_share
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <!--根据订单编号删除分享凭证记录用in查询;物理删除-->
+    <delete id="deleteShareReceipt">
+        delete from ord_receipt_share WHERE order_no in (${orderNumber});
+    </delete>
+    <delete id="deleteShareReceiptByShopId">
+         delete from ord_receipt_share WHERE fk_shp_shop_id = #{shopId}
+    </delete>
+    <!--根据店铺编号,用户编号和分享批号来获取分享的产品id-->
+    <select id="getOrderNoByShareBatch" resultType="com.luxuryadmin.vo.ord.VoShareReceipt">
+        SELECT
+          fk_shp_shop_id 'shopId',
+          order_no 'orderNo',
+          show_product 'showProduct',
+          show_type 'showType',
+          show_deliver showDeliver
+        FROM
+          ord_receipt_share
+        WHERE shop_number = #{shopNumber}
+          AND user_number = #{userNumber}
+          AND share_batch = #{shareBatch}
+    </select>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.ord.OrdShareReceipt">
+        insert into ord_receipt_share
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="shopNumber != null">
+                shop_number,
+            </if>
+            <if test="userNumber != null">
+                user_number,
+            </if>
+            <if test="showProduct != null">
+                show_product,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="shareBatch != null">
+                share_batch,
+            </if>
+            <if test="shareName != null">
+                share_name,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="receiptType != null">
+                receipt_type,
+            </if>
+            <if test="showType != null">
+                show_type,
+            </if>
+            <if test="showDeliver != null">
+                show_deliver,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="shopNumber != null">
+                #{shopNumber,jdbcType=INTEGER},
+            </if>
+            <if test="userNumber != null">
+                #{userNumber,jdbcType=INTEGER},
+            </if>
+            <if test="showProduct != null">
+                #{showProduct,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="shareBatch != null">
+                #{shareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="shareName != null">
+                #{shareName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="receiptType != null">
+                #{receiptType,jdbcType=VARCHAR},
+            </if>
+            <if test="showType != null">
+                #{showType,jdbcType=VARCHAR},
+            </if>
+            <if test="showDeliver != null">
+                #{showDeliver,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.ord.OrdShareReceipt">
+        update ord_receipt_share
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="shopNumber != null">
+                shop_number = #{shopNumber,jdbcType=INTEGER},
+            </if>
+            <if test="userNumber != null">
+                user_number = #{userNumber,jdbcType=INTEGER},
+            </if>
+            <if test="showProduct != null">
+                show_product = #{showProduct,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="shareBatch != null">
+                share_batch = #{shareBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="shareName != null">
+                share_name = #{shareName,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="receiptType != null">
+                receipt_type = #{receiptType,jdbcType=VARCHAR},
+            </if>
+            <if test="showType != null">
+                show_type = #{showType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

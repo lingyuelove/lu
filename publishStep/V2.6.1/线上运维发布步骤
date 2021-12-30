@@ -1,0 +1,18 @@
+发布步骤:
+一、模块添加权限配置
+商家联盟 unionShop
+查看 shop:union:show
+图标 /default/functionIcon/unionShop.png
+
+ 4.店铺模块
+        4.6【其他记账】
+        原先：
+            4.6.1【查看】不修改
+                权限：shop:check:shopBill
+                接口：/listFinShopRecord
+        现在：
+             4.6.1【查看全部】不修改
+                权限：shop:check:shopBill
+             4.6.2【查看个人】不修改
+                权限：user:check:shopBill
+二、执行sql操作[V2.6.1-zs.sql]文件

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.fin.FinSalaryOrderProfitMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.fin.FinSalaryOrderProfit">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+    <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId" />
+    <result column="fk_fin_salary_detail_id" jdbcType="INTEGER" property="fkFinSalaryDetailId" />
+    <result column="fk_fin_salary_scheme_id" jdbcType="INTEGER" property="fkFinSalarySchemeId" />
+    <result column="product_attr" jdbcType="VARCHAR" property="productAttr" />
+    <result column="order_type" jdbcType="VARCHAR" property="orderType" />
+    <result column="total_cost_money" jdbcType="DECIMAL" property="totalCostMoney" />
+    <result column="total_sale_money" jdbcType="DECIMAL" property="totalSaleMoney" />
+    <result column="total_profit_money" jdbcType="DECIMAL" property="totalProfitMoney" />
+    <result column="scheme_num" jdbcType="DECIMAL" property="schemeNum" />
+    <result column="scheme_money" jdbcType="DECIMAL" property="schemeMoney" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_id, fk_fin_salary_detail_id, fk_fin_salary_scheme_id, 
+    product_attr, order_type, total_cost_money, total_sale_money, total_profit_money, 
+    scheme_num, scheme_money, insert_time, update_time, insert_admin, update_admin, remark
+  </sql>
+  <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fin_salary_order_profit
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from fin_salary_order_profit
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveObject" parameterType="com.luxuryadmin.entity.fin.FinSalaryOrderProfit">
+    insert into fin_salary_order_profit
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id,
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id,
+      </if>
+      <if test="fkFinSalaryDetailId != null">
+        fk_fin_salary_detail_id,
+      </if>
+      <if test="fkFinSalarySchemeId != null">
+        fk_fin_salary_scheme_id,
+      </if>
+      <if test="productAttr != null">
+        product_attr,
+      </if>
+      <if test="orderType != null">
+        order_type,
+      </if>
+      <if test="totalCostMoney != null">
+        total_cost_money,
+      </if>
+      <if test="totalSaleMoney != null">
+        total_sale_money,
+      </if>
+      <if test="totalProfitMoney != null">
+        total_profit_money,
+      </if>
+      <if test="schemeNum != null">
+        scheme_num,
+      </if>
+      <if test="schemeMoney != null">
+        scheme_money,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpShopId != null">
+        #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalaryDetailId != null">
+        #{fkFinSalaryDetailId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalarySchemeId != null">
+        #{fkFinSalarySchemeId,jdbcType=INTEGER},
+      </if>
+      <if test="productAttr != null">
+        #{productAttr,jdbcType=VARCHAR},
+      </if>
+      <if test="orderType != null">
+        #{orderType,jdbcType=VARCHAR},
+      </if>
+      <if test="totalCostMoney != null">
+        #{totalCostMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="totalSaleMoney != null">
+        #{totalSaleMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="totalProfitMoney != null">
+        #{totalProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeNum != null">
+        #{schemeNum,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeMoney != null">
+        #{schemeMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateObject" parameterType="com.luxuryadmin.entity.fin.FinSalaryOrderProfit">
+    update fin_salary_order_profit
+    <set>
+      <if test="fkShpShopId != null">
+        fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+      </if>
+      <if test="fkShpUserId != null">
+        fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalaryDetailId != null">
+        fk_fin_salary_detail_id = #{fkFinSalaryDetailId,jdbcType=INTEGER},
+      </if>
+      <if test="fkFinSalarySchemeId != null">
+        fk_fin_salary_scheme_id = #{fkFinSalarySchemeId,jdbcType=INTEGER},
+      </if>
+      <if test="productAttr != null">
+        product_attr = #{productAttr,jdbcType=VARCHAR},
+      </if>
+      <if test="orderType != null">
+        order_type = #{orderType,jdbcType=VARCHAR},
+      </if>
+      <if test="totalCostMoney != null">
+        total_cost_money = #{totalCostMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="totalSaleMoney != null">
+        total_sale_money = #{totalSaleMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="totalProfitMoney != null">
+        total_profit_money = #{totalProfitMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeNum != null">
+        scheme_num = #{schemeNum,jdbcType=DECIMAL},
+      </if>
+      <if test="schemeMoney != null">
+        scheme_money = #{schemeMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.org.OrgOrganizationMapper">
+
+    <select id="getOrganizationPageByApp" resultType="com.luxuryadmin.vo.org.VoOrganizationPageByApp">
+        select
+        oo.id as id
+        ,oo.name as name
+        ,ss.name as shopName
+        ,oo.insert_time as insertTime
+        ,date_format(oo.start_time,'%Y-%m-%d') as startTime
+        ,date_format(oo.end_time,'%Y-%m-%d') as endTime
+        ,oo.insert_admin as insertAdmin
+        , su.nickname as insertAdminName
+        from org_organization oo
+        left join shp_user su on oo.insert_admin =su.id
+        left join shp_shop ss on oo.fk_shp_shop_id =ss.id
+        <where>1=1
+            <if test="shopId != null">
+                and oo.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by oo.insert_time desc
+    </select>
+    <select id="getByName" parameterType="java.lang.Integer" resultType="com.luxuryadmin.entity.org.OrgOrganization">
+        select
+        id
+        ,fk_shp_shop_id as fkShpShopId
+        ,name
+        ,state
+        ,insert_time as insertTime
+        ,update_time as updateTime
+        ,start_time as startTime
+        ,end_time as endTime
+        ,insert_admin as insertAdmin
+        ,update_admin as updateAdmin
+        , remark
+
+        from org_organization oo
+        <where>
+            1=1
+            <if test="shopId != null">
+                and oo.fk_shp_shop_id = #{shopId,jdbcType=INTEGER}
+            </if>
+            <if test="name != null">
+                and oo.name = #{name,jdbcType=VARCHAR}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <select id="getObjectById" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.entity.org.OrgOrganization">
+        select
+        id
+        ,fk_shp_shop_id as fkShpShopId
+        ,name
+        ,state
+        ,insert_time as insertTime
+        ,update_time as updateTime
+        ,start_time as startTime
+        ,end_time as endTime
+        ,insert_admin as insertAdmin
+        ,update_admin as updateAdmin
+        , remark
+
+        from org_organization
+        where id = #{id}
+    </select>
+
+    <select id="getById" parameterType="java.lang.Integer"
+            resultType="com.luxuryadmin.entity.org.OrgOrganization">
+        select
+        id
+        ,fk_shp_shop_id as fkShpShopId
+        ,name
+        ,state
+        ,insert_time as insertTime
+        ,update_time as updateTime
+        ,start_time as startTime
+        ,end_time as endTime
+        ,insert_admin as insertAdmin
+        ,update_admin as updateAdmin
+        , remark
+
+        from org_organization
+        where id = #{id}
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+        delete from org_organization
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.org.OrgOrganization" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into org_organization
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                #{startTime},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.org.OrgOrganization">
+        update org_organization
+        <set>
+
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time =  #{endTime},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

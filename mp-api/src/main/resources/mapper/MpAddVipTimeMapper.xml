@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.MpAddVipTimeMapper">
+
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.MpAddVipTime">
+
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="fk_mp_user_id" jdbcType="INTEGER" property="fkMpUserId"/>
+
+        <result column="fk_be_mp_user_id" jdbcType="INTEGER" property="fkBeMpUserId"/>
+
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+
+        <result column="final_end_time" jdbcType="TIMESTAMP" property="finalEndTime"/>
+
+        <result column="add_day" jdbcType="INTEGER" property="addDay"/>
+
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+
+        <result column="del" jdbcType="CHAR" property="del"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,
+		fk_mp_user_id,
+		fk_be_mp_user_id,
+		start_time,
+		final_end_time,
+		add_day,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+	</sql>
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.MpAddVipTime" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into mp_add_vip_time
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null ">
+                id,
+            </if>
+            <if test="fkMpUserId!=null ">
+                fk_mp_user_id,
+            </if>
+            <if test="fkBeMpUserId!=null ">
+                fk_be_mp_user_id,
+            </if>
+            <if test="startTime!=null ">
+                start_time,
+            </if>
+            <if test="finalEndTime!=null ">
+                final_end_time,
+            </if>
+            <if test="addDay!=null ">
+                add_day,
+            </if>
+            <if test="insertTime!=null ">
+                insert_time,
+            </if>
+            <if test="updateTime!=null ">
+                update_time,
+            </if>
+            <if test="insertAdmin!=null ">
+                insert_admin,
+            </if>
+            <if test="updateAdmin!=null ">
+                update_admin,
+            </if>
+            <if test="del!=null ">
+                del,
+            </if>
+
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkMpUserId!=null">
+                #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeMpUserId!=null">
+                #{fkBeMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="startTime!=null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finalEndTime!=null">
+                #{finalEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addDay!=null">
+                #{addDay,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                #{del,jdbcType=CHAR},
+            </if>
+
+        </trim>
+
+    </insert>
+
+    <delete id="deleteObject">
+		delete from  mp_add_vip_time 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.MpAddVipTime">
+        update mp_add_vip_time
+        <set>
+            <if test="fkMpUserId!=null">
+                fk_mp_user_id = #{fkMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkBeMpUserId!=null">
+                fk_be_mp_user_id = #{fkBeMpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="startTime!=null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finalEndTime!=null">
+                final_end_time = #{finalEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addDay!=null">
+                add_day = #{addDay,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime!=null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin!=null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin!=null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="del!=null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getObjectById" resultMap="BaseResultMap">
+		select
+		id,
+		fk_mp_user_id,
+		fk_be_mp_user_id,
+		start_time,
+		final_end_time,
+		add_day,
+		insert_time,
+		update_time,
+		insert_admin,
+		update_admin,
+		del
+		from mp_add_vip_time
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+    <select id="listAddVipTime" resultType="com.luxuryadmin.vo.award.VOAwardRecordList"
+            parameterType="java.lang.Integer">
+		SELECT
+			mp_add_vip_time.id AS id,
+			mp_add_vip_time.insert_time as insertTime,
+            mp_add_vip_time.add_day as addDay,
+			mp_user.wx_nickname AS remark
+		FROM
+			mp_add_vip_time
+			LEFT JOIN mp_user ON mp_add_vip_time.fk_be_mp_user_id = mp_user.id
+		WHERE
+			mp_add_vip_time.del = 0
+			and
+			mp_add_vip_time.fk_mp_user_id = #{userId}
+	</select>
+    <select id="getTotalAddDay" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT
+			sum(mp_add_vip_time.add_day)
+		FROM
+			mp_add_vip_time
+			LEFT JOIN mp_user ON mp_add_vip_time.fk_mp_user_id = mp_user.id
+		WHERE
+			mp_add_vip_time.del = 0
+			and
+			mp_add_vip_time.fk_mp_user_id = #{userId}
+    </select>
+
+</mapper>

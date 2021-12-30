@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProLockRecordMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProLockRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="pro_biz_id" jdbcType="VARCHAR" property="proBizId"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+        <result column="lock_user_id" jdbcType="INTEGER" property="lockUserId"/>
+        <result column="unlock_user_id" jdbcType="INTEGER" property="unlockUserId"/>
+        <result column="fk_ord_address_id" jdbcType="INTEGER" property="fkOrdAddressId"/>
+        <result column="pre_money" jdbcType="DECIMAL" property="preMoney"/>
+        <result column="pre_finish_money" jdbcType="DECIMAL" property="preFinishMoney"/>
+        <result column="lock_num" jdbcType="INTEGER" property="lockNum"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="unlock_time" jdbcType="TIMESTAMP" property="unlockTime"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="son_record_id" jdbcType="INTEGER" property="sonRecordId"/>
+        <result column="convey_lock_type" jdbcType="VARCHAR" property="conveyLockType"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_pro_product_id, fk_shp_shop_id, pro_biz_id, state, lock_user_id, unlock_user_id,fk_ord_address_id,
+    pre_money, pre_finish_money, lock_num, insert_time, update_time, unlock_time, del, remark, son_record_id, convey_lock_type
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pro_lock_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--根据商品id获取锁单记录的锁单数量-->
+    <select id="getProductLockNumByProId" resultType="java.lang.Integer">
+        SELECT
+          ifnull(SUM(lck.`lock_num`), 0) 'lockNum'
+        FROM
+          pro_lock_record lck
+        WHERE lck.`state` = 0
+          AND lck.`fk_pro_product_id` = #{proId}
+    </select>
+    <!--根据商品bizId和userId查找锁单记录,确保每个商品每个人只有一条锁单记录-->
+    <select id="getProLockRecordByBizIdAndUserId" resultMap="BaseResultMap"
+            resultType="com.luxuryadmin.entity.pro.ProLockRecord">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        pro_lock_record
+        WHERE pro_biz_id = #{bizId}
+        AND lock_user_id = #{userId}
+    </select>
+
+    <!--获取锁单中的商品-->
+    <select id="listLockProductByShopId" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        select
+        pro.fk_shp_shop_id 'shopId',
+        sum(lck.`lock_num`) 'lockNum',
+        SUBSTRING_INDEX(GROUP_CONCAT(lck.remark ORDER BY lck.`insert_time` DESC),',',1) 'lockReason',
+        pro.`biz_id` 'bizId',
+        pro.`name`,
+        pro.`insert_time` 'insertTime',
+        pro.`fk_pro_attribute_code` 'attributeUs',
+        pro.`target_user` 'targetUser',
+        pro.`quality`,
+        pro.`small_img` 'smallImg',
+        pro.`sale_price` 'salePrice',
+        pro.`update_time` 'updateTime'
+        from
+        pro_lock_record lck
+        left join pro_product pro
+        on lck.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        where lck.fk_shp_shop_id = #{shopId} and lck.state = 0
+        <if test="proName != null and proName!=''">
+            AND (
+            CONCAT(pro.name,pro.description,lck.remark) REGEXP #{proName}
+            OR CONCAT(pro.description,pro.name,lck.remark) REGEXP #{proName}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.unique_code REGEXP #{uniqueCode}
+                OR det.auto_number REGEXP #{uniqueCode}
+            </if>
+            )
+        </if>
+        group by pro.`id`
+        ORDER BY lck.`update_time` DESC
+    </select>
+
+    <!--获取锁单中的商品-->
+    <select id="getProductDetail" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        select
+          pro.fk_shp_shop_id 'shopId',
+          pro.`biz_id` 'bizId',
+          pro.`name`,
+          pro.`insert_time` 'insertTime',
+          pro.`description`,
+          pro.`init_price` 'initPrice',
+          pro.`trade_price` 'tradePrice',
+          pro.`agency_price` 'agencyPrice',
+          pro.`sale_price` 'salePrice',
+          pro.`update_time` 'updateTime',
+          pro.`fk_pro_attribute_code` 'attributeUs',
+          pro.`target_user` 'targetUser',
+          pro.`small_img` 'smallImg',
+          det.product_img  'productImg',
+          det.unique_code 'uniqueCode'
+        from
+          pro_product pro
+          left join
+          pro_detail det
+          on pro.id = det.fk_pro_product_id
+        where pro.`biz_id` = #{bizId} and pro.fk_shp_shop_id = #{shopId}
+    </select>
+
+    <!--获取锁单商品的锁单记录-->
+    <select id="listVoProLockRecordByBizId" resultType="com.luxuryadmin.vo.pro.VoProLockRecord">
+        SELECT
+          lck.id 'lockId',
+          lck.fk_pro_product_id 'proId',
+          lck.lock_user_id 'lockUserId',
+          lck.convey_lock_type conveyLockType,
+          (SELECT
+            uShopR.`name`
+          FROM
+            shp_user_shop_ref uShopR
+          WHERE uShopR.fk_shp_shop_id = #{shopId}
+            AND uShopR.fk_shp_user_id = lck.lock_user_id) 'lockUser',
+          lck.`lock_num` 'lockNum',
+          case when lck.`remark`='' or lck.`remark` is null then '无' else lck.`remark` end as 'lockReason',
+          lck.`update_time` 'updateTime'
+        FROM
+          pro_lock_record lck
+        WHERE lck.`fk_shp_shop_id` = #{shopId}
+          AND lck.`pro_biz_id` = #{bizId}
+          AND lck.`state` = 0
+        ORDER BY lck.`update_time` DESC
+    </select>
+    <!--获得商品的锁单记录id;LockId-->
+    <select id="getLockIdByBizId" resultType="java.lang.Integer">
+        SELECT
+          id
+        FROM
+          pro_lock_record
+        WHERE fk_shp_shop_id = #{shopId}
+          AND pro_biz_id = #{bizId}
+          AND state = 0 order by id desc limit 1
+    </select>
+
+    <!--获取正在锁单中的人员;-->
+    <select id="listLockUser" resultType="com.luxuryadmin.vo.pro.VoProLockRecord">
+        select
+          ref.`fk_shp_user_id` 'lockUserId',
+          ref.`name` 'lockUser'
+        from
+          pro_lock_record plr
+          left join shp_user_shop_ref ref
+            on plr.`lock_user_id` = ref.`fk_shp_user_id`
+        where plr.fk_shp_shop_id = #{shopId}
+          and plr.state = 0 and plr.lock_user_id != 0
+        group by plr.lock_user_id
+        ORDER BY CONVERT(ref.`name` USING gbk) ASC
+    </select>
+
+    <!-- 统计锁单商品中的信息-->
+    <select id="countProLockTotal" resultType="com.luxuryadmin.vo.pro.VoProLockTotal">
+        SELECT
+        IFNULL(SUM(lck.lock_num),0) 'countLockNum',
+        IFNULL(SUM(lck.`pre_money`) * 0.01, 0) 'countPreMoney',
+        IFNULL(SUM(lck.`pre_finish_money`) * 0.01, 0) 'countPreFinishMoney',
+        IFNULL(
+        SUM(pro.init_price * lck.lock_num) * 0.01,
+        0
+        ) 'countInitPrice'
+        FROM
+        pro_lock_record lck
+        LEFT JOIN pro_product pro
+        ON lck.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        LEFT JOIN shp_user_shop_ref ref
+        ON lck.`lock_user_id` = ref.`fk_shp_user_id`
+        AND ref.`fk_shp_shop_id` = lck.`fk_shp_shop_id`
+        WHERE lck.fk_shp_shop_id = #{shopId}
+        AND lck.state = 0
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code = #{classifyCode}
+        </if>
+        <if test="lockUserId != null and lockUserId != ''">
+            AND lck.`lock_user_id` in (${lockUserId})
+        </if>
+        <if test="minPrice != null">
+            AND lck.pre_money &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            AND lck.pre_money &lt;= #{maxPrice}
+        </if>
+        <if test="lockTimeSt != null and lockTimeSt != ''">
+            AND lck.insert_time &gt;= #{lockTimeSt}
+        </if>
+        <if test="lockTimeEt != null and lockTimeEt != ''">
+            AND lck.insert_time &lt;= #{lockTimeEt}
+        </if>
+        <if test="keyword != null and keyword!=''">
+            AND (
+            CONCAT(pro.name,pro.description,lck.remark) REGEXP #{keyword}
+            OR CONCAT(pro.description,pro.name,lck.remark) REGEXP #{keyword}
+            <if test="uniqueCode != null and uniqueCode!=''">
+                OR det.unique_code REGEXP #{uniqueCode}
+                OR det.auto_number REGEXP #{uniqueCode}
+            </if>
+            )
+        </if>
+        <if test="uniqueCode != null and uniqueCode!=''">
+            AND det.auto_number = #{uniqueCode}
+        </if>
+    </select>
+
+    <!--统计我的锁单数量(正在锁单中)-->
+    <select id="countMyLockNum" resultType="java.lang.Integer">
+        select
+          IFNULL(SUM(lock_num),0) 'lockNum'
+        from
+          pro_lock_record
+        where state = 0
+          and fk_shp_shop_id = #{shopId}
+          and lock_user_id = #{userId}
+    </select>
+    <!--统计寄卖传送我的锁单数量-->
+    <select id="countConveyProLockNum" resultType="java.lang.Integer">
+        select
+        IFNULL(SUM(lock_num),0) 'lockNum'
+        from
+        pro_lock_record
+        where state = 0
+        <if test="type != null and type!=''">
+            and  convey_lock_type is not null
+        </if>
+        <if test="type != null and type=='lock'">
+            and  convey_lock_type ='lock'
+        </if>
+        and fk_shp_shop_id = #{shopId}
+        and fk_pro_product_id = #{proId}
+    </select>
+    <!--获取锁单中的商品v2.6.2(含)以上版本使用-->
+    <select id="listLockProductByParam" resultType="com.luxuryadmin.vo.pro.VoProductLoad">
+        SELECT
+        pro.fk_shp_shop_id 'shopId',
+        pro.`biz_id` 'bizId',
+        pro.`name`,
+        pro.`fk_pro_attribute_code` 'attributeUs',
+        pro.`target_user` 'targetUser',
+        pro.`quality`,
+        pro.`small_img` 'smallImg',
+        lck.id 'lockId',
+        lck.`lock_num` 'lockNum',
+        lck.remark 'lockReason',
+        lck.`insert_time` 'insertTime',
+        lck.`pre_money` 'preMoney',
+        lck.`pre_finish_money` 'preFinishMoney',
+        ref.name 'lockedUser'
+        FROM
+        pro_lock_record lck
+        LEFT JOIN pro_product pro
+        ON lck.`fk_pro_product_id` = pro.`id`
+        LEFT JOIN pro_detail det
+        ON pro.`id` = det.`fk_pro_product_id`
+        LEFT JOIN shp_user_shop_ref ref
+        ON lck.`lock_user_id` = ref.`fk_shp_user_id`
+        AND ref.`fk_shp_shop_id` = lck.`fk_shp_shop_id`
+        WHERE lck.fk_shp_shop_id = #{shopId}
+        AND lck.state = 0
+        <if test="classifyCode != null and classifyCode!=''">
+            AND pro.fk_pro_classify_code = #{classifyCode}
+        </if>
+        <if test="lockUserId != null and lockUserId != ''">
+            AND lck.`lock_user_id` in (${lockUserId})
+        </if>
+        <if test="minPrice != null">
+            AND lck.pre_money &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            AND lck.pre_money &lt;= #{maxPrice}
+        </if>
+        <if test="lockTimeSt != null and lockTimeSt != ''">
+            AND lck.insert_time &gt;= #{lockTimeSt}
+        </if>
+        <if test="lockTimeEt != null and lockTimeEt != ''">
+            AND lck.insert_time &lt;= #{lockTimeEt}
+        </if>
+        <choose>
+            <when test="keyword != null and keyword!=''">
+                AND (
+                CONCAT(pro.name,pro.description,lck.remark) REGEXP #{keyword}
+                OR CONCAT(pro.description,pro.name,lck.remark) REGEXP #{keyword}
+                <if test="uniqueCode != null and uniqueCode!=''">
+                    OR det.unique_code REGEXP #{uniqueCode}
+                    OR det.auto_number REGEXP #{uniqueCode}
+                </if>
+                )
+            </when>
+            <otherwise>
+                <if test="uniqueCode != null and uniqueCode!=''">
+                    and det.auto_number REGEXP #{uniqueCode}
+                </if>
+            </otherwise>
+        </choose>
+
+        ORDER BY ${sortKeyDb}
+    </select>
+
+    <!--查找某个店铺里具体的单个锁单记录-->
+    <select id="getProLockRecordByIdAndShopId" resultType="com.luxuryadmin.vo.pro.VoProLockRecord">
+        SELECT
+          lck.id 'lockId',
+          lck.lock_user_id 'lockUserId',
+          lck.pro_biz_id 'bizId',
+          (SELECT
+            uShopR.`name`
+          FROM
+            shp_user_shop_ref uShopR
+          WHERE uShopR.fk_shp_shop_id = #{shopId}
+            AND uShopR.fk_shp_user_id = lck.lock_user_id) 'lockUser',
+          lck.`lock_num` 'lockNum',
+          case when lck.`remark`='' or lck.`remark` is null then '无' else lck.`remark` end as 'lockReason',
+          lck.`update_time` 'updateTime',
+          lck.`insert_time` 'insertTime',
+          lck.pre_money 'preMoney',
+          lck.son_record_id 'sonRecordId',
+          lck.fk_ord_address_id 'addressId',
+        (SELECT
+        oa.`receive_address`
+        FROM
+        ord_address oa
+        WHERE oa.id = lck.fk_ord_address_id) 'address',
+          lck.`pre_finish_money` 'preFinishMoney'
+        FROM
+          pro_lock_record lck
+        WHERE lck.`fk_shp_shop_id` = #{shopId}
+          AND lck.`id` = #{lockId}
+          AND lck.`state` = 0
+    </select>
+    <!--查找某个店铺里具体的单个锁单记录-->
+    <select id="getLockRecordByIdAndShopId" resultType="com.luxuryadmin.vo.pro.VoProLockRecord">
+        SELECT
+        lck.id 'lockId',
+        lck.lock_user_id 'lockUserId',
+        lck.pro_biz_id 'bizId',
+        (SELECT
+        uShopR.`name`
+        FROM
+        shp_user_shop_ref uShopR
+        WHERE uShopR.fk_shp_shop_id = #{shopId}
+        AND uShopR.fk_shp_user_id = lck.lock_user_id) 'lockUser',
+        lck.`lock_num` 'lockNum',
+        case when lck.`remark`='' or lck.`remark` is null then '无' else lck.`remark` end as 'lockReason',
+        lck.`update_time` 'updateTime',
+        lck.`insert_time` 'insertTime',
+        lck.pre_money 'preMoney',
+        lck.son_record_id 'sonRecordId',
+        lck.fk_ord_address_id 'addressId',
+        (SELECT
+        oa.`receive_address`
+        FROM
+        ord_address oa
+        WHERE oa.id = lck.fk_ord_address_id) 'address',
+        lck.`pre_finish_money` 'preFinishMoney'
+        FROM
+        pro_lock_record lck
+        WHERE lck.`fk_shp_shop_id` = #{shopId}
+        AND lck.`id` = #{lockId}
+
+    </select>
+
+    <!--获取锁单商品的锁单记录-->
+    <select id="lisProLockRecordByBizId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        pro_lock_record
+        WHERE pro_biz_id = #{bizId}
+        AND fk_shp_shop_id = #{shopId}
+        AND state = 0
+    </select>
+    <select id="getProDeliverInfo" resultType="com.luxuryadmin.vo.pro.VoProDeliverByPage"
+            parameterType="com.luxuryadmin.param.pro.ParamProPageDeliver">
+        SELECT
+        pd.id AS deliverId,
+        pd.fk_pro_lock_record_id AS lockId,
+        pd.state as state,
+        pd.deliver_source as deliverSource,
+        pd.update_time as updateTime,
+        <if test="state==1">
+            pd.deliver_time AS showTime,
+            (SELECT
+            uShopR.`name`
+            FROM
+            shp_user_shop_ref uShopR
+            WHERE
+            uShopR.fk_shp_shop_id = pd.fk_shp_shop_id
+            AND uShopR.fk_shp_user_id = pd.fk_shp_user_id) as deliverNickname,
+        </if>
+        <if test="state==0">
+            pl.insert_time AS showTime,
+        </if>
+        pl.remark as remark,
+        ad.receive_address AS address,
+        pro.`name` 'name',
+        pro.`small_img` 'smallImg',
+        pro.`init_price`*pl.`lock_num` 'initPrice',
+        pro.target_user as targetUser,
+        pro.fk_pro_attribute_code as attributeUs,
+        pro.fk_pro_classify_code 'classifyUs',
+        pro.insert_time 'uploadStoreTime',
+        pro.biz_id as bizId,
+        pro.fk_shp_shop_id as shopId
+        FROM
+        pro_deliver pd
+        LEFT JOIN pro_lock_record pl ON pd.fk_pro_lock_record_id = pl.id
+        LEFT JOIN pro_product pro ON pd.fk_pro_product_id = pro.id
+        LEFT JOIN ord_address ad on pl.fk_ord_address_id = ad.id
+        WHERE
+        pd.del = 0
+        AND pd.state = #{state}
+        AND pd.deliver_source = #{deliverSource}
+        AND pd.fk_shp_shop_id = #{shopId}
+        <if test="deliverStartTime!=null and deliverStartTime!=''">
+            and pd.deliver_time &gt; #{deliverStartTime}
+        </if>
+        <if test="deliverEndTime!=null and deliverStartTime!=''">
+            and pd.deliver_time &lt; #{deliverEndTime}
+        </if>
+        <if test="orderOrLockUserId!=null">
+            and pl.lock_user_id = #{orderOrLockUserId}
+        </if>
+        <if test="state==1 and shpUserId!=null ">
+            and pd.fk_shp_user_id = #{shpUserId}
+        </if>
+        <if test="startTime!=null and startTime!='' and state==1">
+            and pd.insert_time &gt; #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!='' and state==1">
+            and pd.insert_time &lt; #{endTime}
+        </if>
+        <if test="startTime!=null and startTime!='' and state==0">
+            and pl.insert_time &gt; #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!='' and state==0">
+            and pl.insert_time &lt; #{endTime}
+        </if>
+        <if test="proName!=null and proName!=''">
+            and
+            (
+            pro.`name` like CONCAT('%',#{proName},'%')
+            or
+            pd.`remark` like CONCAT('%',#{proName},'%')
+            or
+            pl.`remark` like CONCAT('%',#{proName},'%')
+            or
+            ad.receive_address like CONCAT('%',#{proName},'%')
+            or
+            pd.`number`like CONCAT('%',#{proName},'%')
+            )
+        </if>
+        <if test="sortKey != null and sortKey=='updateTime'">
+            <if test="state==0">
+                <if test="sortValue=='asc' or sortValue=='ASC'">
+                    order by pl.insert_time asc
+                </if>
+                <if test="sortValue=='desc' or sortValue=='DESC'">
+                    order by pl.insert_time desc
+                </if>
+            </if>
+            <if test="state==1">
+                <if test="sortValue=='asc' or sortValue=='ASC'">
+                    order by pd.deliver_time asc
+                </if>
+                <if test="sortValue=='desc' or sortValue=='DESC'">
+                    order by pd.deliver_time desc
+                </if>
+            </if>
+        </if>
+    </select>
+    <select id="getProLockRecordByProId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM
+        pro_lock_record
+        WHERE pro_biz_id = #{bizId}
+        AND fk_shp_shop_id = #{shopId}
+        <!--寄卖传送关联锁单不可删除和解锁 -->
+        and convey_lock_type is null
+        and del =0
+    </select>
+    <select id="getFiltrateinfoByShopId" resultType="com.luxuryadmin.vo.pro.VoOrderUserInfo"
+            parameterType="java.lang.Integer">
+        SELECT
+            pro_lock_record.lock_user_id AS userId,
+            uShopR.`name` AS nickname
+        FROM
+            pro_lock_record
+            LEFT JOIN shp_user_shop_ref uShopR ON uShopR.fk_shp_user_id = pro_lock_record.lock_user_id
+            AND uShopR.fk_shp_shop_id = pro_lock_record.fk_shp_shop_id
+        WHERE
+            pro_lock_record.del = 0
+            AND pro_lock_record.fk_shp_shop_id = #{shopId}
+        GROUP BY
+            pro_lock_record.lock_user_id
+        ORDER BY
+            CONVERT ( uShopR.`name` USING gbk ) ASC
+    </select>
+    <select id="listProDeliverInfo" resultType="com.luxuryadmin.vo.pro.VoProDeliverByPage">
+        SELECT
+        pd.id AS deliverId,
+        pd.fk_pro_lock_record_id AS lockId,
+        pd.state as state,
+        pd.deliver_source as deliverSource,
+        pd.update_time as updateTime,
+        <if test="state==1">
+            pd.deliver_time AS showTime,
+            (SELECT
+            uShopR.`name`
+            FROM
+            shp_user_shop_ref uShopR
+            WHERE
+            uShopR.fk_shp_shop_id = pd.fk_shp_shop_id
+            AND uShopR.fk_shp_user_id = pd.fk_shp_user_id) as deliverNickname,
+            pd.deliver_type as deliverType,
+        </if>
+        <if test="state==0">
+            pl.insert_time AS showTime,
+        </if>
+        pl.remark as remark,
+        ad.receive_address AS address,
+        pro.`name` 'name',
+        pro.`small_img` 'smallImg',
+        pro.`init_price`*pl.`lock_num` 'initPrice',
+        pro.target_user as targetUser,
+        pro.fk_pro_attribute_code as attributeUs,
+        pro.fk_pro_classify_code 'classifyUs',
+        pro.insert_time 'uploadStoreTime',
+        pro.biz_id as bizId,
+        pro.fk_shp_shop_id as shopId
+        FROM
+        pro_deliver pd
+        LEFT JOIN pro_lock_record pl ON pd.fk_pro_lock_record_id = pl.id
+        LEFT JOIN pro_product pro ON pd.fk_pro_product_id = pro.id
+        LEFT JOIN ord_address ad on pl.fk_ord_address_id = ad.id
+        WHERE
+        pd.id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getLockByProId" resultType="com.luxuryadmin.vo.pro.VoLockNumByProId">
+        SELECT
+            fk_pro_product_id as proId,
+            sum( lock_num ) as lockNum
+        FROM
+            pro_lock_record
+        WHERE
+            fk_shp_shop_id = #{shopId}
+            AND state = 0
+            and fk_pro_product_id in
+            <foreach collection="proIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        GROUP BY
+            fk_pro_product_id
+    </select>
+    <select id="getLockSum" resultType="java.lang.Integer"
+            parameterType="java.util.List">
+        SELECT
+        sum(pl.lock_num)
+        FROM
+        pro_deliver pd
+        LEFT JOIN pro_lock_record pl ON pd.fk_pro_lock_record_id = pl.id
+        LEFT JOIN pro_product pro ON pd.fk_pro_product_id = pro.id
+        LEFT JOIN ord_address ad on pl.fk_ord_address_id = ad.id
+        WHERE
+        pd.id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getProLockRecordBySonRecordId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        pro_lock_record
+        WHERE son_record_id = #{sonRecordId}
+        AND convey_lock_type = #{conveyLockType}
+    </select>
+
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from pro_lock_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <!--根据proId删除记录-->
+    <delete id="deleteProLockRecordByProId">
+        DELETE
+        FROM
+          pro_lock_record
+        WHERE pro_biz_id = #{bizId}
+        <!--寄卖传送关联锁单不可删除和解锁 -->
+          AND fk_shp_shop_id = #{shopId} and convey_lock_type is null
+    </delete>
+    <delete id="deleteProLockRecordByShopId">
+        DELETE
+        FROM
+          pro_lock_record
+        WHERE fk_shp_shop_id = #{shopId}
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProLockRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into pro_lock_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkProProductId != null">
+                fk_pro_product_id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="proBizId != null">
+                pro_biz_id,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="lockUserId != null">
+                lock_user_id,
+            </if>
+            <if test="unlockUserId != null">
+                unlock_user_id,
+            </if>
+            <if test="fkOrdAddressId != null">
+                fk_ord_address_id,
+            </if>
+            <if test="preMoney != null">
+                pre_money,
+            </if>
+            <if test="preFinishMoney != null">
+                pre_finish_money,
+            </if>
+            <if test="lockNum != null">
+                lock_num,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="unlockTime != null">
+                unlock_time,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="sonRecordId != null">
+                son_record_id,
+            </if>
+            <if test="conveyLockType != null">
+                convey_lock_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkProProductId != null">
+                #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="proBizId != null">
+                #{proBizId,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="lockUserId != null">
+                #{lockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="unlockUserId != null">
+                #{unlockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdAddressId != null">
+                #{fkOrdAddressId,jdbcType=INTEGER},
+            </if>
+            <if test="preMoney != null">
+                #{preMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="preFinishMoney != null">
+                #{preFinishMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="lockNum != null">
+                #{lockNum,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="unlockTime != null">
+                #{unlockTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="sonRecordId != null">
+                #{sonRecordId,jdbcType=INTEGER},
+            </if>
+            <if test="conveyLockType != null">
+                #{conveyLockType,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProLockRecord">
+        update pro_lock_record
+        <set>
+            <if test="fkProProductId != null">
+                fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="proBizId != null">
+                pro_biz_id = #{proBizId,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="lockUserId != null">
+                lock_user_id = #{lockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="unlockUserId != null">
+                unlock_user_id = #{unlockUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkOrdAddressId != null">
+                fk_ord_address_id = #{fkOrdAddressId,jdbcType=INTEGER},
+            </if>
+            <if test="preMoney != null">
+                pre_money = #{preMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="preFinishMoney != null">
+                pre_finish_money = #{preFinishMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="lockNum != null">
+                lock_num = #{lockNum,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="unlockTime != null">
+                unlock_time = #{unlockTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpUserShopRefMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpUserShopRef">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="fk_shp_user_type_id" jdbcType="INTEGER" property="fkShpUserTypeId"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_shop_id, fk_shp_user_id, name, fk_shp_user_type_id, state, insert_time, update_time, insert_admin,
+    update_admin, versions, del, remark
+  </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user_shop_ref
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!-- 该员工是否存在-->
+    <select id="existsShpUserShopRef" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM shp_user_shop_ref
+        WHERE fk_shp_shop_id = #{shopId} AND fk_shp_user_id = #{userId} AND state = 1
+    </select>
+
+    <!--根据店铺id获取该店铺的销售人员，在职的普通员工级别以上-->
+    <select id="getSalesmanByShopId" resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        SELECT
+          us.`id` 'userId',
+          IF(uShopR.`name` = '', us.`nickname`,uShopR.`name`) 'nickname',
+          (SELECT
+            usType.name
+          FROM
+            shp_user_type usType
+          WHERE usType.id = uShopR.`fk_shp_user_type_id`
+           AND usType.`fk_shp_shop_id` = #{shopId}
+          ) 'role'
+        FROM
+          shp_user_shop_ref uShopR
+          LEFT JOIN shp_user us
+            ON uShopR.`fk_shp_user_id` = us.`id`
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+          AND uShopR.`state` = 1
+        ORDER BY CONVERT(uShopR.`name` USING gbk) ASC
+    </select>
+
+    <!--根据店铺id获取该店铺的所有员工 2020-08-11 22:37:21 临时兼容线上, identity和role临时置换-->
+    <select id="listUserShopRefByShopId" resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        SELECT
+        uShopR.`id` 'refId',
+        us.`id` 'userId',
+        us.username,
+        us.`number` 'userNumber',
+        IF(uShopR.`name` = '', us.`nickname`,uShopR.`name`) 'nickname',
+        us.head_img_url 'headImageUrl',
+        uShopR.insert_time 'joinWorkTime',
+        uShopR.fk_shp_user_type_id 'userTypeId',
+        sutype.name 'userTypeName'
+        FROM
+        shp_user_shop_ref uShopR
+        LEFT JOIN shp_user us
+        ON uShopR.`fk_shp_user_id` = us.`id`
+        LEFT JOIN shp_user_type sutype
+        ON uShopR.`fk_shp_user_type_id` = sutype.`id`
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+        AND uShopR.`state` = #{state}
+        and us.id is not null
+        <if test="queryKey != null">
+            AND(
+            us.username = #{username} OR uShopR.`name` like CONCAT('%',#{queryKey},'%')
+            )
+        </if>
+
+        <choose>
+            <when test="sortKeyDb != null">
+                ORDER BY ${sortKeyDb}
+            </when>
+            <otherwise>
+                ORDER BY IFNULL(sutype.`sort`,99) ASC,sutype.`id` ASC, us.`id` ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--获得所有在职员工的userId-->
+    <select id="listAllUserIdByShopId" resultType="java.lang.Integer">
+        SELECT
+          uShopR.`fk_shp_user_id` 'userId'
+        FROM
+          shp_user_shop_ref uShopR
+          LEFT JOIN shp_user_type sutype
+            ON uShopR.`fk_shp_user_type_id` = sutype.`id`
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+          AND uShopR.`state` = #{state}
+        ORDER BY IFNULL(sutype.`sort`,99) ASC,sutype.`id` ASC
+    </select>
+
+    <select id="getUserTypeByShopIdAndUserId" resultType="java.lang.String">
+        select  `fk_shp_user_type_id` 'userTypeId'  from `shp_user_shop_ref` where `fk_shp_shop_id` =#{shopId} and `fk_shp_user_id` = #{userId}
+    </select>
+
+    <select id="getUserTypeRoleNameByShopIdAndUserId" resultType="java.lang.String">
+        SELECT
+          sutype.name 'userTypeName'
+        FROM
+          shp_user_shop_ref uShopR
+        LEFT JOIN shp_user_type sutype
+            ON uShopR.`fk_shp_user_type_id` = sutype.`id`
+        WHERE
+            uShopR.`fk_shp_shop_id` = #{shopId}
+        AND
+            uShopR.`fk_shp_user_id` = #{userId}
+    </select>
+
+    <!--获取店铺的入库人员(在职员工);-->
+    <select id="listUploadUser" resultType="com.luxuryadmin.vo.shp.VoEmployee">
+        SELECT
+          us.`id` 'userId',
+          IF(uShopR.`name` = '', us.`nickname`,uShopR.`name`) 'nickname',
+          us.`number` 'userNumber'
+        FROM
+          shp_user_shop_ref uShopR
+          left join shp_user us
+            on uShopR.`fk_shp_user_id` = us.`id`
+        where uShopR.fk_shp_shop_id = #{shopId}
+          and uShopR.state = 1
+          and uShopR.fk_shp_user_type_id &lt;=0
+        order by CAST(uShopR.fk_shp_user_type_id AS SIGNED) asc,
+          uShopR.id asc ;
+    </select>
+
+    <!--查找该店铺是否存在此员工记录-->
+    <select id="getShpUserShopRefByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user_shop_ref
+        where fk_shp_shop_id=#{shopId} and fk_shp_user_id =#{userId}
+        order by insert_time desc
+        limit 1
+    </select>
+
+    <!--统计,在职员工和离职员工总数-->
+    <select id="countEmployee" resultType="java.util.Map">
+        select
+          (SELECT
+            COUNT(0)
+          FROM
+            shp_user_shop_ref uShopR
+          WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+            AND uShopR.`state` = '1') 'nomal',
+          (SELECT
+            COUNT(0)
+          FROM
+            shp_user_shop_ref uShopR
+          WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+            AND uShopR.`state` = '0') 'leave'
+    </select>
+
+    <select id="selectUserIdListByTypeList" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT fk_shp_user_id
+        FROM shp_user_shop_ref
+        WHERE fk_shp_shop_id=#{shopId}
+        AND type IN
+        <foreach collection="shpUserTypeList" open="(" close=")" separator="," item="typeName">
+            #{typeName}
+        </foreach>
+    </select>
+
+    <!--获取用户在该店铺的名称-->
+    <select id="getNameFromShop" resultType="java.lang.String">
+        select
+          uShopR.`name`
+        from
+          shp_user_shop_ref uShopR
+        where uShopR.fk_shp_shop_id = #{shopId}
+          and uShopR.fk_shp_user_id = #{userId}
+        order by uShopR.insert_time desc
+    </select>
+
+    <!--获取关联此身份的userId-->
+    <select id="listUserIdByUserTypeId" resultType="java.lang.Integer">
+        SELECT
+          fk_shp_user_id 'userId'
+        FROM
+          shp_user_shop_ref
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_type_id = #{userTypeId}
+    </select>
+
+    <!-- 获取员工的用户名-->
+    <select id="listAllUserNameByShopId" resultType="java.lang.String">
+        SELECT
+          su.username
+        FROM
+          shp_user_shop_ref uShopR
+          LEFT JOIN shp_user su
+            ON uShopR.`fk_shp_user_id` = su.`id`
+        WHERE uShopR.`fk_shp_shop_id` = #{shopId}
+          AND uShopR.`state` = #{state}
+    </select>
+
+    <!--查找在职员工; state=1;-->
+    <select id="getShpUserShopRefOnJobByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_user_shop_ref
+        where fk_shp_shop_id=#{shopId} and fk_shp_user_id =#{userId} and state = 1
+    </select>
+
+    <!--查找在职的所有员工(不包含boss);-->
+    <select id="listAllUserShopRefExceptBoss" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from shp_user_shop_ref where state = 1 and type !=-9
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_user_shop_ref
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <!--物理删除店铺与员工的关系;注销店铺时调用-->
+    <delete id="deleteUserShopRefByShopId">
+        delete from shp_user_shop_ref WHERE fk_shp_shop_id = #{shopId} 
+    </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpUserShopRef">
+        insert into shp_user_shop_ref
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="fkShpUserTypeId != null">
+                fk_shp_user_type_id,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpUserTypeId != null">
+                #{fkShpUserTypeId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <sql id="updateCondition">
+        <set>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fkShpUserTypeId != null">
+                fk_shp_user_type_id = #{fkShpUserTypeId,jdbcType=INTEGER},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+
+    </sql>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpUserShopRef">
+        update shp_user_shop_ref
+        <include refid="updateCondition"/>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="fireEmployee">
+        update shp_user_shop_ref
+        <include refid="updateCondition"/>
+        where id = #{id} and fk_shp_shop_id = #{fkShpShopId} and fk_shp_user_id = #{fkShpUserId}
+    </update>
+
+    <update id="updateUserShopRef">
+        update shp_user_shop_ref
+        set fk_shp_user_type_id = #{fkShpUserTypeId},update_time = now()
+        where fk_shp_shop_id = #{fkShpShopId} and fk_shp_user_id = #{fkShpUserId}
+    </update>
+
+    <update id="updateUserShopRefState">
+        update shp_user_shop_ref
+        set state = #{state},update_time = now()
+        where fk_shp_shop_id = #{fkShpShopId} and fk_shp_user_id = #{fkShpUserId}
+    </update>
+</mapper>

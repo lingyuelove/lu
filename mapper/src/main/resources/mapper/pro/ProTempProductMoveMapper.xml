@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.pro.ProTempProductMoveMapper">
+
+	<resultMap id="BaseResultMap" type="com.luxuryadmin.entity.pro.ProTempProductMove">
+
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId" />
+
+		<result column="fk_pro_product_id" jdbcType="INTEGER" property="fkProProductId" />
+
+		<result column="fk_remove_pro_temp_id" jdbcType="INTEGER" property="fkRemoveProTempId" />
+
+		<result column="fk_enter_pro_temp_id" jdbcType="INTEGER" property="fkEnterProTempId" />
+
+		<result column="remove_num" jdbcType="INTEGER" property="removeNum" />
+
+		<result column="surplus_num" jdbcType="INTEGER" property="surplusNum" />
+
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+
+		<result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		fk_shp_shop_id,
+		fk_pro_product_id,
+		fk_remove_pro_temp_id,
+		fk_enter_pro_temp_id,
+		remove_num,
+		surplus_num,
+		insert_time,
+		insert_admin,
+		remark
+	</sql>
+
+	<insert id="saveObject" parameterType="com.luxuryadmin.entity.pro.ProTempProductMove" keyProperty="id" useGeneratedKeys="true" >
+		insert into pro_temp_product_move
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null ">
+				id, 
+			</if>
+			<if test="fkShpShopId!=null ">
+				fk_shp_shop_id, 
+			</if>
+			<if test="fkProProductId!=null ">
+				fk_pro_product_id, 
+			</if>
+			<if test="fkRemoveProTempId!=null ">
+				fk_remove_pro_temp_id, 
+			</if>
+			<if test="fkEnterProTempId!=null ">
+				fk_enter_pro_temp_id, 
+			</if>
+			<if test="removeNum!=null ">
+				remove_num, 
+			</if>
+			<if test="surplusNum!=null ">
+				surplus_num, 
+			</if>
+			<if test="insertTime!=null ">
+				insert_time, 
+			</if>
+			<if test="insertAdmin!=null ">
+				insert_admin, 
+			</if>
+			<if test="remark!=null ">
+				remark, 
+			</if>
+
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="fkShpShopId!=null">
+				#{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				#{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkRemoveProTempId!=null">
+				#{fkRemoveProTempId,jdbcType=INTEGER},
+			</if>
+			<if test="fkEnterProTempId!=null">
+				#{fkEnterProTempId,jdbcType=INTEGER},
+			</if>
+			<if test="removeNum!=null">
+				#{removeNum,jdbcType=INTEGER},
+			</if>
+			<if test="surplusNum!=null">
+				#{surplusNum,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				#{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<delete id="deleteObject" >
+		delete from  pro_temp_product_move 
+
+		where id = #{id} 
+ 
+
+	</delete>
+
+	<update id="updateObject" parameterType="com.luxuryadmin.entity.pro.ProTempProductMove" >
+		update pro_temp_product_move
+		<set>
+			<if test="fkShpShopId!=null">
+				fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+			</if>
+			<if test="fkProProductId!=null">
+				fk_pro_product_id = #{fkProProductId,jdbcType=INTEGER},
+			</if>
+			<if test="fkRemoveProTempId!=null">
+				fk_remove_pro_temp_id = #{fkRemoveProTempId,jdbcType=INTEGER},
+			</if>
+			<if test="fkEnterProTempId!=null">
+				fk_enter_pro_temp_id = #{fkEnterProTempId,jdbcType=INTEGER},
+			</if>
+			<if test="removeNum!=null">
+				remove_num = #{removeNum,jdbcType=INTEGER},
+			</if>
+			<if test="surplusNum!=null">
+				surplus_num = #{surplusNum,jdbcType=INTEGER},
+			</if>
+			<if test="insertTime!=null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertAdmin!=null">
+				insert_admin = #{insertAdmin,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null and remark!=''">
+				remark = #{remark,jdbcType=VARCHAR},
+			 </if>
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<select id="getObjectById" resultMap="BaseResultMap" >
+		select
+		id,
+		fk_shp_shop_id,
+		fk_pro_product_id,
+		fk_remove_pro_temp_id,
+		fk_enter_pro_temp_id,
+		remove_num,
+		surplus_num,
+		insert_time,
+		insert_admin,
+		remark
+		from pro_temp_product_move
+		where id = #{id,jdbcType=INTEGER}
+
+	</select>
+
+
+</mapper>

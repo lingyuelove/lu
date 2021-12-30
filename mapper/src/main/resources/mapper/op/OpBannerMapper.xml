@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.op.OpBannerMapper">
+  <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.op.OpBanner">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="publish_platform" jdbcType="VARCHAR" property="publishPlatform" />
+    <result column="android_min_version" jdbcType="VARCHAR" property="androidMinVersion" />
+    <result column="android_max_version" jdbcType="VARCHAR" property="androidMaxVersion" />
+    <result column="ios_min_version" jdbcType="VARCHAR" property="iosMinVersion" />
+    <result column="ios_max_version" jdbcType="VARCHAR" property="iosMaxVersion" />
+    <result column="pos" jdbcType="VARCHAR" property="pos" />
+    <result column="jump_type" jdbcType="VARCHAR" property="jumpType" />
+    <result column="jump_h5_url" jdbcType="VARCHAR" property="jumpH5Url" />
+    <result column="jump_native_page" jdbcType="VARCHAR" property="jumpNativePage" />
+    <result column="sort_num" jdbcType="INTEGER" property="sortNum" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="show_start_time" jdbcType="TIMESTAMP" property="showStartTime" />
+    <result column="show_end_time" jdbcType="TIMESTAMP" property="showEndTime" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin" />
+    <result column="update_admin" jdbcType="INTEGER" property="updateAdmin" />
+    <result column="del" jdbcType="CHAR" property="del" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, img_url, publish_platform, android_min_version, android_max_version, ios_min_version, 
+    ios_max_version, pos, jump_type, jump_h5_url, jump_native_page, sort_num, state, 
+    show_start_time, show_end_time, insert_time, update_time, insert_admin, update_admin, 
+    del
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from op_banner
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectOpBannerListByParam" resultType="com.luxuryadmin.vo.op.VoOpBanner" parameterType="com.luxuryadmin.param.op.ParamOpBannerQuery">
+      select
+        ob.id as id,
+        ob.title as title,
+        ob.img_url as imgUrl,
+        ob.publish_platform as publishPlatform,
+
+        ob.android_min_version as androidMinVersion,
+        ob.android_max_version as androidMaxVersion,
+        ob.ios_min_version as iosMinVersion,
+        ob.ios_max_version as iosMaxVersion,
+
+        ob.pos as pos,
+        ob.jump_type as jumpType,
+        ob.jump_h5_url as jumpH5Url,
+        ob.jump_native_page as jumpNativePage,
+
+        ob.sort_num as sortNum,
+        ob.state as state,
+        ob.show_start_time as showStartTime,
+        ob.show_end_time as showEndTime,
+        ob.insert_time as insertTime,
+        su.username as updateAdminName
+      from
+        op_banner ob
+      LEFT JOIN
+        sys_user su
+      ON
+        ob.update_admin = su.id
+      where
+        (1=1)
+      and
+        ob.del = '0'
+      <if test="pos != null">
+        and ob.pos = #{pos}
+      </if>
+      <if test="title != null">
+        and ob.title like CONCAT('%',#{title},'%')
+      </if>
+      <if test="publishPlatform != null">
+        and ob.publish_platform = #{publishPlatform}
+      </if>
+      <if test="state != null">
+        and ob.state = #{state}
+      </if>
+      <if test="insertTimeStart != null">
+        and ob.insert_time >= #{insertTimeStart}
+      </if>
+      <if test="insertTimeEnd != null">
+        and #{insertTimeEnd} >= ob.insert_time
+      </if>
+      order by
+        ob.sort_num desc,ob.insert_time desc
+  </select>
+  <select id="selectOpBannerByPos" resultType="com.luxuryadmin.vo.op.VoOpBanner" parameterType="com.luxuryadmin.param.op.ParamAppBannerQuery">
+        select
+        ob.id as id,
+        ob.title as title,
+        ob.img_url as imgUrl,
+        ob.publish_platform as publishPlatform,
+
+        ob.android_min_version as androidMinVersion,
+        ob.android_max_version as androidMaxVersion,
+        ob.ios_min_version as iosMinVersion,
+        ob.ios_max_version as iosMaxVersion,
+
+        ob.pos as pos,
+        ob.jump_type as jumpType,
+        ob.jump_h5_url as jumpH5Url,
+        ob.jump_native_page as jumpNativePage,
+
+        ob.sort_num as sortNum,
+        ob.state as state,
+        ob.show_start_time as showStartTime,
+        ob.show_end_time as showEndTime,
+        ob.insert_time as insertTime,
+        #{platform}
+      from
+        op_banner ob
+      where
+        (1=1)
+      and
+        ob.del = '0'
+      and
+        ob.state = 'on'
+      and
+        show_start_time &lt;= NOW()
+      and
+        show_end_time &gt;= NOW()
+      <if test="pos != null">
+        and ob.pos = #{pos}
+      </if>
+      <if test="platform != null">
+        and (ob.publish_platform = 'all' OR ob.publish_platform = #{platform})
+      </if>
+      <choose>
+        <when test='platform == "android" '>
+          AND #{appVersion} &gt;= android_min_version
+          AND #{appVersion} &lt;= android_max_version
+        </when>
+        <when test='platform == "ios" '>
+          AND #{appVersion} &gt;= ios_min_version
+          AND #{appVersion} &lt;= ios_max_version
+        </when>
+        <otherwise>
+        </otherwise>
+      </choose>
+      order by sort_num desc
+  </select>
+
+  <select id="selectIndexPopWindowCount" resultType="java.lang.Integer" parameterType="com.luxuryadmin.param.op.ParamAppBannerQuery">
+    select
+        count(1)
+    from
+        op_banner ob
+    where
+        (1=1)
+    and
+        ob.pos = 'indexPopupWindow'
+    and
+        del = '0'
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from op_banner
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.luxuryadmin.entity.op.OpBanner">
+    insert into op_banner (id, title, img_url, 
+      publish_platform, android_min_version, android_max_version, 
+      ios_min_version, ios_max_version, pos, 
+      jump_type, jump_h5_url, jump_native_page, 
+      sort_num, state, show_start_time, 
+      show_end_time, insert_time, update_time, 
+      insert_admin, update_admin, del
+      )
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{imgUrl,jdbcType=VARCHAR}, 
+      #{publishPlatform,jdbcType=VARCHAR}, #{androidMinVersion,jdbcType=VARCHAR}, #{androidMaxVersion,jdbcType=VARCHAR}, 
+      #{iosMinVersion,jdbcType=VARCHAR}, #{iosMaxVersion,jdbcType=VARCHAR}, #{pos,jdbcType=VARCHAR}, 
+      #{jumpType,jdbcType=VARCHAR}, #{jumpH5Url,jdbcType=VARCHAR}, #{jumpNativePage,jdbcType=VARCHAR}, 
+      #{sortNum,jdbcType=INTEGER}, #{state,jdbcType=VARCHAR}, #{showStartTime,jdbcType=TIMESTAMP}, 
+      #{showEndTime,jdbcType=TIMESTAMP}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{insertAdmin,jdbcType=INTEGER}, #{updateAdmin,jdbcType=INTEGER}, #{del,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.luxuryadmin.entity.op.OpBanner">
+    insert into op_banner
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="imgUrl != null">
+        img_url,
+      </if>
+      <if test="publishPlatform != null">
+        publish_platform,
+      </if>
+      <if test="androidMinVersion != null">
+        android_min_version,
+      </if>
+      <if test="androidMaxVersion != null">
+        android_max_version,
+      </if>
+      <if test="iosMinVersion != null">
+        ios_min_version,
+      </if>
+      <if test="iosMaxVersion != null">
+        ios_max_version,
+      </if>
+      <if test="pos != null">
+        pos,
+      </if>
+      <if test="jumpType != null">
+        jump_type,
+      </if>
+      <if test="jumpH5Url != null">
+        jump_h5_url,
+      </if>
+      <if test="jumpNativePage != null">
+        jump_native_page,
+      </if>
+      <if test="sortNum != null">
+        sort_num,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="showStartTime != null">
+        show_start_time,
+      </if>
+      <if test="showEndTime != null">
+        show_end_time,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin,
+      </if>
+      <if test="updateAdmin != null">
+        update_admin,
+      </if>
+      <if test="del != null">
+        del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null">
+        #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="publishPlatform != null">
+        #{publishPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="androidMinVersion != null">
+        #{androidMinVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="androidMaxVersion != null">
+        #{androidMaxVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="iosMinVersion != null">
+        #{iosMinVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="iosMaxVersion != null">
+        #{iosMaxVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="pos != null">
+        #{pos,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpType != null">
+        #{jumpType,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpH5Url != null">
+        #{jumpH5Url,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpNativePage != null">
+        #{jumpNativePage,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null">
+        #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="showStartTime != null">
+        #{showStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="showEndTime != null">
+        #{showEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        #{del,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.luxuryadmin.entity.op.OpBanner">
+    update op_banner
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null">
+        img_url = #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="publishPlatform != null">
+        publish_platform = #{publishPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="androidMinVersion != null">
+        android_min_version = #{androidMinVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="androidMaxVersion != null">
+        android_max_version = #{androidMaxVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="iosMinVersion != null">
+        ios_min_version = #{iosMinVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="iosMaxVersion != null">
+        ios_max_version = #{iosMaxVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="pos != null">
+        pos = #{pos,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpType != null">
+        jump_type = #{jumpType,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpH5Url != null">
+        jump_h5_url = #{jumpH5Url,jdbcType=VARCHAR},
+      </if>
+      <if test="jumpNativePage != null">
+        jump_native_page = #{jumpNativePage,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null">
+        sort_num = #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="showStartTime != null">
+        show_start_time = #{showStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="showEndTime != null">
+        show_end_time = #{showEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertAdmin != null">
+        insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="updateAdmin != null">
+        update_admin = #{updateAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="del != null">
+        del = #{del,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.luxuryadmin.entity.op.OpBanner">
+    update op_banner
+    set title = #{title,jdbcType=VARCHAR},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      publish_platform = #{publishPlatform,jdbcType=VARCHAR},
+      android_min_version = #{androidMinVersion,jdbcType=VARCHAR},
+      android_max_version = #{androidMaxVersion,jdbcType=VARCHAR},
+      ios_min_version = #{iosMinVersion,jdbcType=VARCHAR},
+      ios_max_version = #{iosMaxVersion,jdbcType=VARCHAR},
+      pos = #{pos,jdbcType=VARCHAR},
+      jump_type = #{jumpType,jdbcType=VARCHAR},
+      jump_h5_url = #{jumpH5Url,jdbcType=VARCHAR},
+      jump_native_page = #{jumpNativePage,jdbcType=VARCHAR},
+      sort_num = #{sortNum,jdbcType=INTEGER},
+      state = #{state,jdbcType=VARCHAR},
+      show_start_time = #{showStartTime,jdbcType=TIMESTAMP},
+      show_end_time = #{showEndTime,jdbcType=TIMESTAMP},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      insert_admin = #{insertAdmin,jdbcType=INTEGER},
+      update_admin = #{updateAdmin,jdbcType=INTEGER},
+      del = #{del,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

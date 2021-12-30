@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpUserPermissionRefMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpUserPermissionRef">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="fk_shp_user_id" jdbcType="INTEGER" property="fkShpUserId"/>
+        <result column="fk_shp_permission_id" jdbcType="INTEGER" property="fkShpPermissionId"/>
+        <result column="fk_shp_shop_id" jdbcType="INTEGER" property="fkShpShopId"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="del" jdbcType="CHAR" property="del"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, fk_shp_user_id, fk_shp_permission_id, fk_shp_shop_id, insert_time, update_time, 
+    insert_admin, update_admin, versions, del, remark
+    </sql>
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_role_permission_ref
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--获取用户对应的权限-->
+    <select id="listUserPermByShopIdAndUserId" resultType="com.luxuryadmin.vo.shp.VoUserPermission">
+        SELECT
+          id,
+          fk_shp_permission_id 'permId'
+        FROM
+          shp_user_permission_ref
+        where fk_shp_shop_id = #{shopId}
+          and fk_shp_user_id = #{userId}
+    </select>
+
+    <!--获取用户对应的细粒度权限-->
+    <select id="listUserPermission" resultType="java.lang.String">
+        SELECT
+          permission
+        FROM
+          shp_user_permission_ref uPerm
+          LEFT JOIN shp_permission perm
+            ON uPerm.`fk_shp_permission_id` = perm.`id`
+        WHERE uPerm.`fk_shp_user_id` = #{userId}
+          AND uPerm.`fk_shp_shop_id` = #{shopId}
+          AND perm.`permission` != ''
+          AND perm.`permission` IS NOT NULL
+    </select>
+
+
+    <!--获取所有细粒度权限,适用于经营者-->
+    <select id="listBossPermission" resultType="java.lang.String">
+        SELECT
+          permission
+        FROM
+          shp_permission perm
+        WHERE perm.`permission` != ''
+          AND perm.`permission` IS NOT NULL
+    </select>
+    <select id="listShopUserIdWithPermission" resultType="java.lang.Integer">
+        SELECT
+          fk_shp_user_id
+        FROM
+          shp_user_permission_ref
+        WHERE
+          fk_shp_shop_id = #{shopId}
+        AND
+          fk_shp_permission_id =
+          (
+          SELECT
+            id
+          FROM
+            shp_permission
+          WHERE
+            permission = #{permission}
+          )
+    </select>
+
+    <!--用in查询是否存在权限-->
+    <select id="existsShpUserPermissionRef" resultType="java.lang.Integer">
+        select count(id) from shp_user_permission_ref
+        where fk_shp_permission_id in (${queryPermIds})
+        AND fk_shp_shop_id = #{shopId}
+        AND fk_shp_user_id = #{userId}
+    </select>
+    <select id="countModulePermission" resultType="java.lang.Integer">
+        SELECT
+          COUNT(ref.id)
+        FROM
+          shp_user_permission_ref ref
+        WHERE ref.fk_shp_user_id = #{userId}
+          AND ref.fk_shp_shop_id = #{shopId}
+          AND ref.fk_shp_permission_id IN
+          (SELECT
+            per.id
+          FROM
+            shp_permission per
+          WHERE per.parent_id IN
+            (SELECT
+              subPer.id
+            FROM
+              shp_permission subPer
+            WHERE subPer.parent_id =
+              (SELECT
+                lastPer.id
+              FROM
+                shp_permission lastPer
+              WHERE NAME = #{moduleName})))
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_role_permission_ref
+    where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--清空用户对应的权限-->
+    <delete id="deleteUserPermRefByShopIdAndUserId">
+        DELETE
+        FROM
+          shp_user_permission_ref
+        WHERE fk_shp_shop_id = #{shopId}
+          AND fk_shp_user_id = #{userId}
+    </delete>
+
+    <!--删除用户相应的权限, 用户id用英文逗号拼接-->
+    <delete id="deleteUserPermissionByUserId">
+        delete from shp_user_permission_ref
+        where fk_shp_user_id in (${userIds})
+        and fk_shp_shop_id = #{shopId}
+    </delete>
+    <delete id="deleteShpUserPermissionRefByShopId">
+         delete from shp_user_permission_ref where fk_shp_shop_id = #{shopId}
+    </delete>
+
+    <!--批量添加用户对应的权限-->
+    <insert id="saveBatch" parameterType="com.luxuryadmin.entity.shp.ShpUserPermissionRef">
+        insert into shp_user_permission_ref
+        (fk_shp_user_id, fk_shp_permission_id,
+        fk_shp_shop_id, insert_time, insert_admin,
+        remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.fkShpUserId,jdbcType=INTEGER}, #{item.fkShpPermissionId,jdbcType=INTEGER},
+            #{item.fkShpShopId,jdbcType=INTEGER},
+            #{item.insertTime,jdbcType=TIMESTAMP},#{item.insertAdmin,jdbcType=INTEGER},
+            #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpRolePermissionRef" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into shp_role_permission_ref
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id,
+            </if>
+            <if test="fkShpPermissionId != null">
+                fk_shp_permission_id,
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="del != null">
+                del,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpUserId != null">
+                #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpPermissionId != null">
+                #{fkShpPermissionId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpRolePermissionRef">
+        update shp_role_permission_ref
+        <set>
+            <if test="fkShpUserId != null">
+                fk_shp_user_id = #{fkShpUserId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpPermissionId != null">
+                fk_shp_permission_id = #{fkShpPermissionId,jdbcType=INTEGER},
+            </if>
+            <if test="fkShpShopId != null">
+                fk_shp_shop_id = #{fkShpShopId,jdbcType=INTEGER},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="del != null">
+                del = #{del,jdbcType=CHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--变更经营者时,需要把新经营者之前的权限赋予给旧经营者;-->
+    <update id="changeUserPermission">
+        update shp_user_permission_ref
+        set fk_shp_user_id = #{oldUserId} , update_time = now()
+        where fk_shp_shop_id = #{shopId} and fk_shp_user_id = #{newUserId}
+    </update>
+</mapper>

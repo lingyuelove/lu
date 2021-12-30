@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luxuryadmin.mapper.shp.ShpPermIndexMapper">
+    <resultMap id="BaseResultMap" type="com.luxuryadmin.entity.shp.ShpPermIndex">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="http_url" jdbcType="VARCHAR" property="httpUrl"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="permission" jdbcType="VARCHAR" property="permission"/>
+        <result column="new_state" jdbcType="VARCHAR" property="newState"/>
+        <result column="cost_state" jdbcType="VARCHAR" property="costState"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="display" jdbcType="INTEGER" property="display"/>
+        <result column="is_private" jdbcType="VARCHAR" property="isPrivate"/>
+        <result column="icon_url" jdbcType="VARCHAR" property="iconUrl"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="color" jdbcType="VARCHAR" property="color"/>
+        <result column="ios_version" jdbcType="INTEGER" property="iosVersion"/>
+        <result column="android_version" jdbcType="INTEGER" property="androidVersion"/>
+        <result column="only_shop_id" jdbcType="VARCHAR" property="onlyShopId"/>
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="insert_admin" jdbcType="INTEGER" property="insertAdmin"/>
+        <result column="update_admin" jdbcType="INTEGER" property="updateAdmin"/>
+        <result column="versions" jdbcType="INTEGER" property="versions"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, parent_id, name, code, http_url, url, permission, new_state, cost_state, type, 
+    display, is_private, icon_url, sort, color, ios_version, android_version, only_shop_id,
+    insert_time, update_time, insert_admin, update_admin, versions, remark
+  </sql>
+
+    <select id="getObjectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_perm_index
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--同一个父级下是否已经存在该权限;-->
+    <select id="existsShpPermission" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM shp_perm_index perm
+        WHERE
+        perm.`parent_id` = #{parentId}
+        AND perm.`name` = #{name}
+    </select>
+
+    <!--code是否存在,h5除外;-->
+    <select id="existsShpPermissionCode" resultType="java.lang.Integer">
+        SELECT COUNT(perm.`id`) FROM shp_perm_index perm
+        WHERE
+        perm.`code` = #{code}
+        and perm.`code` != 'h5'
+    </select>
+
+    <!--获取店铺模块的所有权限-所有店铺通用 -1:对所有人开放;不需要配置权限;-9:权限列表里面,只对经营者展示;-->
+    <select id="listAppShpPermission" resultType="com.luxuryadmin.vo.shp.VoShpPermIndex">
+        select
+        id, parent_id 'parentId', name, code, http_url 'httpUrl', url, permission,
+        new_state 'newState', cost_state 'costState', type, display, is_private 'isPrivate',
+        icon_url 'iconUrl', sort, color, ios_version 'iosVersion',
+        android_version 'androidVersion', only_shop_id 'onlyShopId', remark
+        from shp_perm_index
+        <where>
+            <if test="showOnApp != null and showOnApp !=''">
+                only_shop_id not in (-1,-2)
+            </if>
+            <choose>
+                <when test="platform == 'ios'">
+                    and #{appVersion} >= ios_version
+                </when>
+                <when test="platform == 'android'">
+                    and #{appVersion} >= android_version
+                </when>
+            </choose>
+        </where>
+        ORDER BY type asc,sort ASC,parentId asc,id ASC
+    </select>
+
+    <!--获取店铺模块的所有权限id-所有店铺通用-->
+    <select id="listAppShpPermissionId" resultType="java.lang.Integer">
+        select id from shp_perm_index ORDER BY type asc,sort ASC,parent_id asc,id ASC
+    </select>
+
+    <!--shopId=10001,roleId=10064的模板, v2.2改版之后将弃用;-->
+    <select id="listAppEmployeeShpPermissionId" resultType="java.lang.Integer">
+        SELECT fk_shp_permission_id 'permId' FROM shp_role_permission_ref WHERE fk_shp_role_id = 10064
+    </select>
+
+    <!--shopId=10001,roleId=10065的模板, v2.2改版之后将弃用;-->
+    <select id="listAppAgencyShpPermissionId" resultType="java.lang.Integer">
+        SELECT fk_shp_permission_id 'permId' FROM shp_role_permission_ref WHERE fk_shp_role_id = 10065
+    </select>
+
+    <!--in查询权限-->
+    <select id="listShpPermissionByIds" resultType="com.luxuryadmin.vo.shp.VoUsualFunction">
+        select
+          perm.id 'permId',
+          perm.name,
+          perm.code,
+          perm.icon_url 'iconUrl',
+          parPerm.`id` 'parentId',
+          parPerm.`name` 'parentName',
+          parPerm.`code` 'parentCode'
+        from
+          shp_perm_index perm
+          left join shp_perm_index parPerm
+            on perm.`parent_id` = parPerm.`id`
+        where perm.`id` in (${ids})
+    </select>
+
+    <!--是否已存在权限标识符-->
+    <select id="existsPerms" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM shp_perm_index WHERE permission = #{permission}
+    </select>
+
+    <!--根据permission获取实体-->
+    <select id="getShpPermissionByPermission" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from shp_perm_index
+        where permission = #{permission}
+    </select>
+
+    <!--获取权限列表里面可跳转的功能模块-->
+    <select id="listAppFunction" resultType="com.luxuryadmin.vo.shp.VoShpPermIndex">
+        SELECT
+          id,
+          NAME,
+          CODE
+        FROM
+          shp_perm_index
+        WHERE CODE != ''
+        ORDER BY CONVERT(NAME USING gbk) ASC
+    </select>
+
+
+    <!--获取员工旧权限对应的新权限-->
+    <select id="listOldUserPermTurnNewPerm" resultType="com.luxuryadmin.entity.shp.ShpPermUserRef">
+        SELECT
+          ${shopId} 'fkShpShopId',
+          ${userId} 'fkShpUserId',
+          now() 'insertTime',
+          -9 'insertAdmin',
+          id 'fkShpPermIndexId'
+        FROM
+          shp_perm_index
+        WHERE permission IN (${oldPerms})
+    </select>
+
+    <!--获取模板的旧权限-->
+    <select id="listOldPermTplTurnNewPermTpl" resultType="com.luxuryadmin.entity.shp.ShpPermTpl">
+        SELECT
+          ${shopId} 'fkShpShopId',
+          ${userTypeId} 'fkShpUserTypeId',
+          id 'fkShpPermIndexId',
+          now() 'insertTime',
+          -9 'insertAdmin'
+        FROM
+          shp_perm_index
+        WHERE permission IN (${oldPerms})
+    </select>
+
+    <!--根据权限编码获取权限id-->
+    <select id="listPermIndexByPermission" resultType="java.lang.String">
+        SELECT id FROM shp_perm_index WHERE permission IN (${perms})
+    </select>
+
+    <!--根据权限id获取权限授权码-->
+    <select id="listPermCodeByPermIds" resultType="java.lang.String">
+        SELECT permission FROM shp_perm_index WHERE id IN (${ids})
+    </select>
+
+    <delete id="deleteObject" parameterType="java.lang.Integer">
+    delete from shp_perm_index
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <!-- 根据id删除权限，删除多个 -->
+    <delete id="deleteObjects" parameterType="java.lang.String">
+    delete from shp_perm_index
+    where id in (${ids})
+  </delete>
+    <insert id="saveObject" parameterType="com.luxuryadmin.entity.shp.ShpPermIndex" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into shp_perm_index
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="httpUrl != null">
+                http_url,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="permission != null">
+                permission,
+            </if>
+            <if test="newState != null">
+                new_state,
+            </if>
+            <if test="costState != null">
+                cost_state,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="display != null">
+                display,
+            </if>
+            <if test="isPrivate != null">
+                is_private,
+            </if>
+            <if test="iconUrl != null">
+                icon_url,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="color != null">
+                color,
+            </if>
+            <if test="iosVersion != null">
+                ios_version,
+            </if>
+            <if test="androidVersion != null">
+                android_version,
+            </if>
+            <if test="onlyShopId != null">
+                only_shop_id,
+            </if>
+            <if test="insertTime != null">
+                insert_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin,
+            </if>
+            <if test="updateAdmin != null">
+                update_admin,
+            </if>
+            <if test="versions != null">
+                versions,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="httpUrl != null">
+                #{httpUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="newState != null">
+                #{newState,jdbcType=VARCHAR},
+            </if>
+            <if test="costState != null">
+                #{costState,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="display != null">
+                #{display,jdbcType=INTEGER},
+            </if>
+            <if test="isPrivate != null">
+                #{isPrivate,jdbcType=VARCHAR},
+            </if>
+            <if test="iconUrl != null">
+                #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="color != null">
+                #{color,jdbcType=VARCHAR},
+            </if>
+            <if test="iosVersion != null">
+                #{iosVersion,jdbcType=INTEGER},
+            </if>
+            <if test="androidVersion != null">
+                #{androidVersion,jdbcType=INTEGER},
+            </if>
+            <if test="onlyShopId != null">
+                #{onlyShopId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateObject" parameterType="com.luxuryadmin.entity.shp.ShpPermIndex">
+        update shp_perm_index
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="httpUrl != null">
+                http_url = #{httpUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                permission = #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="newState != null">
+                new_state = #{newState,jdbcType=VARCHAR},
+            </if>
+            <if test="costState != null">
+                cost_state = #{costState,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="display != null">
+                display = #{display,jdbcType=INTEGER},
+            </if>
+            <if test="isPrivate != null">
+                is_private = #{isPrivate,jdbcType=VARCHAR},
+            </if>
+            <if test="iconUrl != null">
+                icon_url = #{iconUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="color != null">
+                color = #{color,jdbcType=VARCHAR},
+            </if>
+            <if test="iosVersion != null">
+                ios_version = #{iosVersion,jdbcType=INTEGER},
+            </if>
+            <if test="androidVersion != null">
+                android_version = #{androidVersion,jdbcType=INTEGER},
+            </if>
+            <if test="onlyShopId != null">
+                only_shop_id = #{onlyShopId,jdbcType=VARCHAR},
+            </if>
+            <if test="insertTime != null">
+                insert_time = #{insertTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="insertAdmin != null">
+                insert_admin = #{insertAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="versions != null">
+                versions = #{versions,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
